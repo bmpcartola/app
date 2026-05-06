@@ -61,6 +61,12 @@ function getLeaderImage(team) {
     return encodeURI(`images/lider/${name}.png`);
 }
 
+function getGarconImage(team) {
+    if (!team) return '';
+    const name = (team.nome || '').trim();
+    return encodeURI(`images/garcons/${name}.png`);
+}
+
 function getSerieData() {
     if (!bmpData) return [];
     return bmpState.activeSerie === "A" ? bmpData.serieA : bmpData.serieB;
@@ -222,16 +228,16 @@ function renderContent() {
 function renderPodium(ranking) {
     const leader = ranking[0];
     return `
-        <div class="relative p-10 bg-white rounded-[40px] border border-slate-100 overflow-hidden group shadow-sm">
+        <div class="relative p-6 md:p-8 bg-white rounded-[40px] border border-slate-100 overflow-hidden group shadow-sm">
             <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-50"></div>
             <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all duration-700"></div>
             
             <!-- Golden Crown -->
-            <div class="absolute top-0 right-0 p-8">
+            <div class="absolute top-0 right-0 p-6 md:p-8">
                 <i data-lucide="crown" class="w-16 h-16 text-yellow-500/10 group-hover:text-yellow-500 group-hover:scale-110 transition-all drop-shadow-[0_0_15px_rgba(234,179,8,0.3)]"></i>
             </div>
 
-            <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-4 md:gap-8">
                 <div class="relative cursor-pointer" onclick="bmpSelectTeam('${leader.nome}')">
                     <div class="absolute -inset-4 bg-orange-400/10 rounded-full blur-2xl animate-pulse"></div>
                     <img src="${getLeaderImage(leader)}" class="w-48 h-48 md:w-64 md:h-64 object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(255,99,33,0.1)] transition-transform duration-500 hover:scale-110" onerror="this.onerror=null; this.style.opacity='0.5';">
@@ -239,7 +245,7 @@ function renderPodium(ranking) {
                 
                 <div class="text-center md:text-left">
                     <h2 class="text-6xl md:text-8xl font-jersey text-slate-800 mb-0 tracking-tight leading-none">${leader.nome}</h2>
-                    <div class="flex items-baseline justify-center md:justify-start gap-2 mt-2">
+                    <div class="flex items-baseline justify-center md:justify-start gap-2 -mt-2">
                         <span class="text-4xl font-mono font-black text-orange-500 font-bold">${leader.pontos.toFixed(2)}</span>
                     </div>
                 </div>
@@ -291,12 +297,9 @@ function renderField(ranking) {
             ${top10.map((team, i) => {
                 let garcomImg = '';
                 if (i === 9 && lastTeam) {
-                    garcomImg = `
-                        <img class="absolute h-[150px] md:h-[220px] w-auto object-contain pointer-events-none opacity-40 z-20" 
-                             src="GARCONS/${encodeURIComponent(lastTeam.nome)}.png" 
-                             style="top: 50%; left: -160%; transform: translateY(-50%); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));" 
-                             onerror="this.style.display='none'">
-                    `;
+                    garcomImg = `<div class="absolute -top-4 -left-12 w-16 h-16 z-30 transition-transform group-hover:rotate-12 pointer-events-none">
+                                    <img src="${getGarconImage(lastTeam)}" class="w-full h-full object-contain drop-shadow-lg" onerror="this.onerror=null; this.style.display='none';">
+                                </div>`;
                 }
                 
                 let numberTextColor = "text-white";
