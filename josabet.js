@@ -297,7 +297,7 @@ function renderField(ranking) {
             ${top10.map((team, i) => {
                 let garcomImg = '';
                 if (i === 9 && lastTeam) {
-                    garcomImg = `<div class="absolute -top-4 -left-12 w-16 h-16 z-30 transition-transform group-hover:rotate-12 pointer-events-none">
+                    garcomImg = `<div class="absolute bottom-0 -left-14 w-20 h-20 md:w-32 md:h-32 z-30 transition-transform group-hover:-rotate-6 pointer-events-none">
                                     <img src="${getGarconImage(lastTeam)}" class="w-full h-full object-contain drop-shadow-lg" onerror="this.onerror=null; this.style.display='none';">
                                 </div>`;
                 }
