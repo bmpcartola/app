@@ -357,7 +357,7 @@ function renderTable(ranking) {
 
                             return `
                             <tr class="group hover:bg-orange-50 transition-colors cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
-                                <td class="px-4 md:px-8 py-4">
+                                <td class="px-4 md:px-8 py-2 md:py-3">
                                     <div class="flex items-center gap-2 md:gap-4">
                                         <div class="w-1 h-8 rounded-full ${statusColor} opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0"></div>
                                         <span class="text-lg md:text-2xl font-jogos text-slate-300">
@@ -365,20 +365,20 @@ function renderTable(ranking) {
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-4 md:px-8 py-4">
+                                <td class="px-4 md:px-8 py-2 md:py-3">
                                     <div class="flex items-center gap-2 md:gap-4">
-                                        <div class="w-8 h-8 md:w-12 md:h-12 bg-slate-50 rounded-xl p-1 md:p-2 border border-slate-100 group-hover:border-orange-200 transition-all flex-shrink-0">
+                                        <div class="w-10 h-10 md:w-14 md:h-14 bg-slate-50 rounded-xl p-1 md:p-2 border border-slate-100 group-hover:border-orange-200 transition-all flex-shrink-0">
                                             <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
                                         </div>
-                                        <span class="font-jogos text-[10px] md:text-sm text-slate-600 group-hover:text-slate-900 transition-colors truncate max-w-[80px] sm:max-w-[150px] md:max-w-none">${team.nome}</span>
+                                        <span class="font-jogos text-[11px] md:text-base text-slate-600 group-hover:text-slate-900 transition-colors truncate max-w-[80px] sm:max-w-[150px] md:max-w-none">${team.nome}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 md:px-8 py-4 text-right">
+                                <td class="px-4 md:px-8 py-2 md:py-3 text-right">
                                     <span class="font-mono text-[10px] md:text-xs ${team.roundScore >= 0 ? 'text-orange-500' : 'text-red-500'} font-bold">
                                         ${team.roundScore > 0 ? '+' : ''}${team.roundScore.toFixed(2)}
                                     </span>
                                 </td>
-                                <td class="px-4 md:px-8 py-4 text-right">
+                                <td class="px-4 md:px-8 py-2 md:py-3 text-right">
                                     <div class="flex flex-col items-end">
                                         <span class="text-base md:text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
                                             ${team.pontos.toFixed(2)}
@@ -544,31 +544,31 @@ function renderTeamDetail(container) {
             </button>
 
             <!-- Hero Profiler -->
-            <div class="bg-white rounded-[50px] border border-slate-100 p-10 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden shadow-sm">
+            <div class="bg-white rounded-[50px] border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-10 relative overflow-hidden shadow-sm">
                 <div class="absolute -top-20 -right-20 opacity-[0.05]">
                     <img src="${getTeamEscudo(team)}" class="w-96 h-96 rotate-12" onerror="this.style.display='none'">
                 </div>
 
-                <div class="w-40 h-40 md:w-56 md:h-56 bg-slate-50 rounded-[40px] flex items-center justify-center p-6 relative z-10 border border-slate-100">
+                <div class="w-32 h-32 md:w-44 md:h-44 bg-slate-50 rounded-[40px] flex items-center justify-center p-6 relative z-10 border border-slate-100">
                     <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)]" onerror="this.onerror=null; this.style.opacity='0.5';">
                 </div>
                 
-                <div class="text-center md:text-left space-y-6 relative z-10 flex-1">
+                <div class="text-center md:text-left space-y-4 relative z-10 flex-1">
                     <div>
-                        <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                        <div class="flex items-center justify-center md:justify-start gap-3 mb-1">
                             <span class="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black rounded-lg font-jogos uppercase">SÉRIE ${bmpState.activeSerie}</span>
                         </div>
-                        <h2 class="text-6xl md:text-7xl font-jogos text-slate-800 leading-none tracking-tight">${team.nome}</h2>
+                        <h2 class="text-5xl md:text-6xl font-jersey text-slate-800 leading-none tracking-tight">${team.nome}</h2>
                     </div>
                     
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
-                        <div class="bg-slate-50 px-8 py-4 rounded-3xl border border-slate-100">
+                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto md:mx-0">
+                        <div class="bg-slate-50 px-4 py-3 md:px-6 md:py-4 rounded-3xl border border-slate-100">
                             <p class="text-[9px] text-slate-400 font-black font-jogos tracking-widest mb-1">PONTUAÇÃO GERAL</p>
-                            <p class="text-3xl font-mono font-black text-slate-800 leading-none">${totalPoints.toFixed(2)}</p>
+                            <p class="text-2xl md:text-3xl font-mono font-black text-slate-800 leading-none">${totalPoints.toFixed(2)}</p>
                         </div>
-                        <div class="bg-orange-50 px-8 py-4 rounded-3xl border border-orange-100">
+                        <div class="bg-orange-50 px-4 py-3 md:px-6 md:py-4 rounded-3xl border border-orange-100">
                             <p class="text-[9px] text-orange-600 font-black font-jogos tracking-widest mb-1 uppercase">RODADA ATUAL</p>
-                            <p class="text-3xl font-mono font-black text-orange-600 leading-none">${roundScore.toFixed(2)}</p>
+                            <p class="text-2xl md:text-3xl font-mono font-black text-orange-600 leading-none">${roundScore.toFixed(2)}</p>
                         </div>
                     </div>
                 </div>
@@ -582,10 +582,10 @@ function renderTeamDetail(container) {
                         <h3 class="text-xs font-black font-jogos tracking-[0.2em] text-slate-800 uppercase">ESCALAÇÃO - RDD${bmpState.selectedRound} - ${currentRoundData.formacao || '---'}</h3>
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="space-y-1">
                         ${currentRoundData.jogadores && currentRoundData.jogadores.length > 0 ? 
                             currentRoundData.jogadores.map(p => `
-                                <div class="flex items-center justify-between p-4 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all group">
+                                <div class="flex items-center justify-between p-2 md:p-3 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all group">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-[10px] font-black font-jogos text-slate-400 group-hover:text-orange-500 transition-colors">
                                             ${p.pos}
