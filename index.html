@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Cartola BMP</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6321">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TAÇA BMP">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -127,24 +135,7 @@
 
     <!-- Sidebar Menu -->
     <div id="sidebar-menu" class="fixed left-[-100px] top-1/2 -translate-y-1/2 z-[55] w-20 bg-orange-500/[0.15] backdrop-blur-xl border border-orange-500/10 rounded-r-3xl shadow-2xl py-8 transition-all duration-500 ease-in-out flex flex-col items-center gap-8">
-        <div class="mb-4"></div>
-
-        <ul class="flex flex-col gap-6">
-            <li>
-                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
-                    <i data-lucide="layout-list" class="w-6 h-6 text-orange-600"></i>
-                </button>
-            </li>
-            <li>
-                <button onclick="toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
-                    <i data-lucide="help-circle" class="w-6 h-6 text-orange-600"></i>
-                </button>
-            </li>
-        </ul>
-        
-        <div class="mt-auto opacity-40">
-            <i data-lucide="trophy" class="w-4 h-4 text-orange-800"></i>
-        </div>
+        <!-- Handled dynamically by josabet.js -->
     </div>
 
     <!-- Scroll to Top Button -->
@@ -153,5 +144,12 @@
     </button>
 
     <script src="josabet.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
 </body>
 </html>
