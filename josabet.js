@@ -13,6 +13,29 @@ let bmpState = {
     viewMode: "campo" // "campo" or "tabela"
 };
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    renderApp(); 
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    renderApp();
+});
+
+async function installApp() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        deferredPrompt = null;
+    }
+    renderApp();
+}
+
 // ========== DATA FETCHING ==========
 
 async function fetchBmpData() {
@@ -163,8 +186,42 @@ window.addEventListener("scroll", () => {
 
 function renderApp() {
     renderHeaderControls();
+    renderSidebar();
     renderContent();
     if (typeof lucide !== "undefined") lucide.createIcons();
+}
+
+function renderSidebar() {
+    const sidebar = document.getElementById("sidebar-menu");
+    if (!sidebar) return;
+
+    sidebar.innerHTML = `
+        <div class="mb-4"></div>
+
+        <ul class="flex flex-col items-center gap-6">
+            ${deferredPrompt ? `
+                <li>
+                    <button onclick="installApp(); toggleSidebar(false);" class="p-3 rounded-2xl bg-orange-500 text-white hover:bg-orange-600 transition-all group shadow-lg shadow-orange-500/20" title="Instalar App">
+                        <i data-lucide="download" class="w-6 h-6"></i>
+                    </button>
+                </li>
+            ` : ''}
+            <li>
+                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
+                    <i data-lucide="layout-list" class="w-6 h-6 text-orange-600"></i>
+                </button>
+            </li>
+            <li>
+                <button onclick="toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
+                    <i data-lucide="help-circle" class="w-6 h-6 text-orange-600"></i>
+                </button>
+            </li>
+        </ul>
+        
+        <div class="mt-auto opacity-40">
+            <i data-lucide="trophy" class="w-4 h-4 text-orange-800"></i>
+        </div>
+    `;
 }
 
 function renderHeaderControls() {
@@ -175,7 +232,7 @@ function renderHeaderControls() {
     const rounds = Array.from({ length: maxRound }, (_, i) => i + 1).reverse();
 
     headerControls.innerHTML = `
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 md:gap-3">
             <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
                 <button onclick="bmpSetSerie('A')" class="px-4 py-1.5 rounded-lg text-[10px] font-jogos transition-all ${bmpState.activeSerie === 'A' ? 'bg-white shadow-sm text-orange-600' : 'text-slate-500'}">SÉRIE A</button>
                 <button onclick="bmpSetSerie('B')" class="px-4 py-1.5 rounded-lg text-[10px] font-jogos transition-all ${bmpState.activeSerie === 'B' ? 'bg-white shadow-sm text-orange-600' : 'text-slate-500'}">SÉRIE B</button>
@@ -186,6 +243,7 @@ function renderHeaderControls() {
             </select>
         </div>
     `;
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function renderContent() {
