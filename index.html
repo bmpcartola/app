@@ -28,7 +28,7 @@
         };
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Jersey+25&display=swap');
         
         @font-face {
             font-family: 'FontJogos';
@@ -36,6 +36,10 @@
             font-weight: normal;
             font-style: normal;
             font-display: swap;
+        }
+
+        .font-jersey {
+            font-family: 'Jersey 25', sans-serif;
         }
 
         body {
@@ -113,30 +117,33 @@
         </div>
     </main>
 
+    <!-- Sidebar Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 z-[50] bg-black/5 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500"></div>
+
     <!-- Sidebar Toggle -->
-    <button id="sidebar-toggle" onclick="toggleSidebar()" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/80 backdrop-blur-md border border-slate-100 p-2 py-6 rounded-r-2xl shadow-xl hover:bg-white transition-all group">
+    <button id="sidebar-toggle" onclick="toggleSidebar(true)" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/80 backdrop-blur-md border border-slate-100 p-2 py-6 rounded-r-2xl shadow-xl hover:bg-white transition-all group">
         <i data-lucide="chevron-right" id="sidebar-icon" class="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
     </button>
 
     <!-- Sidebar Menu -->
-    <div id="sidebar-menu" class="fixed left-[-280px] top-1/2 -translate-y-1/2 z-[55] w-64 bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 transition-all duration-500 ease-in-out">
-        <h3 class="font-jogos text-xs tracking-widest text-orange-500 mb-6 border-b border-orange-100 pb-2">MENU PRINCIPAL</h3>
-        <ul class="space-y-4">
+    <div id="sidebar-menu" class="fixed left-[-100px] top-1/2 -translate-y-1/2 z-[55] w-20 bg-orange-500/[0.15] backdrop-blur-xl border border-orange-500/10 rounded-r-3xl shadow-2xl py-8 transition-all duration-500 ease-in-out flex flex-col items-center gap-8">
+        <div class="mb-4"></div>
+
+        <ul class="flex flex-col gap-6">
             <li>
-                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-orange-50 transition-colors group">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-slate-400 group-hover:text-orange-500"></i>
-                    <span class="font-jogos text-[10px] text-slate-600 group-hover:text-orange-600">JOSA.BET</span>
+                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
+                    <i data-lucide="layout-list" class="w-6 h-6 text-orange-600"></i>
                 </button>
             </li>
             <li>
-                <button onclick="bmpReload(); toggleSidebar(false);" class="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-orange-50 transition-colors group">
-                    <i data-lucide="refresh-cw" class="w-5 h-5 text-slate-400 group-hover:text-orange-500"></i>
-                    <span class="font-jogos text-[10px] text-slate-600 group-hover:text-orange-600">ATUALIZAR</span>
+                <button onclick="toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
+                    <i data-lucide="help-circle" class="w-6 h-6 text-orange-600"></i>
                 </button>
             </li>
         </ul>
-        <div class="mt-8 pt-6 border-t border-slate-100">
-            <p class="text-[8px] font-mono text-slate-400 text-center uppercase tracking-widest">BMP Cartola © 2026</p>
+        
+        <div class="mt-auto opacity-40">
+            <i data-lucide="trophy" class="w-4 h-4 text-orange-800"></i>
         </div>
     </div>
 
