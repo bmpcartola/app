@@ -1,10 +1,9 @@
 /* ===================================================================
-   PROVÁVEIS ESCALAÇÕES 
+   PROVÁVEIS ESCALAÇÕES – 
    =================================================================== */
 
 const PROXY_URL = 'https://proxy-f5nr.onrender.com';
 
-// ESTADO GLOBAL
 let provavelState = {
     partidasData: null,
     lineupsData: null,
@@ -13,7 +12,6 @@ let provavelState = {
     error: null
 };
 
-// MAPEAMENTO DE SLUGS PARA IDs DOS TIMES
 const SLUG_TO_ID_MAP = {
     corinthians_v2: 264, palmeiras_v2: 275, flamengo_v2: 262, vasco_v2: 267,
     'atletico-mg_v2': 282, cruzeiro_v2: 283, gremio_v2: 284, internacional_v2: 285,
@@ -76,7 +74,6 @@ function getNomeArquivoJogador(id, playerInfo) {
     return '';
 }
 
-// RENDERIZA JOGADORES NO CAMPO
 function renderFieldPlayers(lineup, teamId) {
     if (!lineup || !lineup.titulares) return '';
     return lineup.titulares.filter(p => p.slot !== 'TEC').map(p => {
@@ -123,7 +120,6 @@ function renderMiniField(matchIdx, teamId) {
     `;
 }
 
-// CORREÇÃO: POSIÇÃO DO TIME AO LADO DO ESCUDO (ESTILO ORIGINAL)
 function renderLineupCards() {
     if (!provavelState.partidasData?.partidas) return '';
     return `
@@ -134,7 +130,6 @@ function renderLineupCards() {
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
                     <div class="flex items-center justify-between mb-1.5 gap-1 text-center">
-                        <!-- TIME DA CASA (POSIÇÃO AO LADO DO ESCUDO) -->
                         <div class="flex items-center gap-0.5 flex-1 justify-center">
                             <div class="flex flex-col items-center">
                                 ${renderDots(match.aproveitamento_mandante)}
@@ -147,9 +142,7 @@ function renderLineupCards() {
                                 <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase leading-tight">${casa?.nome || 'Casa'}</p>
                             </div>
                         </div>
-                        <!-- VS -->
                         <div class="flex flex-col items-center"><span class="text-slate-200 font-black font-jogos italic text-xs md:text-lg">VS</span></div>
-                        <!-- TIME VISITANTE (POSIÇÃO AO LADO DO ESCUDO) -->
                         <div class="flex items-center gap-0.5 flex-1 justify-center">
                             <div class="flex flex-col items-center">
                                 ${renderDots(match.aproveitamento_visitante)}
@@ -214,7 +207,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
 };
 
 // ======================== MODAL COMPLETO ========================
-window.fecharModal = function() {
+window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
 };
@@ -283,11 +276,11 @@ window.abrirModalJogador = function(jogadorId, timeId) {
             </div>
         `;
     }).join('');
-    window.fecharModal();
+    window.fecharModalJogador();
     const modalHtml = `
-        <div id="modal-jogador-scout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) fecharModal()">
+        <div id="modal-jogador-scout" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) window.fecharModalJogador()">
             <div class="relative w-full max-w-md mx-3 bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
-                <button onclick="fecharModal()" class="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center text-white">
+                <button onclick="window.fecharModalJogador()" class="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
                 <div class="bg-gradient-to-r from-orange-50 to-white p-4 border-b border-orange-100">
@@ -337,71 +330,7 @@ window.abrirModalJogador = function(jogadorId, timeId) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 };
 
-// ======================== MENU LATERAL FLUTUANTE ========================
-function initSidebar() {
-    const sidebar = document.getElementById('sidebar-menu');
-    if (!sidebar) return;
-    sidebar.innerHTML = `
-        <div class="flex flex-col items-center justify-between h-full py-12">
-            <button onclick="window.renderJogos()" class="w-12 h-12 rounded-full bg-white shadow-md border border-slate-200 flex items-center justify-center hover:bg-orange-50 transition-all group">
-                <img src="images/ico_jogos.png" class="w-6 h-6 group-hover:scale-110 transition-transform">
-            </button>
-            <button onclick="window.renderBMP()" class="w-12 h-12 rounded-full bg-white shadow-md border border-slate-200 flex items-center justify-center hover:bg-orange-50 transition-all group">
-                <img src="images/logo/CARTOLA.png" class="w-6 h-6 group-hover:scale-110 transition-transform">
-            </button>
-            <button onclick="window.renderProvaveis()" class="w-12 h-12 rounded-full bg-white shadow-md border border-slate-200 flex items-center justify-center hover:bg-orange-50 transition-all group">
-                <img src="images/ico_provaveis.png" class="w-6 h-6 group-hover:scale-110 transition-transform">
-            </button>
-        </div>
-    `;
-}
-window.toggleSidebar = function(open) {
-    const menu = document.getElementById('sidebar-menu');
-    const backdrop = document.getElementById('sidebar-backdrop');
-    const icon = document.getElementById('sidebar-icon');
-    if (!menu) return;
-    if (open) {
-        menu.style.left = '0px';
-        if (backdrop) {
-            backdrop.style.opacity = '1';
-            backdrop.style.pointerEvents = 'auto';
-        }
-        if (icon) icon.style.transform = 'rotate(180deg)';
-    } else {
-        menu.style.left = '-160px';
-        if (backdrop) {
-            backdrop.style.opacity = '0';
-            backdrop.style.pointerEvents = 'none';
-        }
-        if (icon) icon.style.transform = 'rotate(0deg)';
-    }
-};
-window.renderJogos = function() {
-    console.log("JOGOS - Função placeholder");
-    alert("Função JOGOS será implementada em breve.");
-};
-window.renderBMP = function() {
-    console.log("BMP - Função placeholder");
-    alert("Função BMP será implementada em breve.");
-};
-
-// ======================== BOTÃO SCROLL TO TOP ========================
-function initScrollToTop() {
-    const btn = document.getElementById('scroll-to-top');
-    if (!btn) return;
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-            btn.classList.remove('opacity-0', 'pointer-events-none');
-            btn.classList.add('opacity-100', 'pointer-events-auto');
-        } else {
-            btn.classList.add('opacity-0', 'pointer-events-none');
-            btn.classList.remove('opacity-100', 'pointer-events-auto');
-        }
-    });
-    btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// ======================== FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO ========================
+// ======================== FUNÇÃO PRINCIPAL (CHAMADA PELO MENU) ========================
 window.renderProvaveis = async function() {
     const main = document.getElementById('main-content');
     if (!main) return;
@@ -416,28 +345,7 @@ window.renderProvaveis = async function() {
     `;
     await fetchProvaveisData();
     if (provavelState.error) {
-        main.innerHTML = `
-            <div class="max-w-xl mx-auto py-32 text-center space-y-8 animate-in zoom-in duration-700">
-                <div class="relative inline-block">
-                    <div class="absolute -inset-4 bg-red-500/10 rounded-full blur-2xl animate-pulse"></div>
-                    <div class="relative p-10 bg-white border border-red-100 rounded-[50px] shadow-2xl">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <h2 class="text-3xl font-black font-jogos text-slate-800 uppercase tracking-tighter italic">Erro de Sincronia</h2>
-                    <p class="text-slate-400 font-mono text-[10px] uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed">${provavelState.error}</p>
-                    <p class="text-xs text-slate-300">Verifique se o proxy está rodando em: <br><span class="font-mono text-orange-500">${PROXY_URL}</span></p>
-                </div>
-                <button onclick="window.renderProvaveis()" class="group relative px-12 py-5 bg-slate-900 rounded-3xl font-black font-jogos text-[10px] tracking-[0.3em] text-white shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase">
-                    <span class="relative z-10">Tentar Novamente</span>
-                    <div class="absolute inset-0 bg-orange-600 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </button>
-            </div>
-        `;
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
         return;
     }
     const rodada = provavelState.partidasData.rodada_id || '';
@@ -455,11 +363,4 @@ window.renderProvaveis = async function() {
     console.log("✅ RENDERIZAÇÃO CONCLUÍDA COM SUCESSO");
 };
 
-// ======================== INICIALIZAÇÃO ========================
-document.addEventListener('DOMContentLoaded', () => {
-    initSidebar();
-    initScrollToTop();
-    window.renderProvaveis();
-});
-
-console.log("✅ PROVAVEIS.JS CARREGADO – VERSÃO COMPLETA COM MENU E SCROLL TOP");
+console.log("✅ PROVAVEIS.JS CARREGADO – AGUARDANDO CHAMADA DO MENU");
