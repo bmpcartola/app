@@ -1,0 +1,27 @@
+{
+  "name": "TAÇA BMP 2026",
+  "short_name": "TAÇA BMP",
+  "description": "CARTOLA BMP - TAÇA BMP 2026",
+  "start_url": ".",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#FF6321",
+  "icons": [
+    {
+      "src": "images/logo/CARTOLA.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo/CARTOLA.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "games"],
+  "lang": "pt-BR"
+}
