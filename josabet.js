@@ -1,6 +1,5 @@
 /* ============================================================
-   script.js — Dashboard Cartola BMP 2026
-   Handles data fetching, ranking, and UI rendering.
+   Cartola BMP 2026
    ============================================================ */
 
 const API_URL = "https://raw.githubusercontent.com/bmpcartola/app/main/bd/cartola.json";
