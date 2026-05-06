@@ -104,23 +104,74 @@ function renderDots(results) {
     `;
 }
 
+function getNomeArquivo(id, playerInfo) {
+    const nome = playerInfo?.apelido || playerInfo?.nome || '';
+    if (nome) {
+        return nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+    return '';
+}
+
+function renderFieldPlayers(lineup, teamId) {
+    if (!lineup || !lineup.titulares) return '';
+    
+    return lineup.titulares
+        .filter(p => p.slot !== 'TEC')
+        .map(p => {
+            const playerInfo = provavelState.mercadoData?.get(p.id);
+            const nome = playerInfo?.apelido || playerInfo?.nome || '...';
+            const nomeArquivo = getNomeArquivo(p.id, playerInfo);
+            const fotoLocal = nomeArquivo ? `images/jogadores/${p.id}_${nomeArquivo}.webp` : null;
+            const fotoProxy = playerInfo?.foto || '';
+            const isDuvida = p.sit === 'duvida';
+            
+            // coordinates from JSON (0-100)
+            const x = p.x; 
+            const y = p.y;
+
+            const onClickAttr = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
+
+            return `
+                <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform" 
+                     style="left: ${x}%; top: ${y}%; transform: translate(-50%, -50%); z-index: 10;"
+                     ${onClickAttr}>
+                    <div class="w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/95 p-0.5 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
+                        <img src="${fotoLocal}" 
+                             class="w-full h-full object-contain rounded-full" 
+                             onerror="this.onerror=null; this.src='${fotoProxy || getTeamShield(teamId)}'">
+                    </div>
+                    <div class="mt-0.5 bg-black/60 backdrop-blur-[1px] px-1 rounded-[2px] max-w-[42px] md:max-w-[60px] truncate border border-white/10">
+                        <p class="text-[4px] md:text-[6px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+}
+
 function renderMiniField(matchIdx, teamId) {
+    const slug = Object.keys(SLUG_TO_ID_MAP).find(key => SLUG_TO_ID_MAP[key] === teamId);
+    const lineup = slug ? provavelState.lineupsData?.teams?.[slug] : null;
+    
+    const playersHtml = lineup ? renderFieldPlayers(lineup, teamId) : `
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-[8px] font-black font-jogos text-white/20 uppercase tracking-[0.2em] -rotate-12">Escalação em breve</span>
+        </div>
+    `;
+
     return `
         <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20 group/field">
             <!-- Field Lines -->
-            <div class="absolute inset-4 border-2 border-white/20 pointer-events-none"></div>
-            <div class="absolute top-1/2 left-0 right-0 h-[2px] bg-white/10 -translate-y-1/2 pointer-events-none"></div>
-            <div class="absolute top-1/2 left-1/2 w-16 h-16 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div class="absolute inset-4 border-2 border-white/10 pointer-events-none opacity-40"></div>
+            <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2 pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 w-12 h-12 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-40"></div>
             
-            <!-- Team Shield - Larger and more visible -->
-            <div class="absolute top-3 left-3 w-12 h-12 opacity-60 drop-shadow-lg">
-                <img src="${getTeamShield(teamId)}" class="w-full h-full object-contain filter brightness-110">
+            <!-- Team Shield - More visible as requested -->
+            <div class="absolute top-3 left-3 w-12 h-12 md:w-20 md:h-20 opacity-40 drop-shadow-2xl pointer-events-none">
+                <img src="${getTeamShield(teamId)}" class="w-full h-full object-contain grayscale brightness-200">
             </div>
 
-            <!-- Content Area (Future Players) -->
-            <div class="absolute inset-0 flex items-center justify-center">
-                <span class="text-[8px] font-black font-jogos text-white/20 uppercase tracking-[0.2em] -rotate-12">Escalação em breve</span>
-            </div>
+            <!-- Content Area (Players) -->
+            ${playersHtml}
         </div>
     `;
 }
@@ -270,7 +321,7 @@ window.renderProvaveis = async function() {
             <!-- Header Section -->
             <div class="text-center space-y-1 mb-2">
                 <h2 class="font-jogos text-4xl md:text-6xl text-slate-900 leading-none tracking-tighter uppercase italic">QUEM <span class="text-orange-500">JOGA?</span></h2>
-                <p class="text-[9px] font-black text-slate-400 tracking-[0.4em] uppercase">Escalações Prováveis - Rodada ${provavelState.partidasData.rodada || ''}</p>
+                <p class="text-[9px] font-black text-slate-400 tracking-[0.4em] uppercase">ESCALAÇÕES PROVÁVEIS - ${provavelState.partidasData.rodada || ''}ª RODADA</p>
             </div>
 
             ${renderShieldsContainer()}
