@@ -55,6 +55,12 @@ function getTeamEscudo(team) {
     return encodeURI(`${GITHUB_BASE_ESCUDOS}${name}.png`);
 }
 
+function getLeaderImage(team) {
+    if (!team) return '';
+    const name = (team.nome || '').trim();
+    return encodeURI(`images/lider/${name}.png`);
+}
+
 function getSerieData() {
     if (!bmpData) return [];
     return bmpState.activeSerie === "A" ? bmpData.serieA : bmpData.serieB;
@@ -228,7 +234,7 @@ function renderPodium(ranking) {
             <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
                 <div class="relative cursor-pointer" onclick="bmpSelectTeam('${leader.nome}')">
                     <div class="absolute -inset-4 bg-orange-400/10 rounded-full blur-2xl animate-pulse"></div>
-                    <img src="${getTeamEscudo(leader)}" class="w-32 h-32 md:w-44 md:h-44 object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(255,99,33,0.1)] transition-transform duration-500 hover:scale-110" onerror="this.onerror=null; this.style.opacity='0.5';">
+                    <img src="${getLeaderImage(leader)}" class="w-32 h-32 md:w-44 md:h-44 object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(255,99,33,0.1)] transition-transform duration-500 hover:scale-110" onerror="this.onerror=null; this.style.opacity='0.5';">
                 </div>
                 
                 <div class="text-center md:text-left">
