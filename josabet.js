@@ -108,16 +108,31 @@ function getRanking(round) {
 
 function toggleSidebar(force) {
     const sidebar = document.getElementById("sidebar-menu");
-    const icon = document.getElementById("sidebar-icon");
-    const isOpen = sidebar.style.left === "20px";
+    const toggleBtn = document.getElementById("sidebar-toggle");
+    const backdrop = document.getElementById("sidebar-backdrop");
+    const isOpen = sidebar.style.left === "0px";
     const nextState = force !== undefined ? force : !isOpen;
 
     if (nextState) {
-        sidebar.style.left = "20px";
-        if (icon) icon.style.transform = "rotate(180deg)";
+        sidebar.style.left = "0px";
+        if (toggleBtn) {
+            toggleBtn.style.opacity = "0";
+            toggleBtn.style.pointerEvents = "none";
+        }
+        if (backdrop) {
+            backdrop.style.opacity = "1";
+            backdrop.style.pointerEvents = "auto";
+        }
     } else {
-        sidebar.style.left = "-280px";
-        if (icon) icon.style.transform = "rotate(0deg)";
+        sidebar.style.left = "-100px";
+        if (toggleBtn) {
+            toggleBtn.style.opacity = "1";
+            toggleBtn.style.pointerEvents = "auto";
+        }
+        if (backdrop) {
+            backdrop.style.opacity = "0";
+            backdrop.style.pointerEvents = "none";
+        }
     }
 }
 
@@ -183,12 +198,10 @@ function renderContent() {
             
             <div class="space-y-12">
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <h3 class="text-[10px] font-black font-jogos text-slate-400 mb-6 text-center tracking-[0.4em] uppercase">POSICIONAMENTO EM CAMPO</h3>
                     ${renderField(ranking)}
                 </div>
 
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-                    <h3 class="text-[10px] font-black font-jogos text-slate-400 mb-6 text-center tracking-[0.4em] uppercase">TABELA DE CLASSIFICAÇÃO</h3>
                     ${renderTable(ranking)}
                 </div>
 
@@ -278,15 +291,12 @@ function renderField(ranking) {
                     `;
                 }
                 
-                let highlightClass = "border-white/50";
-                let numberColor = "bg-slate-800 text-white";
+                let numberTextColor = "text-white";
 
                 if (bmpState.activeSerie === "A" && i >= 8) { // Last two (9th, 10th)
-                    highlightClass = "border-red-400 bg-red-500/20";
-                    numberColor = "bg-red-600 text-white";
+                    numberTextColor = "text-red-500";
                 } else if (bmpState.activeSerie === "B" && i < 2) { // First two (1st, 2nd)
-                    highlightClass = "border-emerald-400 bg-emerald-500/20";
-                    numberColor = "bg-emerald-600 text-white";
+                    numberTextColor = "text-emerald-400";
                 }
 
                 return `
@@ -294,16 +304,16 @@ function renderField(ranking) {
                     <div class="flex flex-col items-center cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
                         <div class="relative">
                             ${garcomImg}
-                            <div class="w-14 h-14 md:w-20 md:h-20 flex items-center justify-center p-2 bg-white/90 backdrop-blur-sm rounded-full border-2 ${highlightClass} transition-all duration-300 group-hover:scale-110 z-10 relative shadow-lg">
+                            <div class="w-20 h-20 md:w-28 md:h-28 flex items-center justify-center p-1 transition-all duration-300 group-hover:scale-110 z-10 relative drop-shadow-[0_15px_15px_rgba(0,0,0,0.6)]">
                                 <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
                             </div>
-                            <div class="absolute -top-1 -right-1 w-6 h-6 ${numberColor} rounded-full flex items-center justify-center border-2 border-white shadow-lg z-20 font-jogos text-[10px]">
+                            <div class="absolute -top-3 -right-3 z-30 font-jersey text-3xl md:text-5xl drop-shadow-[0_3px_6px_rgba(0,0,0,0.9)] ${numberTextColor}">
                                 ${i + 1}
                             </div>
                         </div>
-                        <div class="mt-2 text-center drop-shadow-md">
-                            <p class="text-[9px] md:text-[10px] text-white font-jogos leading-none tracking-widest">${team.nome}</p>
-                            <p class="text-[11px] md:text-sm text-yellow-300 font-mono font-bold leading-none mt-1">${team.pontos.toFixed(1)}</p>
+                        <div class="mt-0.5 text-center drop-shadow-md">
+                            <p class="text-[9px] md:text-[11px] text-white font-jogos leading-none tracking-widest">${team.nome}</p>
+                            <p class="text-[11px] md:text-base text-yellow-300 font-mono font-bold leading-none mt-0.5">${team.pontos.toFixed(1)}</p>
                         </div>
                     </div>
                 </div>
@@ -315,55 +325,57 @@ function renderField(ranking) {
 
 function renderTable(ranking) {
     return `
-        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 border-b border-slate-100">
-                        <th class="px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">POSIÇÃO</th>
-                        <th class="px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">TIME</th>
-                        <th class="px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">ROUND</th>
-                        <th class="px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">TOTAL PT</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-50">
-                    ${ranking.map((team, i) => {
-                        let statusColor = "bg-slate-200";
-                        if (bmpState.activeSerie === "A" && i >= ranking.length - 2) statusColor = "bg-red-400";
-                        if (bmpState.activeSerie === "B" && i < 2) statusColor = "bg-emerald-400";
-
-                        return `
-                        <tr class="group hover:bg-orange-50 transition-colors cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
-                            <td class="px-8 py-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-1 h-8 rounded-full ${statusColor} opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                    <span class="text-2xl font-jogos text-slate-300">
-                                        ${(i + 1).toString().padStart(2, '0')}
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="px-8 py-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-slate-50 rounded-xl p-2 border border-slate-100 group-hover:border-orange-200 transition-all">
-                                        <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
-                                    </div>
-                                    <span class="font-jogos text-sm text-slate-600 group-hover:text-slate-900 transition-colors">${team.nome}</span>
-                                </div>
-                            </td>
-                            <td class="px-8 py-4 text-right">
-                                <span class="font-mono text-xs ${team.roundScore >= 0 ? 'text-orange-500' : 'text-red-500'} font-bold">
-                                    ${team.roundScore > 0 ? '+' : ''}${team.roundScore.toFixed(2)}
-                                </span>
-                            </td>
-                            <td class="px-8 py-4 text-right">
-                                <span class="text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
-                                    ${team.pontos.toFixed(1)}
-                                </span>
-                            </td>
+        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden w-full">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">POS</th>
+                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">TIME</th>
+                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">RD</th>
+                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">TOTAL</th>
                         </tr>
-                        `;
-                    }).join("")}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        ${ranking.map((team, i) => {
+                            let statusColor = "bg-slate-200";
+                            if (bmpState.activeSerie === "A" && i >= ranking.length - 2) statusColor = "bg-red-400";
+                            if (bmpState.activeSerie === "B" && i < 2) statusColor = "bg-emerald-400";
+
+                            return `
+                            <tr class="group hover:bg-orange-50 transition-colors cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
+                                <td class="px-4 md:px-8 py-4">
+                                    <div class="flex items-center gap-2 md:gap-4">
+                                        <div class="w-1 h-8 rounded-full ${statusColor} opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0"></div>
+                                        <span class="text-lg md:text-2xl font-jogos text-slate-300">
+                                            ${(i + 1).toString().padStart(2, '0')}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 md:px-8 py-4">
+                                    <div class="flex items-center gap-2 md:gap-4">
+                                        <div class="w-8 h-8 md:w-12 md:h-12 bg-slate-50 rounded-xl p-1 md:p-2 border border-slate-100 group-hover:border-orange-200 transition-all flex-shrink-0">
+                                            <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
+                                        </div>
+                                        <span class="font-jogos text-[10px] md:text-sm text-slate-600 group-hover:text-slate-900 transition-colors truncate max-w-[80px] sm:max-w-[150px] md:max-w-none">${team.nome}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 md:px-8 py-4 text-right">
+                                    <span class="font-mono text-[10px] md:text-xs ${team.roundScore >= 0 ? 'text-orange-500' : 'text-red-500'} font-bold">
+                                        ${team.roundScore > 0 ? '+' : ''}${team.roundScore.toFixed(2)}
+                                    </span>
+                                </td>
+                                <td class="px-4 md:px-8 py-4 text-right">
+                                    <span class="text-base md:text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                                        ${team.pontos.toFixed(1)}
+                                    </span>
+                                </td>
+                            </tr>
+                            `;
+                        }).join("")}
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
 }
