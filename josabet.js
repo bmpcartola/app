@@ -274,6 +274,11 @@ function renderHeaderControls() {
     const headerControls = document.getElementById("header-controls");
     if (!headerControls) return;
 
+    if (bmpState.viewMode === "provaveis") {
+        headerControls.innerHTML = "";
+        return;
+    }
+
     const maxRound = getMaxRound();
     const rounds = Array.from({ length: maxRound }, (_, i) => i + 1).reverse();
 
