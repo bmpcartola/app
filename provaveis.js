@@ -1,6 +1,6 @@
-/* ===================================================================
-   PROVÁVEIS ESCALAÇÕES – 
-   =================================================================== */
+/* ============================================================
+   PROVÁVEIS ESCALAÇÕES 
+   ============================================================ */
 
 const PROXY_URL = 'https://proxy-f5nr.onrender.com';
 
@@ -24,29 +24,23 @@ const SLUG_TO_ID_MAP = {
 async function fetchProvaveisData() {
     provavelState.loading = true;
     provavelState.error = null;
-    console.log("🚀 BUSCANDO DADOS...");
     try {
         const partidasRes = await fetch(`${PROXY_URL}/partidas`);
-        if (!partidasRes.ok) throw new Error("FALHA AO CARREGAR PARTIDAS");
+        if (!partidasRes.ok) throw new Error("Falha ao carregar partidas");
         provavelState.partidasData = await partidasRes.json();
-        console.log("✅ PARTIDAS CARREGADAS. RODADA:", provavelState.partidasData?.rodada_id);
 
         const lineupsRes = await fetch(`${PROXY_URL}/provaveis/lineups`);
-        if (!lineupsRes.ok) throw new Error("FALHA AO CARREGAR ESCALAÇÕES");
+        if (!lineupsRes.ok) throw new Error("Falha ao carregar escalações");
         provavelState.lineupsData = await lineupsRes.json();
-        console.log("✅ ESCALAÇÕES CARREGADAS");
 
         const mercadoRes = await fetch(`${PROXY_URL}/provaveis/mercado-images`);
         if (mercadoRes.ok) {
             const mercadoArray = await mercadoRes.json();
             provavelState.mercadoData = new Map();
             mercadoArray.forEach(item => provavelState.mercadoData.set(item.atleta_id, item));
-            console.log("✅ MERCADO CARREGADO:", provavelState.mercadoData.size, "JOGADORES");
-        } else {
-            console.warn("⚠️ MERCADO NÃO DISPONÍVEL (FALLBACK)");
         }
     } catch (err) {
-        console.error("❌ ERRO:", err);
+        console.error(err);
         provavelState.error = err.message;
     } finally {
         provavelState.loading = false;
@@ -206,7 +200,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL COMPLETO ========================
+// ======================== MODAL (com scouts e gráfico) ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
@@ -334,21 +328,13 @@ window.abrirModalJogador = function(jogadorId, timeId) {
 window.renderProvaveis = async function() {
     const main = document.getElementById('main-content');
     if (!main) return;
-    main.innerHTML = `
-        <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6 animate-in fade-in duration-500">
-            <div class="loader"></div>
-            <div class="text-center">
-                <p class="text-slate-400 font-jogos text-xs tracking-[0.4em] uppercase animate-pulse">Sincronizando Escalações</p>
-                <p class="text-[10px] font-mono text-slate-300 mt-2 uppercase tracking-widest">Aguardando dados oficiais...</p>
-            </div>
-        </div>
-    `;
+    main.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh]"><div class="loader"></div><p class="text-slate-400 font-jogos text-xs uppercase animate-pulse mt-4">Sincronizando Escalações...</p></div>`;
     await fetchProvaveisData();
     if (provavelState.error) {
-        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
+        main.innerHTML = `<div class="text-center py-20"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-4 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
         return;
     }
-    const rodada = provavelState.partidasData.rodada_id || '';
+    const rodada = provavelState.partidasData?.rodada_id || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
             <div class="text-center space-y-1 mb-2">
@@ -360,7 +346,6 @@ window.renderProvaveis = async function() {
         </div>
     `;
     if (typeof lucide !== "undefined") lucide.createIcons();
-    console.log("✅ RENDERIZAÇÃO CONCLUÍDA COM SUCESSO");
 };
 
 console.log("✅ PROVAVEIS.JS CARREGADO – AGUARDANDO CHAMADA DO MENU");
