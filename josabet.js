@@ -3,7 +3,7 @@
    Handles data fetching, ranking, and UI rendering.
    ============================================================ */
 
-const API_URL = "https://raw.githubusercontent.com/bmpcartola/proxy/main/bd/cartola.json";
+const API_URL = "https://raw.githubusercontent.com/bmpcartola/app/main/bd/cartola.json";
 
 let bmpData = null;
 let bmpState = {
