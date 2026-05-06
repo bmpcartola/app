@@ -129,12 +129,12 @@
     <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 z-[50] bg-black/5 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500"></div>
 
     <!-- Sidebar Toggle -->
-    <button id="sidebar-toggle" onclick="toggleSidebar(true)" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/80 backdrop-blur-md border border-slate-100 p-2 py-6 rounded-r-2xl shadow-xl hover:bg-white transition-all group">
-        <i data-lucide="chevron-right" id="sidebar-icon" class="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
+    <button id="sidebar-toggle" onclick="toggleSidebar(true)" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/90 backdrop-blur-md border border-slate-100 p-3 py-8 rounded-r-3xl shadow-2xl hover:bg-white transition-all group">
+        <i data-lucide="chevron-right" id="sidebar-icon" class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
     </button>
 
     <!-- Sidebar Menu -->
-    <div id="sidebar-menu" class="fixed left-[-100px] top-1/2 -translate-y-1/2 z-[55] w-20 bg-orange-500/[0.15] backdrop-blur-xl border border-orange-500/10 rounded-r-3xl shadow-2xl py-8 transition-all duration-500 ease-in-out flex flex-col items-center gap-8">
+    <div id="sidebar-menu" class="fixed left-[-160px] top-1/2 -translate-y-1/2 z-[100] w-32 h-[800px] bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[50px] shadow-2xl transition-all duration-700 ease-in-out flex flex-col items-center overflow-hidden">
         <!-- Handled dynamically by josabet.js -->
     </div>
 
@@ -143,6 +143,7 @@
         <i data-lucide="arrow-up" class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600"></i>
     </button>
 
+    <script src="provaveis.js"></script>
     <script src="josabet.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

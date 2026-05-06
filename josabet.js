@@ -1,5 +1,6 @@
 /* ============================================================
-   Cartola BMP 2026
+   script.js — Dashboard Cartola BMP 2026
+   Handles data fetching, ranking, and UI rendering.
    ============================================================ */
 
 const API_URL = "https://raw.githubusercontent.com/bmpcartola/app/main/bd/cartola.json";
@@ -9,7 +10,22 @@ let bmpState = {
     activeSerie: "A", // "A" or "B"
     selectedRound: 1,
     selectedTeam: null, // Team Name
-    viewMode: "campo" // "campo" or "tabela"
+    viewMode: "campo", // "campo", "tabela" or "provaveis"
+    activeProvaveis: false
+};
+
+const PROXY_URL = 'https://proxy-f5nr.onrender.com';
+const API_CARTOLA = {
+    MERCADO_STATUS: "https://api.cartola.globo.com/mercado/status",
+    PARTIDAS: "https://api.cartola.globo.com/partidas"
+};
+
+const SLUG_TO_CARTOLA_ID = {
+    corinthians_v2: 264, palmeiras_v2: 275, flamengo_v2: 262, vasco_v2: 267,
+    'atletico-mg_v2': 282, cruzeiro_v2: 283, gremio_v2: 284, internacional_v2: 285,
+    botafogo_v2: 263, fluminense_v2: 266, 'sao-paulo_v2': 276, santos_v2: 277,
+    bragantino_v2: 280, 'athletico-pr_v2': 293, bahia_v2: 265, vitoria_v2: 287,
+    mirassol_v2: 2305, chapecoense_v2: 315, coritiba_v2: 294, remo_v2: 364,
 };
 
 let deferredPrompt;
@@ -144,10 +160,13 @@ function toggleSidebar(force) {
     const sidebar = document.getElementById("sidebar-menu");
     const toggleBtn = document.getElementById("sidebar-toggle");
     const backdrop = document.getElementById("sidebar-backdrop");
+    if (!sidebar) return;
+
     const isOpen = sidebar.style.left === "0px";
     const nextState = force !== undefined ? force : !isOpen;
 
     if (nextState) {
+        renderSidebar();
         sidebar.style.left = "0px";
         if (toggleBtn) {
             toggleBtn.style.opacity = "0";
@@ -158,7 +177,7 @@ function toggleSidebar(force) {
             backdrop.style.pointerEvents = "auto";
         }
     } else {
-        sidebar.style.left = "-100px";
+        sidebar.style.left = "-200px";
         if (toggleBtn) {
             toggleBtn.style.opacity = "1";
             toggleBtn.style.pointerEvents = "auto";
@@ -194,33 +213,61 @@ function renderSidebar() {
     const sidebar = document.getElementById("sidebar-menu");
     if (!sidebar) return;
 
-    sidebar.innerHTML = `
-        <div class="mb-4"></div>
+    const btnClass = "flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95";
+    const iconBase = "w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent";
+    const activeIcon = "bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50";
+    const inactiveIcon = "bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100";
+    const labelBase = "text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all";
 
-        <ul class="flex flex-col items-center gap-6">
-            ${deferredPrompt ? `
-                <li>
-                    <button onclick="installApp(); toggleSidebar(false);" class="p-3 rounded-2xl bg-orange-500 text-white hover:bg-orange-600 transition-all group shadow-lg shadow-orange-500/20" title="Instalar App">
-                        <i data-lucide="download" class="w-6 h-6"></i>
+    sidebar.innerHTML = `
+        <div class="flex flex-col items-center justify-between h-full py-20 w-full">
+            <div class="flex flex-col items-center gap-14 w-full">
+                <!-- JOSA.BET -->
+                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="${btnClass}">
+                    <div class="${iconBase} ${bmpState.viewMode === 'campo' ? activeIcon : inactiveIcon}">
+                        <i data-lucide="layout-grid" class="w-9 h-9"></i>
+                    </div>
+                    <span class="${labelBase} ${bmpState.viewMode === 'campo' ? 'text-orange-600' : 'text-slate-400 opacity-60'}">JOSA.BET</span>
+                </button>
+
+                <!-- PROVÁVEIS -->
+                <button id="nav-provaveis" onclick="bmpSetViewMode('provaveis'); toggleSidebar(false);" class="${btnClass}">
+                    <div class="${iconBase} ${bmpState.viewMode === 'provaveis' ? activeIcon : inactiveIcon}">
+                        <i data-lucide="users" class="w-9 h-9"></i>
+                    </div>
+                    <span class="${labelBase} ${bmpState.viewMode === 'provaveis' ? 'text-orange-600' : 'text-slate-400 opacity-60'}">PROVÁVEIS</span>
+                </button>
+
+                ${deferredPrompt ? `
+                    <!-- INSTALAR -->
+                    <button onclick="installApp(); toggleSidebar(false);" class="${btnClass}">
+                        <div class="w-16 h-16 rounded-[28px] bg-orange-700 text-white flex items-center justify-center shadow-2xl">
+                            <i data-lucide="download" class="w-9 h-9"></i>
+                        </div>
+                        <span class="${labelBase} text-orange-700">INSTALAR</span>
                     </button>
-                </li>
-            ` : ''}
-            <li>
-                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
-                    <i data-lucide="layout-list" class="w-6 h-6 text-orange-600"></i>
+                ` : ''}
+            </div>
+
+            <div class="mt-auto w-full flex flex-col items-center gap-8">
+                <!-- AJUDA -->
+                <button onclick="toggleSidebar(false);" class="${btnClass}">
+                    <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
+                        <i data-lucide="help-circle" class="w-9 h-9"></i>
+                    </div>
                 </button>
-            </li>
-            <li>
-                <button onclick="toggleSidebar(false);" class="p-3 rounded-2xl bg-white/40 border border-white/40 hover:bg-white/60 transition-all group shadow-sm">
-                    <i data-lucide="help-circle" class="w-6 h-6 text-orange-600"></i>
-                </button>
-            </li>
-        </ul>
-        
-        <div class="mt-auto opacity-40">
-            <i data-lucide="trophy" class="w-4 h-4 text-orange-800"></i>
+
+                <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
+                    <div class="p-5 bg-orange-50 rounded-full mb-3 group-hover/brand:scale-110 transition-transform">
+                        <i data-lucide="trophy" class="w-12 h-12 text-orange-800"></i>
+                    </div>
+                    <p class="text-[12px] font-black font-jogos text-orange-950 uppercase tracking-widest text-center mt-2 leading-tight">TAÇA<br>BMP</p>
+                    <div class="w-12 h-1 bg-orange-200 rounded-full mt-2"></div>
+                </div>
+            </div>
         </div>
     `;
+    if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function renderHeaderControls() {
@@ -251,6 +298,13 @@ function renderContent() {
 
     if (bmpState.selectedTeam) {
         renderTeamDetail(main);
+        return;
+    }
+
+    if (bmpState.viewMode === "provaveis") {
+        if (window.renderProvaveis) {
+            window.renderProvaveis();
+        }
         return;
     }
 
@@ -414,34 +468,34 @@ function renderTable(ranking) {
 
                             return `
                             <tr class="group hover:bg-orange-50 transition-colors cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
-                                <td class="px-4 md:px-8 py-2 md:py-3">
+                                <td class="px-4 md:px-8 py-1 md:py-2">
                                     <div class="flex items-center gap-2 md:gap-4">
                                         <div class="w-1 h-8 rounded-full ${statusColor} opacity-50 group-hover:opacity-100 transition-opacity flex-shrink-0"></div>
-                                        <span class="text-lg md:text-2xl font-jogos text-slate-300">
+                                        <span class="text-lg md:text-3xl font-jersey text-slate-300">
                                             ${(i + 1).toString().padStart(2, '0')}
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-4 md:px-8 py-2 md:py-3">
-                                    <div class="flex items-center gap-2 md:gap-4">
-                                        <div class="w-10 h-10 md:w-14 md:h-14 bg-slate-50 rounded-xl p-1 md:p-2 border border-slate-100 group-hover:border-orange-200 transition-all flex-shrink-0">
+                                <td class="px-4 md:px-8 py-1 md:py-2">
+                                    <div class="flex items-center gap-3 md:gap-5">
+                                        <div class="w-12 h-12 md:w-16 md:h-16 bg-white rounded-2xl p-1 md:p-2 border border-slate-100 group-hover:border-orange-200 transition-all flex-shrink-0 shadow-sm">
                                             <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
                                         </div>
-                                        <span class="font-jogos text-[11px] md:text-base text-slate-600 group-hover:text-slate-900 transition-colors truncate max-w-[80px] sm:max-w-[150px] md:max-w-none">${team.nome}</span>
+                                        <span class="font-jogos text-[12px] md:text-xl text-slate-700 group-hover:text-slate-900 transition-colors truncate max-w-[100px] sm:max-w-[180px] md:max-w-none">${team.nome}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 md:px-8 py-2 md:py-3 text-right">
-                                    <span class="font-mono text-[10px] md:text-xs ${team.roundScore >= 0 ? 'text-orange-500' : 'text-red-500'} font-bold">
+                                <td class="px-4 md:px-8 py-1 md:py-2 text-right">
+                                    <span class="font-mono text-[11px] md:text-sm ${team.roundScore >= 0 ? 'text-orange-500' : 'text-red-500'} font-bold">
                                         ${team.roundScore > 0 ? '+' : ''}${team.roundScore.toFixed(2)}
                                     </span>
                                 </td>
-                                <td class="px-4 md:px-8 py-2 md:py-3 text-right">
+                                <td class="px-4 md:px-8 py-1 md:py-2 text-right">
                                     <div class="flex flex-col items-end">
-                                        <span class="text-base md:text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                                        <span class="text-lg md:text-2xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
                                             ${team.pontos.toFixed(2)}
                                         </span>
                                         ${i > 0 ? `
-                                            <span class="font-mono text-[10px] md:text-xs text-slate-400 font-bold leading-none mt-1">
+                                            <span class="font-mono text-[11px] md:text-sm text-slate-400 font-bold leading-none mt-1">
                                                 -${gap.toFixed(2)}
                                             </span>
                                         ` : ''}
@@ -601,62 +655,61 @@ function renderTeamDetail(container) {
             </button>
 
             <!-- Hero Profiler -->
-            <div class="bg-white rounded-[50px] border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-10 relative overflow-hidden shadow-sm">
+            <div class="bg-white rounded-[40px] border border-slate-100 p-5 md:p-6 flex flex-col md:flex-row items-center gap-5 md:gap-8 relative overflow-hidden shadow-sm">
                 <div class="absolute -top-20 -right-20 opacity-[0.05]">
-                    <img src="${getTeamEscudo(team)}" class="w-96 h-96 rotate-12" onerror="this.style.display='none'">
+                    <img src="${getTeamEscudo(team)}" class="w-80 h-80 rotate-12" onerror="this.style.display='none'">
                 </div>
 
-                <div class="w-32 h-32 md:w-44 md:h-44 bg-slate-50 rounded-[40px] flex items-center justify-center p-6 relative z-10 border border-slate-100">
-                    <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)]" onerror="this.onerror=null; this.style.opacity='0.5';">
+                <div class="w-24 h-24 md:w-32 md:h-32 bg-slate-50 rounded-3xl flex items-center justify-center p-4 relative z-10 border border-slate-100">
+                    <img src="${getTeamEscudo(team)}" class="w-full h-full object-contain drop-shadow-[0_5px_15px_rgba(0,0,0,0.1)]" onerror="this.onerror=null; this.style.opacity='0.5';">
                 </div>
                 
-                <div class="text-center md:text-left space-y-4 relative z-10 flex-1">
+                <div class="text-center md:text-left space-y-3 relative z-10 flex-1">
                     <div>
-                        <div class="flex items-center justify-center md:justify-start gap-3 mb-1">
-                            <span class="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black rounded-lg font-jogos uppercase">SÉRIE ${bmpState.activeSerie}</span>
+                        <div class="flex items-center justify-center md:justify-start gap-3 mb-0.5">
+                            <span class="px-2 py-0.5 bg-orange-100 text-orange-600 text-[8px] font-black rounded font-jogos uppercase">SÉRIE ${bmpState.activeSerie}</span>
                         </div>
-                        <h2 class="text-5xl md:text-6xl font-jersey text-slate-800 leading-none tracking-tight">${team.nome}</h2>
+                        <h2 class="text-4xl md:text-5xl font-jersey text-slate-800 leading-none tracking-tight">${team.nome}</h2>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto md:mx-0">
-                        <div class="bg-slate-50 px-4 py-3 md:px-6 md:py-4 rounded-3xl border border-slate-100">
-                            <p class="text-[9px] text-slate-400 font-black font-jogos tracking-widest mb-1">PONTUAÇÃO GERAL</p>
-                            <p class="text-2xl md:text-3xl font-mono font-black text-slate-800 leading-none">${totalPoints.toFixed(2)}</p>
+                    <div class="grid grid-cols-2 gap-2 max-w-xs mx-auto md:mx-0">
+                        <div class="bg-slate-50 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl border border-slate-100">
+                            <p class="text-[8px] text-slate-400 font-black font-jogos tracking-widest mb-0.5">GERAL</p>
+                            <p class="text-xl md:text-2xl font-mono font-black text-slate-800 leading-none">${totalPoints.toFixed(2)}</p>
                         </div>
-                        <div class="bg-orange-50 px-4 py-3 md:px-6 md:py-4 rounded-3xl border border-orange-100">
-                            <p class="text-[9px] text-orange-600 font-black font-jogos tracking-widest mb-1 uppercase">RODADA ATUAL</p>
-                            <p class="text-2xl md:text-3xl font-mono font-black text-orange-600 leading-none">${roundScore.toFixed(2)}</p>
+                        <div class="bg-orange-50 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl border border-orange-100">
+                            <p class="text-[8px] text-orange-600 font-black font-jogos tracking-widest mb-0.5 uppercase">RODADA</p>
+                            <p class="text-xl md:text-2xl font-mono font-black text-orange-600 leading-none">${roundScore.toFixed(2)}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Detail Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 <!-- Squad -->
-                <div class="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm">
-                    <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-6">
-                        <h3 class="text-xs font-black font-jogos tracking-[0.2em] text-slate-800 uppercase">ESCALAÇÃO - RDD${bmpState.selectedRound} - ${currentRoundData.formacao || '---'}</h3>
+                <div class="bg-white rounded-[40px] border border-slate-100 p-6 md:p-8 shadow-sm">
+                    <div class="flex items-center justify-between mb-6 border-b border-slate-50 pb-4">
+                        <h3 class="text-[10px] font-black font-jogos tracking-[0.2em] text-slate-800 uppercase">RD ${bmpState.selectedRound} • ESCALAÇÃO</h3>
                     </div>
 
-                    <div class="space-y-1">
+                    <div class="space-y-0.5">
                         ${currentRoundData.jogadores && currentRoundData.jogadores.length > 0 ? 
                             currentRoundData.jogadores.map(p => `
-                                <div class="flex items-center justify-between p-2 md:p-3 hover:bg-slate-50 rounded-2xl border border-transparent hover:border-slate-100 transition-all group">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 flex items-center justify-center bg-slate-50 rounded-xl text-[10px] font-black font-jogos text-slate-400 group-hover:text-orange-500 transition-colors">
+                                <div class="flex items-center justify-between p-1.5 md:p-2 hover:bg-orange-50/50 rounded-xl transition-all group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg text-[8px] font-black font-jogos text-slate-400 group-hover:text-orange-500 transition-colors">
                                             ${p.pos}
                                         </div>
                                         <div>
-                                            <p class="text-sm font-jogos text-slate-700 leading-none mb-1">${p.nome}</p>
-                                            <p class="text-[9px] text-slate-400 font-mono uppercase font-bold">${p.clube}</p>
+                                            <p class="text-xs md:text-sm font-jogos text-slate-700 leading-none">${p.nome}</p>
+                                            <p class="text-[8px] text-slate-400 font-mono uppercase mt-0.5">${p.clube}</p>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="font-mono text-sm font-black ${p.val >= 0 ? 'text-orange-500' : 'text-red-500'}">
+                                        <p class="font-mono text-xs md:text-sm font-black ${p.val >= 0 ? 'text-orange-500' : 'text-red-500'}">
                                             ${p.val >= 0 ? '+' : ''}${p.val.toFixed(2)}
                                         </p>
-                                        <p class="text-[8px] font-black text-slate-300 font-jogos uppercase mt-0.5 tracking-tighter">${p.status || 'SCOUTED'}</p>
                                     </div>
                                 </div>
                             `).join("") : 
@@ -715,17 +768,15 @@ function renderError(msg) {
     const main = document.getElementById("main-content");
     if (main) {
         main.innerHTML = `
-            <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-6 animate-in fade-in zoom-in duration-700">
-                <div class="p-8 bg-white rounded-[40px] border border-red-100 text-red-500 shadow-sm relative group">
-                    <i data-lucide="zap-off" class="w-16 h-16 relative z-10"></i>
+            <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-6 animate-in fade-in duration-700">
+                <div class="p-8 bg-white rounded-[40px] border border-red-100 text-red-500 shadow-sm">
+                    <i data-lucide="alert-octagon" class="w-16 h-16"></i>
                 </div>
                 <div class="space-y-2">
-                    <h2 class="text-2xl font-bold text-slate-800 uppercase tracking-tight">Falha de Conexão</h2>
-                    <p class="text-slate-400 max-w-sm font-mono text-[10px] leading-relaxed uppercase tracking-widest">${msg || "Não foi possível estabelecer link com o banco de dados."}</p>
+                    <h2 class="text-2xl font-bold text-slate-800 uppercase tracking-tight">Falha Critica</h2>
+                    <p class="text-slate-400 max-w-sm font-mono text-[10px] leading-relaxed uppercase tracking-widest">${msg || "Erro ao conectar com o serviço de dados."}</p>
                 </div>
-                <button onclick="bmpReload()" class="group relative px-10 py-4 bg-orange-500 rounded-2xl overflow-hidden shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
-                    <span class="relative z-10 text-[10px] font-black font-jogos text-white tracking-[0.2em]">REINICIAR SISTEMA</span>
-                </button>
+                <button onclick="bmpReload()" class="px-10 py-4 bg-orange-500 rounded-2xl text-white font-black font-jogos text-[10px] tracking-[0.2em] hover:scale-105 transition-all">REINICIAR</button>
             </div>
         `;
         if (typeof lucide !== "undefined") lucide.createIcons();
@@ -779,7 +830,7 @@ window.bmpReload = () => {
 
 
 // ========== INIT ==========
-
 document.addEventListener("DOMContentLoaded", () => {
-    fetchBmpData();
+    renderSidebar(); // Render menu structure immediately
+    fetchBmpData();  // Then fetch data
 });
