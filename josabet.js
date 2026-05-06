@@ -170,7 +170,7 @@ function renderHeaderControls() {
             </div>
 
             <select onchange="bmpSetRound(this.value)" class="bg-white border border-slate-200 text-slate-700 text-[10px] font-jogos px-4 py-2 rounded-xl focus:outline-none focus:border-orange-400 transition-colors shadow-sm">
-                ${rounds.map(r => `<option value="${r}" ${bmpState.selectedRound === r ? 'selected' : ''}>RD ${r}</option>`).join("")}
+                ${rounds.map(r => `<option value="${r}" ${bmpState.selectedRound === r ? 'selected' : ''}>RDD ${r}</option>`).join("")}
             </select>
         </div>
     `;
@@ -220,19 +220,21 @@ function renderPodium(ranking) {
             <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-50"></div>
             <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-all duration-700"></div>
             
+            <!-- Golden Crown -->
+            <div class="absolute top-0 right-0 p-8">
+                <i data-lucide="crown" class="w-16 h-16 text-yellow-500/10 group-hover:text-yellow-500 group-hover:scale-110 transition-all drop-shadow-[0_0_15px_rgba(234,179,8,0.3)]"></i>
+            </div>
+
             <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
                 <div class="relative cursor-pointer" onclick="bmpSelectTeam('${leader.nome}')">
                     <div class="absolute -inset-4 bg-orange-400/10 rounded-full blur-2xl animate-pulse"></div>
                     <img src="${getTeamEscudo(leader)}" class="w-32 h-32 md:w-44 md:h-44 object-contain relative z-10 drop-shadow-[0_10px_20px_rgba(255,99,33,0.1)] transition-transform duration-500 hover:scale-110" onerror="this.onerror=null; this.style.opacity='0.5';">
-                    <div class="absolute -bottom-2 -right-2 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center border-4 border-white text-white font-black z-20 shadow-xl font-jogos text-xl">1</div>
                 </div>
                 
                 <div class="text-center md:text-left">
-                    <span class="inline-block px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black rounded-lg font-jogos tracking-[0.2em] mb-3">LÍDER DO RANKING</span>
                     <h2 class="text-5xl md:text-6xl font-jogos text-slate-800 mb-2 tracking-tight">${leader.nome}</h2>
                     <div class="flex items-baseline justify-center md:justify-start gap-2">
                         <span class="text-4xl font-mono font-black text-orange-500 font-bold">${leader.pontos.toFixed(2)}</span>
-                        <span class="text-slate-400 text-xs font-bold font-jogos uppercase">C$</span>
                     </div>
                 </div>
             </div>
@@ -313,7 +315,7 @@ function renderField(ranking) {
                         </div>
                         <div class="mt-0.5 text-center drop-shadow-md">
                             <p class="text-[9px] md:text-[11px] text-white font-jogos leading-none tracking-widest">${team.nome}</p>
-                            <p class="text-[11px] md:text-base text-yellow-300 font-mono font-bold leading-none mt-0.5">${team.pontos.toFixed(1)}</p>
+                            <p class="text-[11px] md:text-base text-yellow-300 font-mono font-bold leading-none mt-0.5">${team.pontos.toFixed(2)}</p>
                         </div>
                     </div>
                 </div>
@@ -332,7 +334,7 @@ function renderTable(ranking) {
                         <tr class="bg-slate-50 border-b border-slate-100">
                             <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">POS</th>
                             <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 tracking-[0.2em]">TIME</th>
-                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">RD</th>
+                            <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">RDD</th>
                             <th class="px-4 md:px-8 py-5 text-[10px] font-jogos text-slate-400 text-right tracking-[0.2em]">TOTAL</th>
                         </tr>
                     </thead>
@@ -341,6 +343,8 @@ function renderTable(ranking) {
                             let statusColor = "bg-slate-200";
                             if (bmpState.activeSerie === "A" && i >= ranking.length - 2) statusColor = "bg-red-400";
                             if (bmpState.activeSerie === "B" && i < 2) statusColor = "bg-emerald-400";
+
+                            const gap = i > 0 ? (ranking[i-1].pontos - team.pontos) : 0;
 
                             return `
                             <tr class="group hover:bg-orange-50 transition-colors cursor-pointer" onclick="bmpSelectTeam('${team.nome}')">
@@ -366,9 +370,16 @@ function renderTable(ranking) {
                                     </span>
                                 </td>
                                 <td class="px-4 md:px-8 py-4 text-right">
-                                    <span class="text-base md:text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
-                                        ${team.pontos.toFixed(1)}
-                                    </span>
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-base md:text-xl font-mono font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                                            ${team.pontos.toFixed(2)}
+                                        </span>
+                                        ${i > 0 ? `
+                                            <span class="font-mono text-[10px] md:text-xs text-slate-400 font-bold leading-none mt-1">
+                                                -${gap.toFixed(2)}
+                                            </span>
+                                        ` : ''}
+                                    </div>
                                 </td>
                             </tr>
                             `;
@@ -475,7 +486,7 @@ function renderBottomCards(ranking) {
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-[10px] font-jogos text-slate-700 truncate leading-tight">${m.A?.nome || '-'}</p>
-                                    <p class="text-[9px] font-mono text-orange-500 font-black leading-none">${m.A?.score.toFixed(1) || '0'}</p>
+                                    <p class="text-[9px] font-mono text-orange-500 font-black leading-none">${m.A?.score.toFixed(2) || '0.00'}</p>
                                 </div>
                             </div>
                             <!-- Serie B Mito -->
@@ -485,7 +496,7 @@ function renderBottomCards(ranking) {
                                 </div>
                                 <div class="min-w-0">
                                     <p class="text-[10px] font-jogos text-slate-700 truncate leading-tight">${m.B?.nome || '-'}</p>
-                                    <p class="text-[9px] font-mono text-orange-500 font-black leading-none">${m.B?.score.toFixed(1) || '0'}</p>
+                                    <p class="text-[9px] font-mono text-orange-500 font-black leading-none">${m.B?.score.toFixed(2) || '0.00'}</p>
                                 </div>
                             </div>
                         </div>
@@ -559,7 +570,7 @@ function renderTeamDetail(container) {
                 <!-- Squad -->
                 <div class="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm">
                     <div class="flex items-center justify-between mb-8 border-b border-slate-50 pb-6">
-                        <h3 class="text-xs font-black font-jogos tracking-[0.2em] text-slate-800 uppercase">ESCALAÇÃO - R${bmpState.selectedRound} - ${currentRoundData.formacao || '---'}</h3>
+                        <h3 class="text-xs font-black font-jogos tracking-[0.2em] text-slate-800 uppercase">ESCALAÇÃO - RDD${bmpState.selectedRound} - ${currentRoundData.formacao || '---'}</h3>
                     </div>
 
                     <div class="space-y-3">
@@ -601,19 +612,19 @@ function renderTeamDetail(container) {
                             
                             const extraInfo = [];
                             if (r.re && r.re !== 0) {
-                                extraInfo.push(`<span class="text-emerald-500">+${r.re.toFixed(1)}</span>`);
+                                extraInfo.push(`<span class="text-emerald-500">+${r.re.toFixed(2)}</span>`);
                             }
                             if (r.pen && r.pen !== 0) {
-                                extraInfo.push(`<span class="text-red-500">-${r.pen.toFixed(1)}</span>`);
+                                extraInfo.push(`<span class="text-red-500">-${r.pen.toFixed(2)}</span>`);
                             }
 
                             return `
                                 <div class="space-y-2 group">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-[12px] font-mono font-bold text-slate-400 tracking-tighter">RD ${r.rdd.toString().padStart(2, '0')}</span>
+                                        <span class="text-[12px] font-mono font-bold text-slate-400 tracking-tighter">RDD ${r.rdd.toString().padStart(2, '0')}</span>
                                         <div class="text-right">
                                             <span class="text-[12px] font-mono font-black ${roundTotal >= 0 ? 'text-orange-500' : 'text-red-500'} group-hover:scale-110 transition-transform block leading-none">
-                                                ${roundTotal.toFixed(1)} PTS
+                                                ${roundTotal.toFixed(2)} PTS
                                             </span>
                                             ${extraInfo.length > 0 ? `
                                                 <div class="text-[9px] font-mono font-bold flex justify-end gap-1 mt-0.5">${extraInfo.join("")}</div>
