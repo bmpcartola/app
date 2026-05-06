@@ -1,9 +1,8 @@
 /* ===================================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO COMPLETA
-   (escudos, campo, jogadores + modal com scouts e gráfico de pontos)
+   PROVÁVEIS ESCALAÇÕES 
    =================================================================== */
 
-const PROXY_URL = 'https://proxy-f5nr.onrender.com';
+const PROXY_URL = 'https://proxy-f5nr.onrender.com'; // <-- Ajuste se necessário
 
 let provavelState = {
     partidasData: null,
@@ -14,7 +13,7 @@ let provavelState = {
     error: null
 };
 
-// Mapeamento slugs -> IDs do Cartola
+// Mapeamento slugs -> IDs do Cartola (para encontrar a escalação de cada time)
 const SLUG_TO_ID_MAP = {
     corinthians_v2: 264, palmeiras_v2: 275, flamengo_v2: 262, vasco_v2: 267,
     'atletico-mg_v2': 282, cruzeiro_v2: 283, gremio_v2: 284, internacional_v2: 285,
@@ -28,28 +27,44 @@ async function fetchProvaveisData() {
     provavelState.loading = true;
     provavelState.error = null;
 
+    console.log("🚀 Iniciando carregamento dos dados...");
+
     try {
+        // 1) Partidas
+        console.log("📡 Buscando partidas em:", `${PROXY_URL}/partidas`);
         const partidasRes = await fetch(`${PROXY_URL}/partidas`);
-        if (!partidasRes.ok) throw new Error("Falha ao carregar partidas");
+        if (!partidasRes.ok) throw new Error(`HTTP ${partidasRes.status} - Erro nas partidas`);
         provavelState.partidasData = await partidasRes.json();
+        console.log("✅ Partidas carregadas. Rodada:", provavelState.partidasData?.rodada_id);
 
+        // 2) Escalações
+        console.log("📡 Buscando escalações em:", `${PROXY_URL}/provaveis/lineups`);
         const lineupsRes = await fetch(`${PROXY_URL}/provaveis/lineups`);
-        if (!lineupsRes.ok) throw new Error("Falha ao carregar escalações");
+        if (!lineupsRes.ok) throw new Error(`HTTP ${lineupsRes.status} - Erro nas escalações`);
         provavelState.lineupsData = await lineupsRes.json();
+        console.log("✅ Escalações carregadas.");
 
+        // 3) Dados do mercado (fotos, apelidos)
+        console.log("📡 Buscando dados de mercado em:", `${PROXY_URL}/provaveis/mercado-images`);
         const mercadoRes = await fetch(`${PROXY_URL}/provaveis/mercado-images`);
         if (mercadoRes.ok) {
             const mercadoArray = await mercadoRes.json();
             provavelState.mercadoData = new Map();
             mercadoArray.forEach(item => provavelState.mercadoData.set(item.atleta_id, item));
+            console.log("✅ Mercado carregado:", provavelState.mercadoData.size, "jogadores");
+        } else {
+            console.warn("⚠️ Mercado não disponível.");
         }
 
-        const updatesRes = await fetch(`${PROXY_URL}/provaveis/team-updates`);
-        if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
+        // 4) Atualizações (opcional)
+        try {
+            const updatesRes = await fetch(`${PROXY_URL}/provaveis/team-updates`);
+            if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
+        } catch (e) { console.warn("⚠️ Team updates ignorado."); }
 
     } catch (err) {
-        console.error("❌ Erro em Prováveis:", err);
-        provavelState.error = err.message;
+        console.error("❌ Erro crítico em fetchProvaveisData:", err);
+        provavelState.error = err.message || "Falha na comunicação com o proxy";
     } finally {
         provavelState.loading = false;
     }
@@ -68,7 +83,7 @@ function renderDots(results) {
     }).join('')}</div>`;
 }
 
-// Nome do jogador: prioriza proxy, depois JOGADORES (se existir), depois fallback
+// Nome do jogador (prioriza proxy, depois JOGADORES se existir)
 function getPlayerName(id, playerInfo) {
     if (playerInfo?.apelido_abreviado) return playerInfo.apelido_abreviado;
     if (playerInfo?.apelido) return playerInfo.apelido;
@@ -79,7 +94,7 @@ function getPlayerName(id, playerInfo) {
     return `#${id}`;
 }
 
-// Nome abreviado para exibição no campo (ex: "YURI A.")
+// Nome abreviado para exibição no campo
 function abreviarNome(nomeCompleto) {
     if (!nomeCompleto) return '...';
     const partes = nomeCompleto.trim().split(' ');
@@ -87,11 +102,13 @@ function abreviarNome(nomeCompleto) {
     return partes[0].charAt(0).toUpperCase() + '. ' + partes.slice(1).join(' ').substring(0, 12);
 }
 
-// Nome do arquivo da foto local
-function getNomeArquivo(playerInfo) {
-    const nome = playerInfo?.apelido || playerInfo?.nome || '';
-    if (!nome) return '';
-    return nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+function getNomeArquivoJogador(id, playerInfo) {
+    let nomeBase = playerInfo?.apelido_ou_nome || playerInfo?.apelido || playerInfo?.nome;
+    if (typeof JOGADORES !== 'undefined' && JOGADORES[id] && JOGADORES[id].slug) {
+        nomeBase = JOGADORES[id].slug;
+    }
+    if (!nomeBase) return '';
+    return nomeBase.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
 // Renderiza os jogadores no campo
@@ -101,7 +118,7 @@ function renderFieldPlayers(lineup, teamId) {
         const playerInfo = provavelState.mercadoData?.get(p.id);
         const nomeCompleto = getPlayerName(p.id, playerInfo);
         const nomeAbrev = abreviarNome(nomeCompleto);
-        const nomeArquivo = getNomeArquivo(playerInfo);
+        const nomeArquivo = getNomeArquivoJogador(p.id, playerInfo);
         const fotoLocal = nomeArquivo ? `images/jogadores/${p.id}_${nomeArquivo}.webp` : null;
         const fotoProxy = playerInfo?.foto || '';
         const isDuvida = p.sit === 'duvida';
@@ -230,17 +247,15 @@ window.scrollToTeamField = (matchIdx, teamId) => {
 
 // ======================== MODAL COMPLETO (com scouts e gráfico) ========================
 window.abrirModalJogador = function(jogadorId, timeId) {
-    // Busca dados do mercado (proxy)
     const playerInfo = provavelState.mercadoData?.get(jogadorId);
     if (!playerInfo) {
         alert(`Dados do jogador ${jogadorId} não disponíveis.`);
         return;
     }
 
-    // Tenta obter scouts e histórico dos objetos globais (se carregados)
     const scoutData = (typeof SCOUTS !== 'undefined') ? SCOUTS[jogadorId] : null;
     const historicoRodadas = (typeof dadosRodadas !== 'undefined') ? dadosRodadas[jogadorId]?.scouts?.rdd : null;
-    const rodadaAtual = (typeof RODADA !== 'undefined') ? RODADA : 14;
+    const rodadaAtual = provavelState.partidasData?.rodada_id || 14;
 
     const nome = playerInfo.apelido_abreviado || playerInfo.apelido || playerInfo.nome || `Jogador ${jogadorId}`;
     const foto = playerInfo.foto || getTeamShield(timeId);
@@ -255,7 +270,6 @@ window.abrirModalJogador = function(jogadorId, timeId) {
     const mpv = scoutData?.mpv ?? '-';
     const pt_ced = scoutData?.pt_ced ?? '-';
 
-    // Scouts de ataque e defesa (se existir)
     const ata = scoutData?.scouts?.ata || {};
     const def = scoutData?.scouts?.def || {};
 
@@ -281,7 +295,6 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         </div>
     `;
 
-    // Gráfico de barras (últimas rodadas)
     const listaRodadas = [];
     for (let r = rodadaAtual - 9; r <= rodadaAtual; r++) {
         if (r > 0) listaRodadas.push(r);
@@ -304,7 +317,6 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         `;
     }).join('');
 
-    // Montagem do modal
     const modalHtml = `
         <div id="modal-jogador" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) fecharModal()">
             <div class="relative w-full max-w-md mx-3 bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh] animate-in fade-in zoom-in duration-200">
@@ -370,21 +382,26 @@ window.fecharModal = function() {
 window.renderProvaveis = async function() {
     const main = document.getElementById('main-content');
     if (!main) return;
+
     main.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-6"><div class="loader"></div><p class="text-slate-400 font-jogos text-xs uppercase animate-pulse">Sincronizando Escalações...</p></div>`;
     await fetchProvaveisData();
+
     if (provavelState.error) {
-        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
+        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
         return;
     }
+
+    const rodadaAtual = provavelState.partidasData?.rodada_id || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
             <div class="text-center"><h2 class="font-jogos text-4xl md:text-6xl text-slate-900 uppercase italic">QUEM <span class="text-orange-500">JOGA?</span></h2>
-            <p class="text-[9px] font-black text-slate-400 tracking-[0.4em] uppercase">ESCALAÇÕES PROVÁVEIS - ${provavelState.partidasData.rodada || ''}ª RODADA</p></div>
+            <p class="text-[9px] font-black text-slate-400 tracking-[0.4em] uppercase">ESCALAÇÕES PROVÁVEIS - ${rodadaAtual}ª RODADA</p></div>
             ${renderShieldsContainer()}
             ${renderLineupCards()}
         </div>
     `;
     if (typeof lucide !== "undefined") lucide.createIcons();
+    console.log("✅ Renderização concluída com sucesso");
 };
 
-console.log("✅ provaveis.js carregado (versão completa com scouts e gráfico)");
+console.log("✅ provaveis.js carregado – aguardando chamada de renderProvaveis()");
