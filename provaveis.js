@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES — VERSÃO FINAL COM MODAL COMPLETO
+   PROVÁVEIS ESCALAÇÕES — VERSÃO COMPLETA (MODAL + AJUSTES)
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -7,7 +7,7 @@ const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
 let provavelState = {
     partidasData: null,
     lineupsData: null,
-    mercadoData: null,
+    mercadoData: null,      // Map<atleta_id, info>
     teamUpdatesData: null,
     loading: false,
     error: null
@@ -21,7 +21,7 @@ const SLUG_TO_ID_MAP = {
     mirassol_v2: 2305, chapecoense_v2: 315, coritiba_v2: 294, remo_v2: 364
 };
 
-// Mapeamento de posições (conforme API Cartola)
+// Mapeamento das posições (conforme API Cartola)
 const POSICOES_MAP = {
     1: { nome: "Goleiro", abrev: "GOL" },
     2: { nome: "Lateral", abrev: "LAT" },
@@ -116,6 +116,7 @@ function renderFieldPlayers(lineup, teamId) {
     if (!lineup?.titulares) return '';
     return lineup.titulares.filter(p => p.slot !== 'TEC').map(p => {
         const playerInfo = provavelState.mercadoData?.get(p.id);
+        // Usa apelido_abreviado (ex: "Y. Alberto") ou fallback
         const nome = playerInfo?.apelido_abreviado || playerInfo?.apelido || playerInfo?.nome || '...';
         const nomeArquivo = playerInfo?.apelido || playerInfo?.nome || '';
         const nomeArquivoClean = nomeArquivo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -126,10 +127,12 @@ function renderFieldPlayers(lineup, teamId) {
         return `
             <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
                  style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
+                <!-- IMAGEM 2x MAIOR -->
                 <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
                     <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
                          onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                 </div>
+                <!-- NOME ABAIXO (apelido_abreviado) -->
                 <div class="mt-1 bg-black/60 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[60px] md:max-w-[80px] truncate border border-white/10">
                     <p class="text-[8px] md:text-[10px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
                 </div>
@@ -152,6 +155,7 @@ function renderMiniField(matchIdx, teamId) {
 
     return `
         <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20">
+            <!-- ÚLTIMA ATUALIZAÇÃO (canto superior esquerdo) -->
             ${fmtUpdate ? `
                 <div class="absolute top-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
                     <p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p>
@@ -215,6 +219,7 @@ function renderLineupCards() {
                     </div>
 
                     <div class="space-y-1 mt-2">
+                        <!-- LOCAL & HORÁRIO FORMATADO (conforme solicitado) -->
                         <div class="px-3 py-2 bg-slate-50 rounded-xl text-left mb-2">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
                             <p class="text-sm md:text-base font-bold text-slate-700"><span class="font-mono text-slate-500">LOCAL:</span> ${match.local || 'Estádio a definir'}</p>
@@ -232,18 +237,6 @@ function renderLineupCards() {
         </div>
     `;
 }
-
-window.scrollToMatch = (index) => {
-    const el = document.getElementById(`match-card-${index}`);
-    if (el) {
-        const offset = 120;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = el.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - offset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-};
 
 window.scrollToTeamField = (matchIdx, teamId) => {
     const el = document.getElementById(`field-${matchIdx}-${teamId}`);
@@ -272,25 +265,22 @@ window.abrirModalJogador = function(jogadorId, timeId) {
     // Dados básicos
     const nome = playerInfo.apelido_abreviado || playerInfo.apelido || playerInfo.nome || `Jogador ${jogadorId}`;
     const foto = playerInfo.foto || getTeamShield(timeId);
-    
-    // Posição (mapeia posicao_id para abreviação)
     const posicaoId = playerInfo.posicao_id;
-    const posicao = POSICOES_MAP[posicaoId]?.abrev || '?';
-    
+    const posicaoAbrev = POSICOES_MAP[posicaoId]?.abrev || '?';
+
     // Dados financeiros e estatísticas
     const preco = playerInfo.preco_num ? `R$ ${playerInfo.preco_num.toFixed(2)}` : 'R$ --';
     const variacao = playerInfo.variacao_num || 0;
     const variacaoStr = variacao > 0 ? `+${variacao.toFixed(2)}` : variacao.toFixed(2);
     const corVar = variacao > 0 ? 'text-green-500' : (variacao < 0 ? 'text-red-500' : 'text-gray-400');
     const jogos = playerInfo.jogos_num || 0;
-    const media = playerInfo.media_num ? playerInfo.media_num.toFixed(1) : '0.0';
     const ultima = playerInfo.pontos_num !== undefined ? playerInfo.pontos_num.toFixed(1) : '-';
-    
-    // MPV e CEDIDO (podem não estar disponíveis nesta API)
-    const mpv = playerInfo.mpv ? playerInfo.mpv.toFixed(2) : '--';
-    const pt_ced = playerInfo.pt_ced ? playerInfo.pt_ced.toFixed(1) : '--';
+    const media = playerInfo.media_num ? playerInfo.media_num.toFixed(1) : '0.0';
+    // MPV e CEDIDO ainda não disponíveis nesta API
+    const mpv = '--';
+    const pt_ced = '--';
 
-    // Scouts (da API de mercado)
+    // Scouts (diretamente do campo "scout" do jogador)
     const scouts = playerInfo.scout || {};
     const ata = {
         G: scouts.G || 0,
@@ -339,10 +329,10 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         </div>
     `;
 
-    // Gráfico de barras (placeholder)
+    // Gráfico placeholder (histórico de pontuações virá de outra API)
     const graficoHtml = `
         <div class="flex items-end justify-between h-[85px] w-full px-1">
-            <div class="w-full text-center text-[10px] text-gray-400">Dados de pontuação por rodada disponíveis em breve</div>
+            <div class="w-full text-center text-[10px] text-gray-400">Dados de pontuação por rodada em breve</div>
         </div>
     `;
 
@@ -360,7 +350,7 @@ window.abrirModalJogador = function(jogadorId, timeId) {
                         </div>
                         <div>
                             <h3 class="text-xl uppercase tracking-wide text-gray-800 font-jogos">${nome}</h3>
-                            <p class="text-xs font-mono text-gray-500">${posicao}</p>
+                            <p class="text-xs font-mono text-gray-500">${posicaoAbrev}</p>
                         </div>
                     </div>
                 </div>
@@ -421,7 +411,9 @@ window.renderProvaveis = async function() {
                 <div class="relative inline-block">
                     <div class="absolute -inset-4 bg-red-500/10 rounded-full blur-2xl animate-pulse"></div>
                     <div class="relative p-10 bg-white border border-red-100 rounded-[50px] shadow-2xl">
-                        <i data-lucide="alert-triangle" class="w-20 h-20 text-red-500"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
                     </div>
                 </div>
                 <div class="space-y-4">
@@ -452,4 +444,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js - Versão final com modal completo e mapeamento de posições");
+console.log("✅ provaveis.js carregado (modal completo, imagens maiores, local/horário formatado)");
