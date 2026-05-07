@@ -186,7 +186,7 @@ function renderLineupCards() {
                     <div class="flex items-center justify-between mb-4 gap-2">
                         <!-- Time da Casa: posição à esquerda do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-end">
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}&ordm;</span>
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
@@ -200,15 +200,15 @@ function renderLineupCards() {
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
                             </div>
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}º</span>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}&ordm;</span>
                         </div>
                     </div>
 
                     <div class="mt-2">
-                        <!-- 🔥 LOCAL E HORÁRIO: Fonte unificada e cores ajustadas -->
-                        <div class="bg-slate-50 rounded-xl px-3 py-2 text-left mb-2 text-[10px] md:text-xs font-jogos text-slate-500 border border-slate-100 uppercase tracking-tighter">
-                            <div><span>LOCAL:</span> <span class="text-orange-500 ml-1">${match.local || 'Estádio a definir'}</span></div>
-                            <div class="mt-0.5"><span>HORÁRIO:</span> <span class="text-orange-500 ml-1">${horaFormatada} - ${dataFormatada}</span></div>
+                        <!-- 🔥 LOCAL E HORÁRIO: Fonte mono unificada e cores ajustadas -->
+                        <div class="bg-slate-50 rounded-xl px-3 py-2 text-left mb-2 text-[10px] md:text-xs font-mono text-slate-500 border border-slate-100 uppercase tracking-tight">
+                            <div><span class="font-bold">LOCAL:</span> <span class="text-orange-600 ml-1">${match.local || 'Estádio a definir'}</span></div>
+                            <div class="mt-0.5"><span class="font-bold">HORÁRIO:</span> <span class="text-orange-600 ml-1">${horaFormatada} - ${dataFormatada}</span></div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
