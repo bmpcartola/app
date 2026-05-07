@@ -129,7 +129,7 @@ function renderFieldPlayers(lineup, teamId) {
                 <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
                      style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
                     <!-- 🔥 BORDA DE DÚVIDA MAIS VISÍVEL: 3px laranja com brilho -->
-                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-4 ring-orange-500 ring-offset-2 shadow-lg shadow-orange-500/50 border-2 border-orange-300' : 'border border-white'}">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-3 ring-orange-500 ring-offset-2 shadow-lg shadow-orange-500/50 border-2 border-orange-300' : 'border border-white'}">
                         <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
                              onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                     </div>
