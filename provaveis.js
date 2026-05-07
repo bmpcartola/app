@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES — VERSÃO ORIGINAL CORRIGIDA (APENAS URLs)
+   PROVÁVEIS ESCALAÇÕES — VERSÃO COMPLETA CORRIGIDA
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -8,11 +8,11 @@ let provavelState = {
     partidasData: null,
     lineupsData: null,
     mercadoData: null,
+    teamUpdatesData: null,
     loading: false,
     error: null
 };
 
-// Map of Cartola IDs to Proxy Slugs for Lineups
 const SLUG_TO_ID_MAP = {
     corinthians_v2: 264, palmeiras_v2: 275, flamengo_v2: 262, vasco_v2: 267,
     'atletico-mg_v2': 282, cruzeiro_v2: 283, gremio_v2: 284, internacional_v2: 285,
@@ -26,12 +26,10 @@ async function fetchProvaveisData() {
     provavelState.error = null;
     
     try {
-        // Fetch matches from Cartola API via Proxy to avoid CORS
         const partidasRes = await fetch(`${PROXY_URL_PROVAVEIS}/partidas`);
         if (!partidasRes.ok) throw new Error("Erro ao carregar partidas via proxy");
         provavelState.partidasData = await partidasRes.json();
 
-        // 🔥 CORREÇÃO: adicionado prefixo /provaveis/ nas duas chamadas abaixo
         try {
             const lineupsRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/lineups`);
             if (lineupsRes.ok) provavelState.lineupsData = await lineupsRes.json();
@@ -41,6 +39,12 @@ async function fetchProvaveisData() {
                 const mercadoArray = await mercadoRes.json();
                 provavelState.mercadoData = new Map();
                 mercadoArray.forEach(item => provavelState.mercadoData.set(item.atleta_id, item));
+            }
+
+            // 🔥 Buscar team-updates para última atualização
+            const updatesRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/team-updates`);
+            if (updatesRes.ok) {
+                provavelState.teamUpdatesData = await updatesRes.json();
             }
         } catch (e) {
             console.warn("⚠️ Proxy details failed, using basic match info.", e);
@@ -55,33 +59,39 @@ async function fetchProvaveisData() {
 }
 
 function getTeamShield(teamId) {
-    // Shield path as requested: /images/escudos_brasileirao/{ID}.png
     return `images/escudos_brasileirao/${teamId}.png`;
 }
 
-function renderShieldsContainer() {
-    if (!provavelState.partidasData || !provavelState.partidasData.partidas) return '';
+function formatarDataAtualizacao(lastUpdate) {
+    if (!lastUpdate) return null;
+    try {
+        const now = new Date();
+        const dt = new Date(lastUpdate);
+        const pad = n => String(n).padStart(2, '0');
+        const hhmm = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+        if (now.toDateString() === dt.toDateString()) return `Hoje ${hhmm}`;
+        const yest = new Date(now);
+        yest.setDate(now.getDate() - 1);
+        if (yest.toDateString() === dt.toDateString()) return `Ontem ${hhmm}`;
+        return `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)} ${hhmm}`;
+    } catch (e) {
+        return null;
+    }
+}
 
-    const matches = provavelState.partidasData.partidas;
-    
+function renderShieldsContainer() {
+    if (!provavelState.partidasData?.partidas) return '';
     return `
-        <div class="bg-white/80 backdrop-blur-md rounded-[40px] border border-slate-100 p-8 shadow-sm mb-6 animate-in fade-in slide-in-from-top-4 duration-1000">
+        <div class="bg-white/80 backdrop-blur-md rounded-[40px] border border-slate-100 p-8 shadow-sm mb-6">
             <p class="text-[10px] font-black font-jogos text-slate-400 tracking-[0.3em] mb-6 uppercase text-center">Partidas da Rodada</p>
             <div class="flex flex-wrap items-center justify-start gap-4 md:gap-6">
-                ${matches.map((match, idx) => `
-                    <div class="flex items-center gap-1 group">
-                        <!-- Mandante -->
-                        <button onclick="scrollToTeamField(${idx}, ${match.clube_casa_id})" class="w-10 h-10 md:w-12 md:h-12 p-1.5 bg-white rounded-xl border border-slate-100 hover:border-orange-300 hover:bg-orange-50 transition-all shadow-sm hover:scale-110 active:scale-95 group/btn">
-                            <img src="${getTeamShield(match.clube_casa_id)}" 
-                                 class="w-full h-full object-contain drop-shadow-sm"
-                                 onerror="this.src='https://s.glbimg.com/es/sde/f/equipes/2018/03/12/identidade-visual-60x60.png'">
+                ${provavelState.partidasData.partidas.map((match, idx) => `
+                    <div class="flex items-center gap-1">
+                        <button onclick="scrollToTeamField(${idx}, ${match.clube_casa_id})" class="w-10 h-10 md:w-12 md:h-12 p-1.5 bg-white rounded-xl border hover:border-orange-300 transition-all shadow-sm hover:scale-110">
+                            <img src="${getTeamShield(match.clube_casa_id)}" onerror="this.src='https://s.glbimg.com/es/sde/f/equipes/2018/03/12/identidade-visual-60x60.png'">
                         </button>
-                        
-                        <!-- Visitante -->
-                        <button onclick="scrollToTeamField(${idx}, ${match.clube_visitante_id})" class="w-10 h-10 md:w-12 md:h-12 p-1.5 bg-white rounded-xl border border-slate-100 hover:border-orange-300 hover:bg-orange-50 transition-all shadow-sm hover:scale-110 active:scale-95 group/btn">
-                            <img src="${getTeamShield(match.clube_visitante_id)}" 
-                                 class="w-full h-full object-contain drop-shadow-sm"
-                                 onerror="this.src='https://s.glbimg.com/es/sde/f/equipes/2018/03/12/identidade-visual-60x60.png'">
+                        <button onclick="scrollToTeamField(${idx}, ${match.clube_visitante_id})" class="w-10 h-10 md:w-12 md:h-12 p-1.5 bg-white rounded-xl border hover:border-orange-300 transition-all shadow-sm hover:scale-110">
+                            <img src="${getTeamShield(match.clube_visitante_id)}" onerror="this.src='https://s.glbimg.com/es/sde/f/equipes/2018/03/12/identidade-visual-60x60.png'">
                         </button>
                     </div>
                 `).join('')}
@@ -91,66 +101,47 @@ function renderShieldsContainer() {
 }
 
 function renderDots(results) {
-    if (!results || !Array.isArray(results)) return '<div class="h-1.5 mb-1 text-transparent">.</div>';
-    return `
-        <div class="flex gap-0.5 justify-center mb-1">
-            ${results.map(res => {
-                let color = 'bg-slate-300'; 
-                if (res === 'v') color = 'bg-emerald-500';
-                if (res === 'd') color = 'bg-red-500';
-                return `<div class="w-1.5 h-1.5 rounded-full ${color}"></div>`;
-            }).join('')}
-        </div>
-    `;
-}
-
-function getNomeArquivo(id, playerInfo) {
-    const nome = playerInfo?.apelido || playerInfo?.nome || '';
-    if (nome) {
-        return nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    }
-    return '';
+    if (!results || !Array.isArray(results)) return '<div class="h-1.5 mb-1"></div>';
+    return `<div class="flex gap-0.5 justify-center mb-1">${results.map(res => {
+        let color = res === 'v' ? 'bg-emerald-500' : (res === 'd' ? 'bg-red-500' : 'bg-slate-300');
+        return `<div class="w-1.5 h-1.5 rounded-full ${color}"></div>`;
+    }).join('')}</div>`;
 }
 
 function renderFieldPlayers(lineup, teamId) {
-    if (!lineup || !lineup.titulares) return '';
-    
-    return lineup.titulares
-        .filter(p => p.slot !== 'TEC')
-        .map(p => {
-            const playerInfo = provavelState.mercadoData?.get(p.id);
-            const nome = playerInfo?.apelido || playerInfo?.nome || '...';
-            const nomeArquivo = getNomeArquivo(p.id, playerInfo);
-            const fotoLocal = nomeArquivo ? `images/jogadores/${p.id}_${nomeArquivo}.webp` : null;
-            const fotoProxy = playerInfo?.foto || '';
-            const isDuvida = p.sit === 'duvida';
-            
-            // coordinates from JSON (0-100)
-            const x = p.x; 
-            const y = p.y;
-
-            const onClickAttr = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
-
-            return `
-                <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform" 
-                     style="left: ${x}%; top: ${y}%; transform: translate(-50%, -50%); z-index: 10;"
-                     ${onClickAttr}>
-                    <div class="w-6 h-6 md:w-10 md:h-10 rounded-full bg-white/95 p-0.5 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
-                        <img src="${fotoLocal}" 
-                             class="w-full h-full object-contain rounded-full" 
-                             onerror="this.onerror=null; this.src='${fotoProxy || getTeamShield(teamId)}'">
-                    </div>
-                    <div class="mt-0.5 bg-black/60 backdrop-blur-[1px] px-1 rounded-[2px] max-w-[42px] md:max-w-[60px] truncate border border-white/10">
-                        <p class="text-[4px] md:text-[6px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
-                    </div>
+    if (!lineup?.titulares) return '';
+    return lineup.titulares.filter(p => p.slot !== 'TEC').map(p => {
+        const playerInfo = provavelState.mercadoData?.get(p.id);
+        // 🔥 Usa apelido_abreviado se disponível
+        const nome = playerInfo?.apelido_abreviado || playerInfo?.apelido || playerInfo?.nome || '...';
+        const nomeArquivo = playerInfo?.apelido || playerInfo?.nome || '';
+        const nomeArquivoClean = nomeArquivo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const fotoLocal = nomeArquivoClean ? `images/jogadores/${p.id}_${nomeArquivoClean}.webp` : null;
+        const fotoProxy = playerInfo?.foto || '';
+        const isDuvida = p.sit === 'duvida';
+        const onClick = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
+        return `
+            <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
+                 style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
+                <!-- 🔥 IMAGEM 2X MAIOR (w-12 h-12 em mobile, w-16 h-16 em desktop) -->
+                <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
+                    <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
+                         onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                 </div>
-            `;
-        }).join('');
+                <!-- 🔥 NOME DO JOGADOR ABAIXO DA IMAGEM (com apelido_abreviado) -->
+                <div class="mt-1 bg-black/60 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[60px] md:max-w-[80px] truncate border border-white/10">
+                    <p class="text-[8px] md:text-[10px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function renderMiniField(matchIdx, teamId) {
     const slug = Object.keys(SLUG_TO_ID_MAP).find(key => SLUG_TO_ID_MAP[key] === teamId);
     const lineup = slug ? provavelState.lineupsData?.teams?.[slug] : null;
+    const lastUpdate = slug ? provavelState.teamUpdatesData?.teams?.[slug]?.last_update : null;
+    const fmtUpdate = formatarDataAtualizacao(lastUpdate);
     
     const playersHtml = lineup ? renderFieldPlayers(lineup, teamId) : `
         <div class="absolute inset-0 flex items-center justify-center">
@@ -159,32 +150,34 @@ function renderMiniField(matchIdx, teamId) {
     `;
 
     return `
-        <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20 group/field">
-            <!-- Field Lines -->
+        <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20">
+            <!-- 🔥 ÚLTIMA ATUALIZAÇÃO (canto superior esquerdo) -->
+            ${fmtUpdate ? `
+                <div class="absolute top-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                    <p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p>
+                </div>
+            ` : ''}
             <div class="absolute inset-4 border-2 border-white/10 pointer-events-none opacity-40"></div>
             <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2 pointer-events-none"></div>
             <div class="absolute top-1/2 left-1/2 w-12 h-12 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-40"></div>
-            
-            <!-- Team Shield - More visible as requested -->
             <div class="absolute top-3 left-3 w-12 h-12 md:w-20 md:h-20 opacity-40 drop-shadow-2xl pointer-events-none">
                 <img src="${getTeamShield(teamId)}" class="w-full h-full object-contain grayscale brightness-200">
             </div>
-
-            <!-- Content Area (Players) -->
             ${playersHtml}
         </div>
     `;
 }
 
 function renderLineupCards() {
-    if (!provavelState.partidasData || !provavelState.partidasData.partidas) return '';
-    
+    if (!provavelState.partidasData?.partidas) return '';
     return `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             ${provavelState.partidasData.partidas.map((match, idx) => {
                 const clubeCasa = provavelState.partidasData.clubes[match.clube_casa_id];
                 const clubeVisitante = provavelState.partidasData.clubes[match.clube_visitante_id];
-                
+                const dataPartida = new Date(match.partida_data);
+                const dataFormatada = dataPartida.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+                const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm group hover:shadow-xl transition-all duration-500 overflow-hidden relative">
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -222,11 +215,12 @@ function renderLineupCards() {
                     </div>
 
                     <div class="space-y-1 mt-2">
-                        <div class="px-2 py-1.5 bg-slate-50 rounded-xl border border-slate-100 text-center group-hover:bg-white transition-colors mb-2">
-                            <p class="text-[6px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">Local & Horário</p>
-                            <p class="text-[8px] md:text-xs font-bold text-slate-700 leading-tight truncate">${match.local || 'Estádio a definir'}</p>
-                            <div class="h-[1px] w-3 bg-slate-200 mx-auto my-0.5"></div>
-                            <p class="text-[7px] md:text-[9px] font-mono font-bold text-orange-500 uppercase">${new Date(match.partida_data).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}</p>
+                        <!-- 🔥 LOCAL E HORÁRIO COM FONTE MAIOR E FORMATO MELHORADO -->
+                        <div class="px-3 py-2 bg-slate-50 rounded-xl text-center mb-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
+                            <p class="text-sm md:text-base font-bold text-slate-700">${match.local || 'Estádio a definir'}</p>
+                            <div class="h-[1px] w-6 bg-slate-200 mx-auto my-1.5"></div>
+                            <p class="text-sm md:text-base font-mono font-bold text-orange-500">${horaFormatada} • ${dataFormatada}</p>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-2">
@@ -249,11 +243,7 @@ window.scrollToMatch = (index) => {
         const elementRect = el.getBoundingClientRect().top;
         const elementPosition = elementRect - bodyRect;
         const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
 };
 
@@ -265,13 +255,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
         const elementRect = el.getBoundingClientRect().top;
         const elementPosition = elementRect - bodyRect;
         const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
-        
-        // Visual feedback
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         el.classList.add('ring-4', 'ring-orange-500', 'ring-offset-2');
         setTimeout(() => el.classList.remove('ring-4', 'ring-orange-500', 'ring-offset-2'), 2000);
     }
@@ -318,7 +302,6 @@ window.renderProvaveis = async function() {
 
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
-            <!-- Header Section -->
             <div class="text-center space-y-1 mb-2">
                 <h2 class="font-jogos text-4xl md:text-6xl text-slate-900 leading-none tracking-tighter uppercase italic">QUEM <span class="text-orange-500">JOGA?</span></h2>
                 <p class="text-[9px] font-black text-slate-400 tracking-[0.4em] uppercase">ESCALAÇÕES PROVÁVEIS - ${provavelState.partidasData.rodada_id || ''}ª RODADA</p>
@@ -336,8 +319,9 @@ window.renderProvaveis = async function() {
 };
 
 window.abrirModalJogador = function(id, timeId) {
-    console.log("Modal jogador:", id, timeId);
-    // Future implementation
+    const playerInfo = provavelState.mercadoData?.get(id);
+    const nome = playerInfo?.apelido_abreviado || playerInfo?.apelido || playerInfo?.nome || `Jogador ${id}`;
+    alert(`Jogador: ${nome}\nID: ${id}\n\nDetalhes completos em breve!`);
 };
 
-console.log("✅ provaveis.js - V.Final Reiniciado com Sucesso");
+console.log("✅ provaveis.js - Versão completa com todas as melhorias");
