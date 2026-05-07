@@ -129,7 +129,7 @@ function renderFieldPlayers(lineup, teamId) {
                 <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
                      style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
                     <!-- 🔥 BORDA DE DÚVIDA MAIS VISÍVEL: 3px laranja com brilho -->
-                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-3 ring-orange-500 ring-offset-1 shadow-orange-500/30' : 'border border-white'}">
+                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-4 ring-orange-500 ring-offset-2 shadow-lg shadow-orange-500/50 border-2 border-orange-300' : 'border border-white'}">
                         <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
                              onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                     </div>
@@ -186,7 +186,7 @@ function renderLineupCards() {
                     <div class="flex items-center justify-between mb-4 gap-2">
                         <!-- Time da Casa: posição à esquerda do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-end">
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}&ordm;</span>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
