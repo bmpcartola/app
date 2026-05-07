@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL COM TODAS CORREÇÕES
+   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL (COM TIMEOUT E MODAL CORRIGIDO)
    ============================================================ */
 
 const PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -23,7 +23,7 @@ const SLUG_TO_ID_MAP = {
 
 const POSICOES_MAP = { 1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC" };
 
-// Timeout para evitar travamento eterno
+// 🔥 FUNÇÃO COM TIMEOUT (evita travamento eterno)
 async function fetchWithTimeout(url, timeout = 10000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
@@ -57,9 +57,9 @@ async function fetchProvaveisData() {
         const updatesRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/team-updates`);
         if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
 
-        console.log("✅ Dados carregados com sucesso");
+        console.log("✅ Dados carregados");
     } catch (err) {
-        console.error("❌ Erro fetch:", err);
+        console.error("❌ Erro:", err);
         provavelState.error = err.message;
     } finally {
         provavelState.loading = false;
@@ -187,20 +187,16 @@ function renderLineupCards() {
                 const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
-                    <!-- Cabeçalho: posição mandante à esquerda, visitante à direita -->
                     <div class="flex items-center justify-between gap-2 mb-4">
-                        <!-- Mandante: posição à esquerda do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-start">
                             <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
                         </div>
-                        <!-- VS -->
                         <div class="flex flex-col items-center px-2">
                             <span class="text-slate-300 font-black font-jogos italic text-sm md:text-base">VS</span>
                         </div>
-                        <!-- Visitante: posição à direita do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-end">
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
@@ -208,12 +204,9 @@ function renderLineupCards() {
                             <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}º</span>
                         </div>
                     </div>
-
-                    <!-- Local e horário (mesma fonte, sem labels) -->
                     <div class="bg-slate-50 rounded-xl px-3 py-2 text-center mb-2 text-sm md:text-base font-medium text-slate-600 border border-slate-100">
                         ${match.local || 'Estádio a definir'} • ${horaFormatada} - ${dataFormatada}
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         ${renderMiniField(idx, match.clube_casa_id)}
                         ${renderMiniField(idx, match.clube_visitante_id)}
@@ -235,7 +228,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL ========================
+// ======================== MODAL CORRIGIDO (usa API /mercado) ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
@@ -259,8 +252,8 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         const jogos = atleta.jogos_num || 0;
         const ultima = atleta.pontos_num !== undefined ? atleta.pontos_num.toFixed(1) : '-';
         const media = atleta.media_num ? atleta.media_num.toFixed(1) : '0.0';
-        const mpv = '--';
-        const pt_ced = '--';
+        const mpv = atleta.mpv ? atleta.mpv.toFixed(2) : '--';
+        const pt_ced = atleta.pt_ced ? atleta.pt_ced.toFixed(1) : '--';
 
         const scout = atleta.scout || {};
         const ataque = {
@@ -354,7 +347,7 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     } catch (err) {
         console.error("Erro modal:", err);
-        alert(`Não foi possível carregar os dados do jogador.`);
+        alert(`Erro ao carregar dados do jogador. Verifique o console.`);
     }
 };
 
@@ -385,4 +378,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js carregado – aguardando clique no menu");
+console.log("✅ provaveis.js carregado – agora com timeout e modal corrigido");
