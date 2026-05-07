@@ -29,21 +29,26 @@ async function fetchProvaveisData() {
     provavelState.loading = true;
     provavelState.error = null;
     try {
-        const partidasRes = await fetch(`${PROXY_URL_PROVAVEIS}/partidas`);
+        // 🔥 Requisições paralelas (mais rápido)
+        const [partidasRes, lineupsRes, mercadoRes, updatesRes] = await Promise.all([
+            fetch(`${PROXY_URL_PROVAVEIS}/partidas`),
+            fetch(`${PROXY_URL_PROVAVEIS}/provaveis/lineups`),
+            fetch(`${PROXY_URL_PROVAVEIS}/provaveis/mercado-images`),
+            fetch(`${PROXY_URL_PROVAVEIS}/provaveis/team-updates`)
+        ]);
+
         if (!partidasRes.ok) throw new Error("Falha partidas");
         provavelState.partidasData = await partidasRes.json();
 
-        const lineupsRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/lineups`);
         if (lineupsRes.ok) provavelState.lineupsData = await lineupsRes.json();
         
-        const mercadoRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/mercado-images`);
         if (mercadoRes.ok) {
             const arr = await mercadoRes.json();
             provavelState.mercadoData = new Map(arr.map(i => [i.atleta_id, i]));
         }
 
-        const updatesRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/team-updates`);
         if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
+
     } catch (err) {
         console.error(err);
         provavelState.error = err.message;
@@ -360,13 +365,31 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
 };
 
 window.renderProvaveis = async function() {
-    await fetchProvaveisData();
     const main = document.getElementById('main-content');
     if (!main) return;
+
+    // 1. MOSTRA O LOADER IMEDIATAMENTE (tela de prováveis já aparece)
+    main.innerHTML = `
+        <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+            <div class="loader"></div>
+            <div class="text-center">
+                <p class="text-slate-400 font-jogos text-xs tracking-[0.4em] uppercase animate-pulse">Carregando Escalações</p>
+                <p class="text-[10px] font-mono text-slate-300 mt-2 uppercase tracking-widest">Aguarde um momento...</p>
+            </div>
+        </div>
+    `;
+
+    // 2. CARREGA OS DADOS EM PARALELO (mais rápido)
+    await fetchProvaveisData();
+
+    // 3. SE HOUVER ERRO, MOSTRA MENSAGEM
     if (provavelState.error) {
-        main.innerHTML = `<div class="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-xl p-6 max-w-md mx-4"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 w-full bg-black text-white py-2 rounded-full">Tentar novamente</button></div></div>`;
+        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
+        if (typeof lucide !== "undefined") lucide.createIcons();
         return;
     }
+
+    // 4. RENDERIZA O CONTEÚDO FINAL
     const rodada = provavelState.partidasData.rodada_id || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
