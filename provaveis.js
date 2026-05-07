@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO COMPLETA + MELHORIAS
+   PROVÁVEIS ESCALAÇÕES – VERSÃO DEFINITIVA (COM DEPURAÇÃO)
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -216,7 +216,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL COMPLETO ========================
+// ======================== MODAL CORRIGIDO COM DEPURAÇÃO ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
@@ -229,6 +229,9 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         return;
     }
 
+    // 🔥 LOG PARA DEPURAÇÃO – ABRA O CONSOLE (F12) PARA VER O QUE O PLAYER CONTÉM
+    console.log("🔍 Dados completos do jogador:", player);
+
     const nome = player.apelido_abreviado || player.apelido || player.nome || `#${jogadorId}`;
     const foto = player.foto || getTeamShield(timeId);
     const posAbrev = POSICOES_MAP[player.posicao_id] || '?';
@@ -239,34 +242,36 @@ window.abrirModalJogador = function(jogadorId, timeId) {
     const jogos = player.jogos_num || 0;
     const ultima = player.pontos_num !== undefined ? player.pontos_num.toFixed(1) : '-';
     const media = player.media_num ? player.media_num.toFixed(1) : '0.0';
-    const mpv = '--';
-    const pt_ced = '--';
+    const mpv = player.mpv ? player.mpv.toFixed(2) : '--';
+    const pt_ced = player.pt_ced ? player.pt_ced.toFixed(1) : '--';
 
+    // 🔥 EXTRAI OS SCOUTS – USANDO OS MESMOS CAMPOS QUE A API FORNECE
     const scout = player.scout || {};
-    const ata = {
+    // Lista completa de scouts possíveis (Cartola)
+    const ataque = {
         G: scout.G || 0, A: scout.A || 0, FT: scout.FT || 0, FD: scout.FD || 0,
         FF: scout.FF || 0, FS: scout.FS || 0, PS: scout.PS || 0, V: scout.V || 0,
         I: scout.I || 0, PP: scout.PP || 0
     };
-    const def = {
+    const defesa = {
         DS: scout.DS || 0, SG: scout.SG || 0, DE: scout.DE || 0, DP: scout.DP || 0,
         CV: scout.CV || 0, CA: scout.CA || 0, FC: scout.FC || 0, GC: scout.GC || 0,
         GS: scout.GS || 0, PC: scout.PC || 0
     };
 
     const ataques = [
-        { label: "G", val: ata.G, red: false }, { label: "A", val: ata.A, red: false },
-        { label: "FT", val: ata.FT, red: false }, { label: "FD", val: ata.FD, red: false },
-        { label: "FF", val: ata.FF, red: false }, { label: "FS", val: ata.FS, red: false },
-        { label: "PS", val: ata.PS, red: false }, { label: "V", val: ata.V, red: false },
-        { label: "I", val: ata.I, red: true }, { label: "PP", val: ata.PP, red: true }
+        { label: "G", val: ataque.G, red: false }, { label: "A", val: ataque.A, red: false },
+        { label: "FT", val: ataque.FT, red: false }, { label: "FD", val: ataque.FD, red: false },
+        { label: "FF", val: ataque.FF, red: false }, { label: "FS", val: ataque.FS, red: false },
+        { label: "PS", val: ataque.PS, red: false }, { label: "V", val: ataque.V, red: false },
+        { label: "I", val: ataque.I, red: true }, { label: "PP", val: ataque.PP, red: true }
     ];
     const defesas = [
-        { label: "DS", val: def.DS, red: false }, { label: "SG", val: def.SG, red: false },
-        { label: "DE", val: def.DE, red: false }, { label: "DP", val: def.DP, red: false },
-        { label: "CV", val: def.CV, red: true }, { label: "CA", val: def.CA, red: true },
-        { label: "FC", val: def.FC, red: true }, { label: "GC", val: def.GC, red: true },
-        { label: "GS", val: def.GS, red: true }, { label: "PC", val: def.PC, red: true }
+        { label: "DS", val: defesa.DS, red: false }, { label: "SG", val: defesa.SG, red: false },
+        { label: "DE", val: defesa.DE, red: false }, { label: "DP", val: defesa.DP, red: false },
+        { label: "CV", val: defesa.CV, red: true }, { label: "CA", val: defesa.CA, red: true },
+        { label: "FC", val: defesa.FC, red: true }, { label: "GC", val: defesa.GC, red: true },
+        { label: "GS", val: defesa.GS, red: true }, { label: "PC", val: defesa.PC, red: true }
     ];
 
     const renderCell = (label, val, isRed) => `
@@ -361,4 +366,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js carregado (modal com scouts, imagens maiores, último update, local/horário)");
+console.log("✅ provaveis.js carregado – abra o console ao clicar num jogador para ver os dados recebidos.");
