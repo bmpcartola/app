@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES — VERSÃO COMPLETA (MODAL + AJUSTES)
+   PROVÁVEIS ESCALAÇÕES – VERSÃO COMPLETA + MELHORIAS
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -7,7 +7,7 @@ const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
 let provavelState = {
     partidasData: null,
     lineupsData: null,
-    mercadoData: null,      // Map<atleta_id, info>
+    mercadoData: null,
     teamUpdatesData: null,
     loading: false,
     error: null
@@ -21,23 +21,16 @@ const SLUG_TO_ID_MAP = {
     mirassol_v2: 2305, chapecoense_v2: 315, coritiba_v2: 294, remo_v2: 364
 };
 
-// Mapeamento das posições (conforme API Cartola)
 const POSICOES_MAP = {
-    1: { nome: "Goleiro", abrev: "GOL" },
-    2: { nome: "Lateral", abrev: "LAT" },
-    3: { nome: "Zagueiro", abrev: "ZAG" },
-    4: { nome: "Meia", abrev: "MEI" },
-    5: { nome: "Atacante", abrev: "ATA" },
-    6: { nome: "Técnico", abrev: "TEC" }
+    1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC"
 };
 
 async function fetchProvaveisData() {
     provavelState.loading = true;
     provavelState.error = null;
-    
     try {
         const partidasRes = await fetch(`${PROXY_URL_PROVAVEIS}/partidas`);
-        if (!partidasRes.ok) throw new Error("Erro ao carregar partidas");
+        if (!partidasRes.ok) throw new Error("Falha partidas");
         provavelState.partidasData = await partidasRes.json();
 
         const lineupsRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/lineups`);
@@ -45,17 +38,14 @@ async function fetchProvaveisData() {
         
         const mercadoRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/mercado-images`);
         if (mercadoRes.ok) {
-            const mercadoArray = await mercadoRes.json();
-            provavelState.mercadoData = new Map();
-            mercadoArray.forEach(item => provavelState.mercadoData.set(item.atleta_id, item));
+            const arr = await mercadoRes.json();
+            provavelState.mercadoData = new Map(arr.map(i => [i.atleta_id, i]));
         }
 
         const updatesRes = await fetch(`${PROXY_URL_PROVAVEIS}/provaveis/team-updates`);
-        if (updatesRes.ok) {
-            provavelState.teamUpdatesData = await updatesRes.json();
-        }
+        if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
     } catch (err) {
-        console.error("❌ Erro:", err);
+        console.error(err);
         provavelState.error = err.message;
     } finally {
         provavelState.loading = false;
@@ -69,18 +59,16 @@ function getTeamShield(teamId) {
 function formatarDataAtualizacao(lastUpdate) {
     if (!lastUpdate) return null;
     try {
-        const now = new Date();
         const dt = new Date(lastUpdate);
+        const now = new Date();
         const pad = n => String(n).padStart(2, '0');
         const hhmm = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
         if (now.toDateString() === dt.toDateString()) return `Hoje ${hhmm}`;
         const yest = new Date(now);
         yest.setDate(now.getDate() - 1);
         if (yest.toDateString() === dt.toDateString()) return `Ontem ${hhmm}`;
-        return `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)} ${hhmm}`;
-    } catch (e) {
-        return null;
-    }
+        return `${pad(dt.getDate())}/${pad(dt.getMonth()+1)} ${hhmm}`;
+    } catch(e) { return null; }
 }
 
 function renderShieldsContainer() {
@@ -114,31 +102,29 @@ function renderDots(results) {
 
 function renderFieldPlayers(lineup, teamId) {
     if (!lineup?.titulares) return '';
-    return lineup.titulares.filter(p => p.slot !== 'TEC').map(p => {
-        const playerInfo = provavelState.mercadoData?.get(p.id);
-        // Usa apelido_abreviado (ex: "Y. Alberto") ou fallback
-        const nome = playerInfo?.apelido_abreviado || playerInfo?.apelido || playerInfo?.nome || '...';
-        const nomeArquivo = playerInfo?.apelido || playerInfo?.nome || '';
-        const nomeArquivoClean = nomeArquivo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-        const fotoLocal = nomeArquivoClean ? `images/jogadores/${p.id}_${nomeArquivoClean}.webp` : null;
-        const fotoProxy = playerInfo?.foto || '';
-        const isDuvida = p.sit === 'duvida';
-        const onClick = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
-        return `
-            <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
-                 style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
-                <!-- IMAGEM 2x MAIOR -->
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
-                    <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
-                         onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
+    return lineup.titulares
+        .filter(p => p.slot !== 'TEC')
+        .map(p => {
+            const playerInfo = provavelState.mercadoData?.get(p.id);
+            const nome = playerInfo?.apelido_abreviado || playerInfo?.apelido || playerInfo?.nome || '...';
+            const nomeArquivo = (playerInfo?.apelido || playerInfo?.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const fotoLocal = nomeArquivo ? `images/jogadores/${p.id}_${nomeArquivo}.webp` : null;
+            const fotoProxy = playerInfo?.foto || '';
+            const isDuvida = p.sit === 'duvida';
+            const onClick = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
+            return `
+                <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
+                     style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
+                        <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
+                             onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
+                    </div>
+                    <div class="mt-1 bg-black/60 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[60px] md:max-w-[80px] truncate border border-white/10">
+                        <p class="text-[8px] md:text-[10px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
+                    </div>
                 </div>
-                <!-- NOME ABAIXO (apelido_abreviado) -->
-                <div class="mt-1 bg-black/60 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[60px] md:max-w-[80px] truncate border border-white/10">
-                    <p class="text-[8px] md:text-[10px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
 }
 
 function renderMiniField(matchIdx, teamId) {
@@ -146,25 +132,18 @@ function renderMiniField(matchIdx, teamId) {
     const lineup = slug ? provavelState.lineupsData?.teams?.[slug] : null;
     const lastUpdate = slug ? provavelState.teamUpdatesData?.teams?.[slug]?.last_update : null;
     const fmtUpdate = formatarDataAtualizacao(lastUpdate);
-    
     const playersHtml = lineup ? renderFieldPlayers(lineup, teamId) : `
         <div class="absolute inset-0 flex items-center justify-center">
             <span class="text-[8px] font-black font-jogos text-white/20 uppercase tracking-[0.2em] -rotate-12">Escalação em breve</span>
         </div>
     `;
-
     return `
         <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20">
-            <!-- ÚLTIMA ATUALIZAÇÃO (canto superior esquerdo) -->
-            ${fmtUpdate ? `
-                <div class="absolute top-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                    <p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p>
-                </div>
-            ` : ''}
+            ${fmtUpdate ? `<div class="absolute top-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full"><p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p></div>` : ''}
             <div class="absolute inset-4 border-2 border-white/10 pointer-events-none opacity-40"></div>
-            <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2 pointer-events-none"></div>
-            <div class="absolute top-1/2 left-1/2 w-12 h-12 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-40"></div>
-            <div class="absolute top-3 left-3 w-12 h-12 md:w-20 md:h-20 opacity-40 drop-shadow-2xl pointer-events-none">
+            <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2"></div>
+            <div class="absolute top-1/2 left-1/2 w-12 h-12 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-40"></div>
+            <div class="absolute top-3 left-3 w-12 h-12 md:w-20 md:h-20 opacity-40 drop-shadow-2xl">
                 <img src="${getTeamShield(teamId)}" class="w-full h-full object-contain grayscale brightness-200">
             </div>
             ${playersHtml}
@@ -177,61 +156,50 @@ function renderLineupCards() {
     return `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             ${provavelState.partidasData.partidas.map((match, idx) => {
-                const clubeCasa = provavelState.partidasData.clubes[match.clube_casa_id];
-                const clubeVisitante = provavelState.partidasData.clubes[match.clube_visitante_id];
+                const casa = provavelState.partidasData.clubes[match.clube_casa_id];
+                const fora = provavelState.partidasData.clubes[match.clube_visitante_id];
                 const dataPartida = new Date(match.partida_data);
                 const dataFormatada = dataPartida.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
                 const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 return `
-                <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm group hover:shadow-xl transition-all duration-500 overflow-hidden relative">
-                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
+                <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
                     <div class="flex items-center justify-between mb-1.5 gap-1 text-center">
-                        <div class="flex flex-col items-center gap-0.5 flex-1 min-w-0">
-                             <div class="flex items-center gap-0.5">
-                                 <span class="font-jersey text-xl md:text-2xl text-slate-200 pointer-events-none mt-2">${match.clube_casa_posicao}<span class="text-[0.6em] ml-0.5">º</span></span>
-                                 <div class="flex flex-col items-center">
-                                     ${renderDots(match.aproveitamento_mandante)}
-                                     <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 md:p-2 rounded-xl border border-slate-100 group-hover:border-orange-100 transition-colors">
-                                        <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain drop-shadow-md">
-                                     </div>
-                                 </div>
-                             </div>
-                             <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase leading-tight truncate w-full px-1">${clubeCasa?.nome || 'Casa'}</p>
+                        <div class="flex flex-col items-center gap-0.5 flex-1">
+                            <div class="flex items-center gap-0.5">
+                                <span class="font-jersey text-xl md:text-2xl text-slate-200 mt-2">${match.clube_casa_posicao}<span class="text-[0.6em]">º</span></span>
+                                <div>
+                                    ${renderDots(match.aproveitamento_mandante)}
+                                    <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border">
+                                        <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase truncate w-full">${casa?.nome || 'Casa'}</p>
                         </div>
-                        
-                        <div class="flex flex-col items-center">
-                            <span class="text-slate-200 font-black font-jogos italic text-xs md:text-lg mt-3">VS</span>
-                        </div>
-
-                        <div class="flex flex-col items-center gap-0.5 flex-1 min-w-0">
-                             <div class="flex items-center gap-0.5 text-center">
-                                 <div class="flex flex-col items-center">
-                                     ${renderDots(match.aproveitamento_visitante)}
-                                     <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 md:p-2 rounded-xl border border-slate-100 group-hover:border-orange-100 transition-colors">
-                                        <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain drop-shadow-md">
-                                     </div>
-                                 </div>
-                                 <span class="font-jersey text-xl md:text-2xl text-slate-200 pointer-events-none mt-2">${match.clube_visitante_posicao}<span class="text-[0.6em] ml-0.5">º</span></span>
-                             </div>
-                             <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase leading-tight truncate w-full px-1">${clubeVisitante?.nome || 'Fora'}</p>
+                        <div class="flex flex-col items-center"><span class="text-slate-200 font-black font-jogos italic text-xs md:text-lg">VS</span></div>
+                        <div class="flex flex-col items-center gap-0.5 flex-1">
+                            <div>
+                                ${renderDots(match.aproveitamento_visitante)}
+                                <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border">
+                                    <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
+                                </div>
+                            </div>
+                            <span class="font-jersey text-xl md:text-2xl text-slate-200 mt-2">${match.clube_visitante_posicao}<span class="text-[0.6em]">º</span></span>
+                            <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase truncate w-full">${fora?.nome || 'Fora'}</p>
                         </div>
                     </div>
-
-                    <div class="space-y-1 mt-2">
-                        <!-- LOCAL & HORÁRIO FORMATADO (conforme solicitado) -->
+                    <div class="mt-2">
                         <div class="px-3 py-2 bg-slate-50 rounded-xl text-left mb-2">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
                             <p class="text-sm md:text-base font-bold text-slate-700"><span class="font-mono text-slate-500">LOCAL:</span> ${match.local || 'Estádio a definir'}</p>
                             <p class="text-sm md:text-base font-mono font-bold text-orange-500 mt-1"><span class="font-mono text-slate-500">HORÁRIO:</span> ${horaFormatada} - ${dataFormatada}</p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             ${renderMiniField(idx, match.clube_casa_id)}
                             ${renderMiniField(idx, match.clube_visitante_id)}
                         </div>
                     </div>
-                </div>
-                `;
+                </div>`;
             }).join('')}
         </div>
     `;
@@ -255,55 +223,35 @@ window.fecharModalJogador = function() {
 };
 
 window.abrirModalJogador = function(jogadorId, timeId) {
-    const playerInfo = provavelState.mercadoData?.get(jogadorId);
-    if (!playerInfo) {
+    const player = provavelState.mercadoData?.get(jogadorId);
+    if (!player) {
         alert(`Dados do jogador ${jogadorId} não disponíveis.`);
         return;
     }
 
-    // Dados básicos
-    const nome = playerInfo.apelido_abreviado || playerInfo.apelido || playerInfo.nome || `Jogador ${jogadorId}`;
-    const foto = playerInfo.foto || getTeamShield(timeId);
-    const posicaoId = playerInfo.posicao_id;
-    const posicaoAbrev = POSICOES_MAP[posicaoId]?.abrev || '?';
-
-    // Dados financeiros e estatísticas
-    const preco = playerInfo.preco_num ? `R$ ${playerInfo.preco_num.toFixed(2)}` : 'R$ --';
-    const variacao = playerInfo.variacao_num || 0;
+    const nome = player.apelido_abreviado || player.apelido || player.nome || `#${jogadorId}`;
+    const foto = player.foto || getTeamShield(timeId);
+    const posAbrev = POSICOES_MAP[player.posicao_id] || '?';
+    const preco = player.preco_num ? `R$ ${player.preco_num.toFixed(2)}` : 'R$ --';
+    const variacao = player.variacao_num || 0;
     const variacaoStr = variacao > 0 ? `+${variacao.toFixed(2)}` : variacao.toFixed(2);
     const corVar = variacao > 0 ? 'text-green-500' : (variacao < 0 ? 'text-red-500' : 'text-gray-400');
-    const jogos = playerInfo.jogos_num || 0;
-    const ultima = playerInfo.pontos_num !== undefined ? playerInfo.pontos_num.toFixed(1) : '-';
-    const media = playerInfo.media_num ? playerInfo.media_num.toFixed(1) : '0.0';
-    // MPV e CEDIDO ainda não disponíveis nesta API
+    const jogos = player.jogos_num || 0;
+    const ultima = player.pontos_num !== undefined ? player.pontos_num.toFixed(1) : '-';
+    const media = player.media_num ? player.media_num.toFixed(1) : '0.0';
     const mpv = '--';
     const pt_ced = '--';
 
-    // Scouts (diretamente do campo "scout" do jogador)
-    const scouts = playerInfo.scout || {};
+    const scout = player.scout || {};
     const ata = {
-        G: scouts.G || 0,
-        A: scouts.A || 0,
-        FT: scouts.FT || 0,
-        FD: scouts.FD || 0,
-        FF: scouts.FF || 0,
-        FS: scouts.FS || 0,
-        PS: scouts.PS || 0,
-        V: scouts.V || 0,
-        I: scouts.I || 0,
-        PP: scouts.PP || 0
+        G: scout.G || 0, A: scout.A || 0, FT: scout.FT || 0, FD: scout.FD || 0,
+        FF: scout.FF || 0, FS: scout.FS || 0, PS: scout.PS || 0, V: scout.V || 0,
+        I: scout.I || 0, PP: scout.PP || 0
     };
     const def = {
-        DS: scouts.DS || 0,
-        SG: scouts.SG || 0,
-        DE: scouts.DE || 0,
-        DP: scouts.DP || 0,
-        CV: scouts.CV || 0,
-        CA: scouts.CA || 0,
-        FC: scouts.FC || 0,
-        GC: scouts.GC || 0,
-        GS: scouts.GS || 0,
-        PC: scouts.PC || 0
+        DS: scout.DS || 0, SG: scout.SG || 0, DE: scout.DE || 0, DP: scout.DP || 0,
+        CV: scout.CV || 0, CA: scout.CA || 0, FC: scout.FC || 0, GC: scout.GC || 0,
+        GS: scout.GS || 0, PC: scout.PC || 0
     };
 
     const ataques = [
@@ -321,15 +269,14 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         { label: "GS", val: def.GS, red: true }, { label: "PC", val: def.PC, red: true }
     ];
 
-    const renderScoutCell = (label, val, isRed) => `
+    const renderCell = (label, val, isRed) => `
         <div class="${isRed ? 'bg-red-100' : 'bg-green-100'} rounded-md p-1 text-center min-w-[40px]">
             <div class="text-[9px] font-bold uppercase text-gray-600">${label}</div>
             <div class="text-sm font-black text-gray-800">${val}</div>
         </div>
     `;
 
-    // Gráfico placeholder (histórico de pontuações virá de outra API)
-    const graficoHtml = `
+    const graficoPlaceholder = `
         <div class="flex items-end justify-between h-[85px] w-full px-1">
             <div class="w-full text-center text-[10px] text-gray-400">Dados de pontuação por rodada em breve</div>
         </div>
@@ -349,7 +296,7 @@ window.abrirModalJogador = function(jogadorId, timeId) {
                         </div>
                         <div>
                             <h3 class="text-xl uppercase tracking-wide text-gray-800 font-jogos">${nome}</h3>
-                            <p class="text-xs font-mono text-gray-500">${posicaoAbrev}</p>
+                            <p class="text-xs font-mono text-gray-500">${posAbrev}</p>
                         </div>
                     </div>
                 </div>
@@ -370,15 +317,15 @@ window.abrirModalJogador = function(jogadorId, timeId) {
                     </div>
                     <div class="bg-black/[0.02] rounded-xl p-2">
                         <p class="text-[10px] font-black uppercase text-gray-600 mb-2">ATAQUE</p>
-                        <div class="flex flex-wrap gap-1">${ataques.map(a => renderScoutCell(a.label, a.val, a.red)).join('')}</div>
+                        <div class="flex flex-wrap gap-1">${ataques.map(a => renderCell(a.label, a.val, a.red)).join('')}</div>
                     </div>
                     <div class="bg-black/[0.02] rounded-xl p-2">
                         <p class="text-[10px] font-black uppercase text-gray-600 mb-2">DEFESA</p>
-                        <div class="flex flex-wrap gap-1">${defesas.map(d => renderScoutCell(d.label, d.val, d.red)).join('')}</div>
+                        <div class="flex flex-wrap gap-1">${defesas.map(d => renderCell(d.label, d.val, d.red)).join('')}</div>
                     </div>
                     <div class="bg-black/[0.02] rounded-xl p-3">
                         <p class="text-[10px] font-black uppercase text-gray-600 mb-3 text-center">ÚLTIMAS PONTUAÇÕES</p>
-                        ${graficoHtml}
+                        ${graficoPlaceholder}
                     </div>
                 </div>
             </div>
@@ -392,40 +339,11 @@ window.renderProvaveis = async function() {
     const main = document.getElementById('main-content');
     if (!main) return;
 
-    main.innerHTML = `
-        <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6 animate-in fade-in duration-500">
-            <div class="loader"></div>
-            <div class="text-center">
-                <p class="text-slate-400 font-jogos text-xs tracking-[0.4em] uppercase animate-pulse">Sincronizando Escalações</p>
-                <p class="text-[10px] font-mono text-slate-300 mt-2 uppercase tracking-widest">Aguardando dados oficiais...</p>
-            </div>
-        </div>
-    `;
-
+    main.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-6"><div class="loader"></div><p class="text-slate-400 font-jogos text-xs uppercase animate-pulse">Sincronizando Escalações...</p></div>`;
     await fetchProvaveisData();
 
     if (provavelState.error) {
-        main.innerHTML = `
-            <div class="max-w-xl mx-auto py-32 text-center space-y-8 animate-in zoom-in duration-700">
-                <div class="relative inline-block">
-                    <div class="absolute -inset-4 bg-red-500/10 rounded-full blur-2xl animate-pulse"></div>
-                    <div class="relative p-10 bg-white border border-red-100 rounded-[50px] shadow-2xl">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <h2 class="text-3xl font-black font-jogos text-slate-800 uppercase tracking-tighter italic">Erro de Sincronia</h2>
-                    <p class="text-slate-400 font-mono text-[10px] uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed">${provavelState.error}</p>
-                </div>
-                <button onclick="window.renderProvaveis()" class="group relative px-12 py-5 bg-slate-900 rounded-3xl font-black font-jogos text-[10px] tracking-[0.3em] text-white shadow-2xl transition-all hover:scale-105 active:scale-95 uppercase">
-                    <span class="relative z-10">Tentar Novamente</span>
-                    <div class="absolute inset-0 bg-orange-600 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </button>
-            </div>
-        `;
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
         return;
     }
 
@@ -443,4 +361,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js carregado (modal completo, imagens maiores, local/horário formatado)");
+console.log("✅ provaveis.js carregado (modal com scouts, imagens maiores, último update, local/horário)");
