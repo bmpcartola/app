@@ -239,23 +239,34 @@ window.scrollToTeamField = (matchIdx, teamId) => {
 };
 
 // ======================== MODAL ========================
+// ======================== MODAL (com MPV e CEDIDO) ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
 };
 
-
-
 window.abrirModalJogador = async function(jogadorId, timeId) {
     try {
-        // Busca o atleta na API de mercado (para scouts e estatísticas)
-        const response = await fetch(`${PROXY_URL_PROVAVEIS}/mercado`);
-        if (!response.ok) throw new Error("Falha ao carregar mercado");
-        const data = await response.json();
-        const atleta = data.atletas?.find(a => a.atleta_id == jogadorId);
+        // 🔥 Busca os dados de mercado (scouts, preço, etc.) e os dados de MPV/CEDIDO em paralelo
+        const [mercadoRes, cedidoRes] = await Promise.all([
+            fetch(`${PROXY_URL_PROVAVEIS}/mercado`),
+            fetch(`${PROXY_URL_PROVAVEIS}/escalar/rodadas-anteriores`)
+        ]);
+
+        if (!mercadoRes.ok) throw new Error("Falha ao carregar mercado");
+        if (!cedidoRes.ok) throw new Error("Falha ao carregar MPV/CEDIDO");
+
+        const mercadoData = await mercadoRes.json();
+        const cedidoData = await cedidoRes.json();
+
+        // Encontra o atleta nos dados de mercado
+        const atleta = mercadoData.atletas?.find(a => a.atleta_id == jogadorId);
         if (!atleta) throw new Error("Jogador não encontrado");
 
-        // 🔥 PRIORIZA A FOTO DO MERCADO-IMAGES (MESMA DO CAMPO)
+        // 🔥 Pega MPV e CEDIDO do endpoint específico (usa o mesmo ID do jogador)
+        const infoExtra = cedidoData.jogadores?.[jogadorId] || {};
+        
+        // 🔥 Prioriza a foto do mercado-images (mesma do campo)
         const playerInfo = provavelState.mercadoData?.get(jogadorId);
         const foto = (playerInfo?.foto && playerInfo.foto.startsWith('http')) 
             ? playerInfo.foto 
@@ -270,8 +281,10 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         const jogos = atleta.jogos_num || 0;
         const ultima = atleta.pontos_num !== undefined ? atleta.pontos_num.toFixed(1) : '-';
         const media = atleta.media_num ? atleta.media_num.toFixed(1) : '0.0';
-        const mpv = '--';
-        const pt_ced = '--';
+        
+        // 🔥 MPV e CEDIDO extraídos da nova API
+        const mpv = infoExtra.pm !== undefined ? infoExtra.pm.toFixed(2) : '--';
+        const pt_ced = infoExtra.pc0 !== undefined ? Number(infoExtra.pc0).toFixed(1) : '--';
 
         const scout = atleta.scout || {};
         const ataque = {
@@ -364,8 +377,8 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     } catch (err) {
-        console.error(err);
-        alert(`Erro ao carregar dados do jogador: ${err.message}`);
+        console.error("Erro no modal:", err);
+        alert("Erro ao carregar dados do jogador. Verifique o console.");
     }
 };
 
