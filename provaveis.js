@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES — VERSÃO FINAL COM MODAL E AJUSTES
+   PROVÁVEIS ESCALAÇÕES — VERSÃO FINAL COM MODAL COMPLETO
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -19,6 +19,16 @@ const SLUG_TO_ID_MAP = {
     botafogo_v2: 263, fluminense_v2: 266, 'sao-paulo_v2': 276, santos_v2: 277,
     bragantino_v2: 280, 'athletico-pr_v2': 293, bahia_v2: 265, vitoria_v2: 287,
     mirassol_v2: 2305, chapecoense_v2: 315, coritiba_v2: 294, remo_v2: 364
+};
+
+// Mapeamento de posições (conforme API Cartola)
+const POSICOES_MAP = {
+    1: { nome: "Goleiro", abrev: "GOL" },
+    2: { nome: "Lateral", abrev: "LAT" },
+    3: { nome: "Zagueiro", abrev: "ZAG" },
+    4: { nome: "Meia", abrev: "MEI" },
+    5: { nome: "Atacante", abrev: "ATA" },
+    6: { nome: "Técnico", abrev: "TEC" }
 };
 
 async function fetchProvaveisData() {
@@ -205,7 +215,6 @@ function renderLineupCards() {
                     </div>
 
                     <div class="space-y-1 mt-2">
-                        <!-- 🔥 LOCAL E HORÁRIO NO FORMATO SOLICITADO -->
                         <div class="px-3 py-2 bg-slate-50 rounded-xl text-left mb-2">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
                             <p class="text-sm md:text-base font-bold text-slate-700"><span class="font-mono text-slate-500">LOCAL:</span> ${match.local || 'Estádio a definir'}</p>
@@ -247,7 +256,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL COMPLETO (com scouts e gráfico) ========================
+// ======================== MODAL COMPLETO ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
@@ -260,26 +269,29 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         return;
     }
 
-    // Obtém scouts da API de mercado (se existirem)
-    const scouts = playerInfo.scout || {};
-    // Dados financeiros (a API de mercado tem preco_num, variacao_num, etc.)
+    // Dados básicos
+    const nome = playerInfo.apelido_abreviado || playerInfo.apelido || playerInfo.nome || `Jogador ${jogadorId}`;
+    const foto = playerInfo.foto || getTeamShield(timeId);
+    
+    // Posição (mapeia posicao_id para abreviação)
+    const posicaoId = playerInfo.posicao_id;
+    const posicao = POSICOES_MAP[posicaoId]?.abrev || '?';
+    
+    // Dados financeiros e estatísticas
     const preco = playerInfo.preco_num ? `R$ ${playerInfo.preco_num.toFixed(2)}` : 'R$ --';
     const variacao = playerInfo.variacao_num || 0;
     const variacaoStr = variacao > 0 ? `+${variacao.toFixed(2)}` : variacao.toFixed(2);
     const corVar = variacao > 0 ? 'text-green-500' : (variacao < 0 ? 'text-red-500' : 'text-gray-400');
     const jogos = playerInfo.jogos_num || 0;
     const media = playerInfo.media_num ? playerInfo.media_num.toFixed(1) : '0.0';
-    // MPV pode não estar na API de mercado; deixaremos como '-'
+    const ultima = playerInfo.pontos_num !== undefined ? playerInfo.pontos_num.toFixed(1) : '-';
+    
+    // MPV e CEDIDO (podem não estar disponíveis nesta API)
     const mpv = playerInfo.mpv ? playerInfo.mpv.toFixed(2) : '--';
     const pt_ced = playerInfo.pt_ced ? playerInfo.pt_ced.toFixed(1) : '--';
-    // Última pontuação (não está disponível, usaremos o campo 'ult' se existir)
-    const ultima = playerInfo.ult !== undefined ? playerInfo.ult.toFixed(1) : '-';
 
-    const nome = playerInfo.apelido_abreviado || playerInfo.apelido || playerInfo.nome || `Jogador ${jogadorId}`;
-    const foto = playerInfo.foto || getTeamShield(timeId);
-    const posicao = playerInfo.posicao || '?';
-
-    // Scouts de ataque e defesa (padrão Cartola)
+    // Scouts (da API de mercado)
+    const scouts = playerInfo.scout || {};
     const ata = {
         G: scouts.G || 0,
         A: scouts.A || 0,
@@ -327,8 +339,7 @@ window.abrirModalJogador = function(jogadorId, timeId) {
         </div>
     `;
 
-    // Gráfico de barras (simulado, pois não temos histórico de rodadas nesta API)
-    // Podemos deixar uma mensagem ou gráfico vazio; como pedido, mesmo em branco.
+    // Gráfico de barras (placeholder)
     const graficoHtml = `
         <div class="flex items-end justify-between h-[85px] w-full px-1">
             <div class="w-full text-center text-[10px] text-gray-400">Dados de pontuação por rodada disponíveis em breve</div>
@@ -441,4 +452,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js - Versão final com modal e ajustes de local/horário");
+console.log("✅ provaveis.js - Versão final com modal completo e mapeamento de posições");
