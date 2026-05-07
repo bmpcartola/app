@@ -186,7 +186,7 @@ function renderLineupCards() {
                     <div class="flex items-center justify-between mb-4 gap-2">
                         <!-- Time da Casa: posição à esquerda do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-end">
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}\u00BA</span>
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
@@ -200,7 +200,7 @@ function renderLineupCards() {
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
                             </div>
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}&ordm;</span>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}\u00BA</span>
                         </div>
                     </div>
 
