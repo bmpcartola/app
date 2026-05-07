@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO ESTÁVEL (COM AJUSTES VISUAIS)
+   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL (SEM AUTOEXECUÇÃO)
    ============================================================ */
 
 const PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -7,7 +7,8 @@ const PROXY_URL = 'https://proxy-f5nr.onrender.com';
 let provavelState = {
     partidasData: null,
     lineupsData: null,
-    mercadoData: null,
+    mercadoImagens: null,
+    mercadoCompleto: null,
     teamUpdatesData: null,
     loading: false,
     error: null
@@ -43,23 +44,34 @@ async function fetchProvaveisData() {
     provavelState.error = null;
     try {
         const partidasRes = await fetchWithTimeout(`${PROXY_URL}/partidas`);
-        if (!partidasRes.ok) throw new Error("Erro nas partidas");
+        if (!partidasRes.ok) throw new Error("Falha partidas");
         provavelState.partidasData = await partidasRes.json();
 
         const lineupsRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/lineups`);
         if (lineupsRes.ok) provavelState.lineupsData = await lineupsRes.json();
         
-        const mercadoRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/mercado-images`);
+        const imagensRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/mercado-images`);
+        if (imagensRes.ok) {
+            const arr = await imagensRes.json();
+            provavelState.mercadoImagens = new Map(arr.map(i => [i.atleta_id, i]));
+        }
+
+        const mercadoRes = await fetchWithTimeout(`${PROXY_URL}/mercado`);
         if (mercadoRes.ok) {
-            const arr = await mercadoRes.json();
-            provavelState.mercadoData = new Map(arr.map(i => [i.atleta_id, i]));
+            const data = await mercadoRes.json();
+            provavelState.mercadoCompleto = new Map();
+            if (data.atletas && Array.isArray(data.atletas)) {
+                data.atletas.forEach(item => {
+                    provavelState.mercadoCompleto.set(item.atleta_id, item);
+                });
+            }
         }
 
         const updatesRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/team-updates`);
         if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
 
     } catch (err) {
-        console.error("Erro fetch:", err);
+        console.error(err);
         provavelState.error = err.message;
     } finally {
         provavelState.loading = false;
@@ -117,15 +129,15 @@ function renderDots(results) {
 function renderFieldPlayers(lineup, teamId) {
     if (!lineup?.titulares) return '';
     return lineup.titulares.filter(p => p.slot !== 'TEC').map(p => {
-        const info = provavelState.mercadoData?.get(p.id);
-        const nome = info?.apelido_abreviado || info?.apelido || info?.nome || '...';
-        const nomeArquivo = (info?.apelido || info?.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const imgInfo = provavelState.mercadoImagens?.get(p.id);
+        const nome = imgInfo?.apelido_abreviado || imgInfo?.apelido || imgInfo?.nome || '...';
+        const nomeArquivo = (imgInfo?.apelido || imgInfo?.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]/g, '');
         const fotoLocal = nomeArquivo ? `images/jogadores/${p.id}_${nomeArquivo}.webp` : null;
-        const fotoProxy = info?.foto || '';
+        const fotoProxy = imgInfo?.foto || '';
         const isDuvida = p.sit === 'duvida';
         let nomeSubstituto = '';
         if (isDuvida && p.duvida_com) {
-            const subInfo = provavelState.mercadoData?.get(p.duvida_com);
+            const subInfo = provavelState.mercadoImagens?.get(p.duvida_com);
             nomeSubstituto = subInfo?.apelido_abreviado || subInfo?.apelido || subInfo?.nome || '...';
             nomeSubstituto = '⬇️ ' + nomeSubstituto;
         }
@@ -234,33 +246,33 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL (usando dados já carregados) ========================
+// ======================== MODAL (usa dados completos) ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
 };
 
 window.abrirModalJogador = function(jogadorId, timeId) {
-    const player = provavelState.mercadoData?.get(jogadorId);
-    if (!player) {
+    const atleta = provavelState.mercadoCompleto?.get(jogadorId);
+    if (!atleta) {
         alert(`Dados do jogador ${jogadorId} não disponíveis.`);
         return;
     }
 
-    const nome = player.apelido_abreviado || player.apelido || player.nome || `#${jogadorId}`;
-    const foto = player.foto || getTeamShield(timeId);
-    const posAbrev = POSICOES_MAP[player.posicao_id] || '?';
-    const preco = player.preco_num ? `R$ ${player.preco_num.toFixed(2)}` : 'R$ --';
-    const variacao = player.variacao_num || 0;
+    const nome = atleta.apelido_abreviado || atleta.apelido || atleta.nome || `#${jogadorId}`;
+    const foto = atleta.foto || getTeamShield(timeId);
+    const posAbrev = POSICOES_MAP[atleta.posicao_id] || '?';
+    const preco = atleta.preco_num ? `R$ ${atleta.preco_num.toFixed(2)}` : 'R$ --';
+    const variacao = atleta.variacao_num || 0;
     const variacaoStr = variacao > 0 ? `+${variacao.toFixed(2)}` : variacao.toFixed(2);
     const corVar = variacao > 0 ? 'text-green-500' : (variacao < 0 ? 'text-red-500' : 'text-gray-400');
-    const jogos = player.jogos_num || 0;
-    const ultima = player.pontos_num !== undefined ? player.pontos_num.toFixed(1) : '-';
-    const media = player.media_num ? player.media_num.toFixed(1) : '0.0';
-    const mpv = player.mpv ? player.mpv.toFixed(2) : '--';
-    const pt_ced = player.pt_ced ? player.pt_ced.toFixed(1) : '--';
+    const jogos = atleta.jogos_num || 0;
+    const ultima = atleta.pontos_num !== undefined ? atleta.pontos_num.toFixed(1) : '-';
+    const media = atleta.media_num ? atleta.media_num.toFixed(1) : '0.0';
+    const mpv = atleta.mpv ? atleta.mpv.toFixed(2) : '--';
+    const pt_ced = atleta.pt_ced ? atleta.pt_ced.toFixed(1) : '--';
 
-    const scout = player.scout || {};
+    const scout = atleta.scout || {};
     const ataque = {
         G: scout.G || 0, A: scout.A || 0, FT: scout.FT || 0, FD: scout.FD || 0,
         FF: scout.FF || 0, FS: scout.FS || 0, PS: scout.PS || 0, V: scout.V || 0,
@@ -379,7 +391,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-// 🔥 GARANTE QUE A FUNÇÃO SEJA CHAMADA QUANDO O ARQUIVO CARREGAR
-window.renderProvaveis();
-
-console.log("✅ provaveis.js carregado – versão estável com ajustes visuais");
+console.log("✅ provaveis.js carregado – aguardando clique no menu PROVÁVEIS");
