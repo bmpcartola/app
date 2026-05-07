@@ -158,7 +158,7 @@ function renderMiniField(matchIdx, teamId) {
     `;
     return `
         <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20">
-            ${fmtUpdate ? `<div class="absolute top-2 left-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full"><p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p></div>` : ''}
+            ${fmtUpdate ? `<div class="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full"><p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p></div>` : ''}
             <div class="absolute inset-4 border-2 border-white/10 pointer-events-none opacity-40"></div>
             <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2"></div>
             <div class="absolute top-1/2 left-1/2 w-12 h-12 border-2 border-white/20 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-40"></div>
@@ -182,14 +182,14 @@ function renderLineupCards() {
                 const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
-                    <!-- 🔥 CABEÇALHO: posição à direita do escudo -->
+                    <!-- 🔥 CABEÇALHO: Posição ajustada conforme mandante/visitante -->
                     <div class="flex items-center justify-between mb-4 gap-2">
-                        <!-- Time da Casa: escudo + posição à direita -->
+                        <!-- Time da Casa: posição à esquerda do escudo -->
                         <div class="flex items-center gap-2 flex-1 justify-end">
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
                                 <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
-                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
                         </div>
                         <!-- VS central -->
                         <div class="flex flex-col items-center px-2">
@@ -205,10 +205,10 @@ function renderLineupCards() {
                     </div>
 
                     <div class="mt-2">
-                        <!-- 🔥 LOCAL E HORÁRIO (sem título, apenas dados) -->
-                        <div class="bg-slate-50 rounded-xl px-3 py-2 text-left mb-2 text-sm md:text-base font-medium text-slate-600 border border-slate-100">
-                            <div><span class="font-mono text-slate-400">LOCAL:</span> ${match.local || 'Estádio a definir'}</div>
-                            <div class="mt-0.5"><span class="font-mono text-slate-400">HORÁRIO:</span> ${horaFormatada} - ${dataFormatada}</div>
+                        <!-- 🔥 LOCAL E HORÁRIO: Fonte unificada e cores ajustadas -->
+                        <div class="bg-slate-50 rounded-xl px-3 py-2 text-left mb-2 text-[10px] md:text-xs font-jogos text-slate-500 border border-slate-100 uppercase tracking-tighter">
+                            <div><span>LOCAL:</span> <span class="text-orange-500 ml-1">${match.local || 'Estádio a definir'}</span></div>
+                            <div class="mt-0.5"><span>HORÁRIO:</span> <span class="text-orange-500 ml-1">${horaFormatada} - ${dataFormatada}</span></div>
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
