@@ -244,17 +244,22 @@ window.fecharModalJogador = function() {
     if (modal) modal.remove();
 };
 
+
+
 window.abrirModalJogador = async function(jogadorId, timeId) {
     try {
-        // Busca o atleta na API de mercado (garante dados atualizados)
+        // Busca o atleta na API de mercado (para scouts e estatísticas)
         const response = await fetch(`${PROXY_URL_PROVAVEIS}/mercado`);
         if (!response.ok) throw new Error("Falha ao carregar mercado");
         const data = await response.json();
         const atleta = data.atletas?.find(a => a.atleta_id == jogadorId);
         if (!atleta) throw new Error("Jogador não encontrado");
 
-        // 🔥 FOTO: usa a foto do atleta, fallback escudo do time
-        const foto = atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId);
+        // 🔥 PRIORIZA A FOTO DO MERCADO-IMAGES (MESMA DO CAMPO)
+        const playerInfo = provavelState.mercadoData?.get(jogadorId);
+        const foto = (playerInfo?.foto && playerInfo.foto.startsWith('http')) 
+            ? playerInfo.foto 
+            : (atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId));
         
         const nome = atleta.apelido_abreviado || atleta.apelido || atleta.nome || `#${jogadorId}`;
         const posAbrev = POSICOES_MAP[atleta.posicao_id] || '?';
