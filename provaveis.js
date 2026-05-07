@@ -373,8 +373,8 @@ window.renderProvaveis = async function() {
         <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6">
             <div class="loader"></div>
             <div class="text-center">
-                <p class="text-slate-400 font-jogos text-xs tracking-[0.4em] uppercase animate-pulse">Carregando Escalações</p>
-                <p class="text-[10px] font-mono text-slate-300 mt-2 uppercase tracking-widest">Aguarde um momento...</p>
+                <p class="text-slate-400 font-jogos text-xs tracking-[0.4em] uppercase animate-pulse">Aguenta aí.</p>
+                <p class="text-[10px] font-mono text-slate-300 mt-2 uppercase tracking-widest">Tá quase...</p>
             </div>
         </div>
     `;
