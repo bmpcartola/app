@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO COM BUSCA DIRETA DOS SCOUTS
+   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL (TODAS CORREÇÕES)
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
@@ -7,7 +7,7 @@ const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';
 let provavelState = {
     partidasData: null,
     lineupsData: null,
-    mercadoData: null,      // ainda útil para fotos e apelidos
+    mercadoData: null,      // Map<atleta_id, info>
     teamUpdatesData: null,
     loading: false,
     error: null
@@ -100,6 +100,12 @@ function renderDots(results) {
     }).join('')}</div>`;
 }
 
+// 🔥 Função para obter nome do jogador (usada para dúvida)
+function getNomeJogador(id) {
+    const info = provavelState.mercadoData?.get(id);
+    return info?.apelido_abreviado || info?.apelido || info?.nome || `#${id}`;
+}
+
 function renderFieldPlayers(lineup, teamId) {
     if (!lineup?.titulares) return '';
     return lineup.titulares
@@ -112,16 +118,29 @@ function renderFieldPlayers(lineup, teamId) {
             const fotoProxy = playerInfo?.foto || '';
             const isDuvida = p.sit === 'duvida';
             const onClick = `onclick="event.stopPropagation(); window.abrirModalJogador(${p.id}, ${teamId})"`;
+            
+            // 🔥 Nome do jogador que entra na dúvida
+            let duvidaComNome = '';
+            if (isDuvida && p.duvida_com) {
+                duvidaComNome = getNomeJogador(p.duvida_com);
+            }
+            
             return `
                 <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
                      style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
-                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm border ${isDuvida ? 'border-orange-500' : 'border-white'}">
+                    <!-- 🔥 BORDA DE DÚVIDA MAIS VISÍVEL: 3px laranja com brilho -->
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-3 ring-orange-500 ring-offset-1 shadow-orange-500/30' : 'border border-white'}">
                         <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
                              onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                     </div>
                     <div class="mt-1 bg-black/60 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[60px] md:max-w-[80px] truncate border border-white/10">
                         <p class="text-[8px] md:text-[10px] font-black text-white uppercase leading-none text-center truncate">${nome}</p>
                     </div>
+                    ${isDuvida && duvidaComNome ? `
+                        <div class="mt-0.5 bg-black/40 backdrop-blur-[1px] px-1.5 py-0.5 rounded-md max-w-[70px] md:max-w-[90px] truncate">
+                            <p class="text-[7px] md:text-[9px] font-medium text-orange-300 uppercase leading-none text-center truncate">⇄ ${duvidaComNome}</p>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }).join('');
@@ -163,37 +182,35 @@ function renderLineupCards() {
                 const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
-                    <div class="flex items-center justify-between mb-1.5 gap-1 text-center">
-                        <div class="flex flex-col items-center gap-0.5 flex-1">
-                            <div class="flex items-center gap-0.5">
-                                <span class="font-jersey text-xl md:text-2xl text-slate-200 mt-2">${match.clube_casa_posicao}<span class="text-[0.6em]">º</span></span>
-                                <div>
-                                    ${renderDots(match.aproveitamento_mandante)}
-                                    <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border">
-                                        <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
-                                    </div>
-                                </div>
+                    <!-- 🔥 CABEÇALHO: posição à direita do escudo -->
+                    <div class="flex items-center justify-between mb-4 gap-2">
+                        <!-- Time da Casa: escudo + posição à direita -->
+                        <div class="flex items-center gap-2 flex-1 justify-end">
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                                <img src="${getTeamShield(match.clube_casa_id)}" class="w-full h-full object-contain">
                             </div>
-                            <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase truncate w-full">${casa?.nome || 'Casa'}</p>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_casa_posicao}º</span>
                         </div>
-                        <div class="flex flex-col items-center"><span class="text-slate-200 font-black font-jogos italic text-xs md:text-lg">VS</span></div>
-                        <div class="flex flex-col items-center gap-0.5 flex-1">
-                            <div>
-                                ${renderDots(match.aproveitamento_visitante)}
-                                <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border">
-                                    <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
-                                </div>
+                        <!-- VS central -->
+                        <div class="flex flex-col items-center px-2">
+                            <span class="text-slate-300 font-black font-jogos italic text-sm md:text-base">VS</span>
+                        </div>
+                        <!-- Time Visitante: escudo + posição à direita -->
+                        <div class="flex items-center gap-2 flex-1">
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                                <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
                             </div>
-                            <span class="font-jersey text-xl md:text-2xl text-slate-200 mt-2">${match.clube_visitante_posicao}<span class="text-[0.6em]">º</span></span>
-                            <p class="font-jogos text-[7px] md:text-xs text-slate-800 uppercase truncate w-full">${fora?.nome || 'Fora'}</p>
+                            <span class="font-jersey text-2xl md:text-3xl text-slate-700">${match.clube_visitante_posicao}º</span>
                         </div>
                     </div>
+
                     <div class="mt-2">
-                        <div class="px-3 py-2 bg-slate-50 rounded-xl text-left mb-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
-                            <p class="text-sm md:text-base font-bold text-slate-700"><span class="font-mono text-slate-500">LOCAL:</span> ${match.local || 'Estádio a definir'}</p>
-                            <p class="text-sm md:text-base font-mono font-bold text-orange-500 mt-1"><span class="font-mono text-slate-500">HORÁRIO:</span> ${horaFormatada} - ${dataFormatada}</p>
+                        <!-- 🔥 LOCAL E HORÁRIO (sem título, apenas dados) -->
+                        <div class="bg-slate-50 rounded-xl px-3 py-2 text-left mb-2 text-sm md:text-base font-medium text-slate-600 border border-slate-100">
+                            <div><span class="font-mono text-slate-400">LOCAL:</span> ${match.local || 'Estádio a definir'}</div>
+                            <div class="mt-0.5"><span class="font-mono text-slate-400">HORÁRIO:</span> ${horaFormatada} - ${dataFormatada}</div>
                         </div>
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             ${renderMiniField(idx, match.clube_casa_id)}
                             ${renderMiniField(idx, match.clube_visitante_id)}
@@ -216,27 +233,25 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL COM BUSCA DIRETA À API DE ATLETAS ========================
+// ======================== MODAL ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
 };
 
 window.abrirModalJogador = async function(jogadorId, timeId) {
-    // 🔥 BUSCA OS DADOS COMPLETOS DO ATLETA DIRETAMENTE DA API DE MERCADO
     try {
+        // Busca o atleta na API de mercado (garante dados atualizados)
         const response = await fetch(`${PROXY_URL_PROVAVEIS}/mercado`);
-        if (!response.ok) throw new Error("Falha ao carregar dados do mercado");
+        if (!response.ok) throw new Error("Falha ao carregar mercado");
         const data = await response.json();
-        
-        // Procura o atleta pelo ID dentro da lista 'atletas'
         const atleta = data.atletas?.find(a => a.atleta_id == jogadorId);
-        if (!atleta) throw new Error(`Jogador ${jogadorId} não encontrado no mercado`);
-        
-        console.log("🔍 Atleta encontrado na API:", atleta); // LOG PARA DEPURAÇÃO
+        if (!atleta) throw new Error("Jogador não encontrado");
 
+        // 🔥 FOTO: usa a foto do atleta, fallback escudo do time
+        const foto = atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId);
+        
         const nome = atleta.apelido_abreviado || atleta.apelido || atleta.nome || `#${jogadorId}`;
-        const foto = atleta.foto || getTeamShield(timeId);
         const posAbrev = POSICOES_MAP[atleta.posicao_id] || '?';
         const preco = atleta.preco_num ? `R$ ${atleta.preco_num.toFixed(2)}` : 'R$ --';
         const variacao = atleta.variacao_num || 0;
@@ -245,10 +260,9 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         const jogos = atleta.jogos_num || 0;
         const ultima = atleta.pontos_num !== undefined ? atleta.pontos_num.toFixed(1) : '-';
         const media = atleta.media_num ? atleta.media_num.toFixed(1) : '0.0';
-        const mpv = atleta.mpv ? atleta.mpv.toFixed(2) : '--';
-        const pt_ced = atleta.pt_ced ? atleta.pt_ced.toFixed(1) : '--';
+        const mpv = '--';
+        const pt_ced = '--';
 
-        // 🔥 SCOUTS – EXTRAÍDOS DIRETAMENTE DO OBJETO DO ATLETA
         const scout = atleta.scout || {};
         const ataque = {
             G: scout.G || 0, A: scout.A || 0, FT: scout.FT || 0, FD: scout.FD || 0,
@@ -340,24 +354,19 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     } catch (err) {
-        console.error("Erro ao buscar atleta:", err);
-        alert(`Não foi possível carregar os dados do jogador. Erro: ${err.message}`);
+        console.error(err);
+        alert(`Erro ao carregar dados do jogador: ${err.message}`);
     }
 };
 
-// ======================== FUNÇÃO PRINCIPAL ========================
 window.renderProvaveis = async function() {
+    await fetchProvaveisData();
     const main = document.getElementById('main-content');
     if (!main) return;
-
-    main.innerHTML = `<div class="flex flex-col items-center justify-center min-h-[60vh] gap-6"><div class="loader"></div><p class="text-slate-400 font-jogos text-xs uppercase animate-pulse">Sincronizando Escalações...</p></div>`;
-    await fetchProvaveisData();
-
     if (provavelState.error) {
-        main.innerHTML = `<div class="max-w-xl mx-auto py-32 text-center"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 px-6 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
+        main.innerHTML = `<div class="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm"><div class="bg-white rounded-xl p-6 max-w-md mx-4"><p class="text-red-500">Erro: ${provavelState.error}</p><button onclick="window.renderProvaveis()" class="mt-4 w-full bg-black text-white py-2 rounded-full">Tentar novamente</button></div></div>`;
         return;
     }
-
     const rodada = provavelState.partidasData.rodada_id || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
@@ -372,4 +381,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js carregado – agora busca dados diretamente da API /mercado");
+console.log("✅ provaveis.js carregado – versão final com todas as correções");
