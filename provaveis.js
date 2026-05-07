@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL (AJUSTES SOLICITADOS)
+   PROVÁVEIS ESCALAÇÕES – VERSÃO ESTÁVEL (SEM TRAVAMENTO)
    ============================================================ */
 
 const PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -7,11 +7,10 @@ const PROXY_URL = 'https://proxy-f5nr.onrender.com';
 let provavelState = {
     partidasData: null,
     lineupsData: null,
-    mercadoData: null,      // Map<atleta_id, info>
+    mercadoData: null,
     teamUpdatesData: null,
     loading: false,
-    error: null,
-    rodadaAtual: null
+    error: null
 };
 
 const SLUG_TO_ID_MAP = {
@@ -26,15 +25,17 @@ const POSICOES_MAP = {
     1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC"
 };
 
-async function fetchRodadaAtual() {
+// 🔥 Função com timeout para evitar travamento
+async function fetchWithTimeout(url, timeout = 10000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
     try {
-        const res = await fetch(`${PROXY_URL}/mercado/status`);
-        if (res.ok) {
-            const data = await res.json();
-            provavelState.rodadaAtual = data.rodada_id;
-        }
-    } catch (err) {
-        console.warn("❌ Erro ao buscar rodada atual:", err);
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        throw error;
     }
 }
 
@@ -42,24 +43,21 @@ async function fetchProvaveisData() {
     provavelState.loading = true;
     provavelState.error = null;
     try {
-        const partidasRes = await fetch(`${PROXY_URL}/partidas`);
+        const partidasRes = await fetchWithTimeout(`${PROXY_URL}/partidas`);
         if (!partidasRes.ok) throw new Error("Falha partidas");
         provavelState.partidasData = await partidasRes.json();
 
-        const lineupsRes = await fetch(`${PROXY_URL}/provaveis/lineups`);
+        const lineupsRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/lineups`);
         if (lineupsRes.ok) provavelState.lineupsData = await lineupsRes.json();
         
-        const mercadoRes = await fetch(`${PROXY_URL}/provaveis/mercado-images`);
+        const mercadoRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/mercado-images`);
         if (mercadoRes.ok) {
             const arr = await mercadoRes.json();
             provavelState.mercadoData = new Map(arr.map(i => [i.atleta_id, i]));
         }
 
-        const updatesRes = await fetch(`${PROXY_URL}/provaveis/team-updates`);
+        const updatesRes = await fetchWithTimeout(`${PROXY_URL}/provaveis/team-updates`);
         if (updatesRes.ok) provavelState.teamUpdatesData = await updatesRes.json();
-
-        // 🔥 Busca a rodada atual da API de status
-        if (!provavelState.rodadaAtual) await fetchRodadaAtual();
 
     } catch (err) {
         console.error(err);
@@ -129,7 +127,6 @@ function renderFieldPlayers(lineup, teamId) {
             const fotoProxy = info?.foto || '';
             const isDuvida = p.sit === 'duvida';
             
-            // Nome do substituto (duvida_com)
             let nomeSubstituto = '';
             if (isDuvida && p.duvida_com) {
                 const subInfo = provavelState.mercadoData?.get(p.duvida_com);
@@ -141,8 +138,7 @@ function renderFieldPlayers(lineup, teamId) {
             return `
                 <div class="absolute flex flex-col items-center cursor-pointer hover:scale-110 transition-transform"
                      style="left: ${p.x}%; top: ${p.y}%; transform: translate(-50%, -50%); z-index: 10;" ${onClick}>
-                    <!-- 🔥 BORDA DE DÚVIDA MAIS FORTE E COM SOMBRA -->
-                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-2 ring-orange-500 ring-offset-2 shadow-lg shadow-orange-500/30' : 'border-white'}">
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/95 p-1 shadow-sm ${isDuvida ? 'ring-2 ring-orange-500 ring-offset-2 shadow-orange-500/50' : 'border-white'}">
                         <img src="${fotoLocal || fotoProxy}" class="w-full h-full object-contain rounded-full"
                              onerror="this.onerror=null; this.src='${getTeamShield(teamId)}'">
                     </div>
@@ -171,7 +167,6 @@ function renderMiniField(matchIdx, teamId) {
     `;
     return `
         <div id="field-${matchIdx}-${teamId}" class="relative w-full aspect-[4/5] bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-2xl overflow-hidden shadow-inner border border-emerald-900/20">
-            <!-- 🔥 Última atualização no CANTO SUPERIOR DIREITO -->
             ${fmtUpdate ? `<div class="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full"><p class="text-[8px] font-mono text-white/80">🔄 ${fmtUpdate}</p></div>` : ''}
             <div class="absolute inset-4 border-2 border-white/10 pointer-events-none opacity-40"></div>
             <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-white/10 -translate-y-1/2"></div>
@@ -196,13 +191,14 @@ function renderLineupCards() {
                 const horaFormatada = dataPartida.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
                 const dataHoraFormatada = `${horaFormatada} - ${dataFormatada}`;
                 const localPartida = match.local || 'Estádio a definir';
-                
+                const posCasa = match.clube_casa_posicao;
+                const posVisitante = match.clube_visitante_posicao;
                 return `
                 <div id="match-card-${idx}" class="bg-white rounded-[40px] border border-slate-100 p-2.5 md:p-4 shadow-sm hover:shadow-xl transition-all">
                     <div class="flex items-center justify-between mb-1.5 gap-1">
-                        <!-- 🔥 TIME DA CASA (POSIÇÃO À ESQUERDA) -->
+                        <!-- Casa: posição à esquerda -->
                         <div class="flex items-center gap-1 flex-1 justify-start">
-                            <span class="font-jersey text-xl md:text-2xl text-slate-800">${match.clube_casa_posicao}<span class="text-sm align-top">º</span></span>
+                            <span class="font-jersey text-xl md:text-2xl text-slate-800">${posCasa}<span class="text-sm align-top">º</span></span>
                             <div class="flex flex-col items-center">
                                 ${renderDots(match.aproveitamento_mandante)}
                                 <div class="w-11 h-11 md:w-16 md:h-16 bg-slate-50 p-1.5 rounded-xl border">
@@ -210,10 +206,8 @@ function renderLineupCards() {
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="flex flex-col items-center"><span class="text-slate-200 font-black font-jogos italic text-xs md:text-lg">VS</span></div>
-                        
-                        <!-- 🔥 TIME VISITANTE (POSIÇÃO À DIREITA) -->
+                        <!-- Visitante: posição à direita -->
                         <div class="flex items-center gap-1 flex-1 justify-end">
                             <div class="flex flex-col items-center">
                                 ${renderDots(match.aproveitamento_visitante)}
@@ -221,11 +215,10 @@ function renderLineupCards() {
                                     <img src="${getTeamShield(match.clube_visitante_id)}" class="w-full h-full object-contain">
                                 </div>
                             </div>
-                            <span class="font-jersey text-xl md:text-2xl text-slate-800">${match.clube_visitante_posicao}<span class="text-sm align-top">º</span></span>
+                            <span class="font-jersey text-xl md:text-2xl text-slate-800">${posVisitante}<span class="text-sm align-top">º</span></span>
                         </div>
                     </div>
                     <div class="mt-2">
-                        <!-- 🔥 LOCAL E HORÁRIO – SEM CABEÇALHO, UMA ÚNICA LINHA -->
                         <div class="px-3 py-2 bg-slate-50 rounded-xl text-center mb-2">
                             <p class="text-sm md:text-base font-mono font-bold text-slate-700">${localPartida}</p>
                             <p class="text-sm md:text-base font-mono font-bold text-orange-500">${dataHoraFormatada}</p>
@@ -252,7 +245,7 @@ window.scrollToTeamField = (matchIdx, teamId) => {
     }
 };
 
-// ======================== MODAL (BUSCA DIRETA) ========================
+// ======================== MODAL (BUSCA DIRETA COM TIMEOUT) ========================
 window.fecharModalJogador = function() {
     const modal = document.getElementById('modal-jogador-scout');
     if (modal) modal.remove();
@@ -260,15 +253,12 @@ window.fecharModalJogador = function() {
 
 window.abrirModalJogador = async function(jogadorId, timeId) {
     try {
-        const response = await fetch(`${PROXY_URL}/mercado`);
+        const response = await fetchWithTimeout(`${PROXY_URL}/mercado`, 8000);
         if (!response.ok) throw new Error("Falha ao carregar dados do mercado");
         const data = await response.json();
-        
         const atleta = data.atletas?.find(a => a.atleta_id == jogadorId);
         if (!atleta) throw new Error(`Jogador ${jogadorId} não encontrado no mercado`);
         
-        console.log("🔍 Atleta encontrado:", atleta);
-
         const nome = atleta.apelido_abreviado || atleta.apelido || atleta.nome || `#${jogadorId}`;
         const foto = atleta.foto || getTeamShield(timeId);
         const posAbrev = POSICOES_MAP[atleta.posicao_id] || '?';
@@ -391,7 +381,8 @@ window.renderProvaveis = async function() {
         return;
     }
 
-    const rodada = provavelState.rodadaAtual || provavelState.partidasData?.rodada_id || '';
+    // 🔥 Usa a rodada das partidas (sempre disponível)
+    const rodada = provavelState.partidasData?.rodada_id || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
             <div class="text-center space-y-1 mb-2">
@@ -405,4 +396,4 @@ window.renderProvaveis = async function() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 };
 
-console.log("✅ provaveis.js carregado – versão final com ajustes solicitados");
+console.log("✅ provaveis.js carregado – versão estável (sem chamada problemática)");
