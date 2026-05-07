@@ -221,7 +221,6 @@ function renderLineupCards() {
                     <div class="space-y-1 mt-2">
                         <!-- LOCAL & HORÁRIO FORMATADO (conforme solicitado) -->
                         <div class="px-3 py-2 bg-slate-50 rounded-xl text-left mb-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">LOCAL & HORÁRIO</p>
                             <p class="text-sm md:text-base font-bold text-slate-700"><span class="font-mono text-slate-500">LOCAL:</span> ${match.local || 'Estádio a definir'}</p>
                             <p class="text-sm md:text-base font-mono font-bold text-orange-500 mt-1"><span class="font-mono text-slate-500">HORÁRIO:</span> ${horaFormatada} - ${dataFormatada}</p>
                         </div>
