@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA 
+   JOGOS DA RODADA — JOSA.BET (VERSÃO FINAL CORRIGIDA)
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -10,7 +10,6 @@ let currentRodada = null;
 let currentPartidas = [];
 let currentClubes = {};
 let currentPontuados = {};
-let currentValuation = null;
 let mercadoStatus = null;
 let maxRodadaGlobal = 38;
 
@@ -66,13 +65,17 @@ async function buscarPontuados(rodada) {
     const url = `${JOGOS_PROXY_URL}/atletas/pontuados/${rodada}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou: ${res.status}`);
-    const data = await res.json();
+    let data = await res.json();
+    
+    // O proxy pode retornar array ou objeto. Garantir objeto com atletas
     if (Array.isArray(data)) {
       const obj = {};
       data.forEach(a => { obj[a.id] = a; });
       return obj;
     }
-    return data.atletas || {};
+    // Se já for objeto com a chave "atletas", usa ela
+    if (data.atletas) return data.atletas;
+    return data;
   } catch (err) {
     console.error(`Erro ao carregar scouts da rodada ${rodada}`, err);
     return {};
@@ -106,7 +109,7 @@ async function abrirModalScouts(partida) {
     "CA": "🟨",
     "CV": "🟥",
     "GC": "<span style='color:#e11d1d;'>⚽</span>"
-};
+  };
 
   const atletas = Object.values(pontuados);
   
@@ -119,33 +122,41 @@ async function abrirModalScouts(partida) {
       body.innerHTML = `<div class="text-center py-8 text-gray-400 text-xs">NENHUM ATLETA EM CAMPO</div>`;
       return;
     }
+    
     body.innerHTML = atletasTime.map(atleta => {
       const sigla = siglaPosicao[atleta.posicao_id] || "???";
-      const scoutsList = Object.entries(atleta.scouts || {}).map(([k,v]) => `<span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-[10px] font-mono mr-1">${v} ${k.toUpperCase()}</span>`).join("");
+      // Pega os scouts (pode estar em scout ou scouts)
+      const scoutData = atleta.scout || atleta.scouts || {};
+      const scoutsList = Object.entries(scoutData)
+        .map(([k, v]) => `<span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-[10px] font-mono mr-1">${v} ${k.toUpperCase()}</span>`)
+        .join("");
+      
       let emojis = [];
-      if (atleta.scouts?.G) emojis.push(scoutEmoji.G);
-      if (atleta.scouts?.A) emojis.push(scoutEmoji.A);
-      if (atleta.scouts?.CA) emojis.push(scoutEmoji.CA);
-      if (atleta.scouts?.CV) emojis.push(scoutEmoji.CV);
-      if (scoutData.GC) emojis.push(scoutEmoji.GC); 
-      const emojiSpan = emojis.length ? `<span class="ml-1">${emojis.join(" ")}</span>` : "";
+      if (scoutData.G) emojis.push(scoutEmoji.G);
+      if (scoutData.A) emojis.push(scoutEmoji.A);
+      if (scoutData.CA) emojis.push(scoutEmoji.CA);
+      if (scoutData.CV) emojis.push(scoutEmoji.CV);
+      if (scoutData.GC) emojis.push(scoutEmoji.GC);
+      const emojiSpan = emojis.length ? `<span class="ml-1 text-lg">${emojis.join(" ")}</span>` : "";
+      
       const pontuacao = atleta.pontuacao.toFixed(1);
       const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-600" : "text-rose-600";
-
+      const fotoUrl = atleta.foto ? atleta.foto.replace("FORMATO", "140x140") : "";
+      
       return `
         <div class="flex items-center justify-between p-2 border-b border-gray-50">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden">
-              <img src="${atleta.foto?.replace("FORMATO", "140x140") || ""}" class="w-full h-full object-cover" onerror="this.style.display='none'">
+            <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden flex-shrink-0">
+              <img src="${fotoUrl}" class="w-full h-full object-cover" onerror="this.style.display='none'">
             </div>
             <div>
               <div class="text-[10px] font-mono text-gray-400">${sigla}</div>
-              <div class="text-sm font-bold text-gray-800">${atleta.apelido || atleta.nome}</div>
+              <div class="text-sm font-bold text-gray-800">${atleta.apelido || atleta.nome || "?"}</div>
             </div>
           </div>
           <div class="text-right">
             <div class="font-black ${pontuacaoClass}">${pontuacao}</div>
-            <div class="text-[10px]">${scoutsList || "—"}</div>
+            <div class="text-[10px] mt-1">${scoutsList || "—"}</div>
             ${emojiSpan}
           </div>
         </div>
