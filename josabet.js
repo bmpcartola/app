@@ -275,10 +275,14 @@ function renderHeaderControls() {
     const headerControls = document.getElementById("header-controls");
     if (!headerControls) return;
 
-    if (bmpState.viewMode === "provaveis") {
-        headerControls.innerHTML = "";
-        return;
-    }
+if (bmpState.viewMode === "provaveis") {
+    if (window.renderProvaveis) window.renderProvaveis();
+    return;
+}
+if (bmpState.viewMode === "jogos") {
+    if (window.renderJogos) window.renderJogos();
+    return;
+}
 
     const maxRound = getMaxRound();
     const rounds = Array.from({ length: maxRound }, (_, i) => i + 1).reverse();
