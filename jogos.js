@@ -100,7 +100,13 @@ async function abrirModalScouts(partida) {
   }
 
   const siglaPosicao = { 1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC" };
-  const scoutEmoji = { "G": "⚽", "A": "👟", "CA": "🟨", "CV": "🟥" };
+  const scoutEmoji = {
+    "G": "⚽",
+    "A": "👟",
+    "CA": "🟨",
+    "CV": "🟥",
+    "GC": "<span style='color:#e11d1d;'>⚽</span>"
+};
 
   const atletas = Object.values(pontuados);
   
@@ -121,6 +127,7 @@ async function abrirModalScouts(partida) {
       if (atleta.scouts?.A) emojis.push(scoutEmoji.A);
       if (atleta.scouts?.CA) emojis.push(scoutEmoji.CA);
       if (atleta.scouts?.CV) emojis.push(scoutEmoji.CV);
+      if (scoutData.GC) emojis.push(scoutEmoji.GC); 
       const emojiSpan = emojis.length ? `<span class="ml-1">${emojis.join(" ")}</span>` : "";
       const pontuacao = atleta.pontuacao.toFixed(1);
       const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-600" : "text-rose-600";
