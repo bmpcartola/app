@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Cartola BMP</title>
-    
-    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FF6321">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -70,12 +68,12 @@
         <i data-lucide="chevron-right" id="sidebar-icon" class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
     </button>
 
-    <!-- Sidebar Menu (completamente estático, com JS embutido) -->
+    <!-- Sidebar Menu (estático, funcional) -->
     <div id="sidebar-menu" class="fixed left-[-160px] top-1/2 -translate-y-1/2 z-[100] w-32 h-[800px] bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[50px] shadow-2xl transition-all duration-700 ease-in-out flex flex-col items-center overflow-hidden">
         <div class="flex flex-col items-center justify-between h-full py-20 w-full">
             <div class="flex flex-col items-center gap-14 w-full">
                 <!-- JOSA.BET -->
-                <button id="menu-campo" onclick="setViewMode('campo'); toggleSidebar(false);" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
+                <button id="menu-campo" onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
                     <div class="w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100">
                         <i data-lucide="layout-grid" class="w-9 h-9"></i>
                     </div>
@@ -83,14 +81,14 @@
                 </button>
 
                 <!-- PROVÁVEIS -->
-                <button id="menu-provaveis" onclick="setViewMode('provaveis'); toggleSidebar(false);" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
+                <button id="menu-provaveis" onclick="bmpSetViewMode('provaveis'); toggleSidebar(false);" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
                     <div class="w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100">
                         <i data-lucide="users" class="w-9 h-9"></i>
                     </div>
                     <span class="text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">PROVÁVEIS</span>
                 </button>
 
-                <!-- INSTALAR (controlado via JS abaixo) -->
+                <!-- INSTALAR (controlado abaixo) -->
                 <button id="menu-instalar" onclick="installApp(); toggleSidebar(false);" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95" style="display: none;">
                     <div class="w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-orange-700 text-white">
                         <i data-lucide="download" class="w-9 h-9"></i>
@@ -121,7 +119,6 @@
         </div>
     </div>
 
-    <!-- Scroll to Top Button -->
     <button id="scroll-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-10 right-6 z-50 p-4 bg-orange-500/10 backdrop-blur-md border border-orange-200/30 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-500 hover:bg-orange-500/20 hover:scale-110 group">
         <i data-lucide="arrow-up" class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600"></i>
     </button>
@@ -129,44 +126,28 @@
     <script src="provaveis.js"></script>
     <script src="josabet.js"></script>
 
-    <!-- ========== TODO O CONTROLE DO MENU FICA AQUI (NÃO NO josabet.js) ========== -->
     <script>
-        // Controle do sidebar (abrir/fechar)
+        // ========== CONTROLE DO SIDEBAR ==========
         function toggleSidebar(force) {
             const sidebar = document.getElementById("sidebar-menu");
             const toggleBtn = document.getElementById("sidebar-toggle");
             const backdrop = document.getElementById("sidebar-backdrop");
             if (!sidebar) return;
-
             const isOpen = sidebar.style.left === "0px";
             const nextState = force !== undefined ? force : !isOpen;
-
             if (nextState) {
                 sidebar.style.left = "0px";
-                if (toggleBtn) {
-                    toggleBtn.style.opacity = "0";
-                    toggleBtn.style.pointerEvents = "none";
-                }
-                if (backdrop) {
-                    backdrop.style.opacity = "1";
-                    backdrop.style.pointerEvents = "auto";
-                }
+                if (toggleBtn) { toggleBtn.style.opacity = "0"; toggleBtn.style.pointerEvents = "none"; }
+                if (backdrop) { backdrop.style.opacity = "1"; backdrop.style.pointerEvents = "auto"; }
             } else {
                 sidebar.style.left = "-200px";
-                if (toggleBtn) {
-                    toggleBtn.style.opacity = "1";
-                    toggleBtn.style.pointerEvents = "auto";
-                }
-                if (backdrop) {
-                    backdrop.style.opacity = "0";
-                    backdrop.style.pointerEvents = "none";
-                }
+                if (toggleBtn) { toggleBtn.style.opacity = "1"; toggleBtn.style.pointerEvents = "auto"; }
+                if (backdrop) { backdrop.style.opacity = "0"; backdrop.style.pointerEvents = "none"; }
             }
         }
 
-        
-        function updateSidebarActiveState() {
-
+        // Atualiza o visual do botão ativo
+        function updateMenuActiveState() {
             if (typeof bmpState === 'undefined') return;
             const viewMode = bmpState.viewMode;
             const btnCampo = document.getElementById('menu-campo');
@@ -179,69 +160,48 @@
             const activeIconClass = 'bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50';
             const inactiveIconClass = 'bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100';
 
-            const campoIconDiv = btnCampo.querySelector('div');
-            if (campoIconDiv) {
-                campoIconDiv.className = `w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent ${isCampoActive ? activeIconClass : inactiveIconClass}`;
-            }
+            const campoDiv = btnCampo.querySelector('div');
+            if (campoDiv) campoDiv.className = `w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent ${isCampoActive ? activeIconClass : inactiveIconClass}`;
             const campoSpan = btnCampo.querySelector('span');
-            if (campoSpan) {
-                campoSpan.className = `text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all ${isCampoActive ? 'text-orange-600' : 'text-slate-400 opacity-60'}`;
-            }
+            if (campoSpan) campoSpan.className = `text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all ${isCampoActive ? 'text-orange-600' : 'text-slate-400 opacity-60'}`;
 
-            const provIconDiv = btnProvaveis.querySelector('div');
-            if (provIconDiv) {
-                provIconDiv.className = `w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent ${isProvaveisActive ? activeIconClass : inactiveIconClass}`;
-            }
+            const provDiv = btnProvaveis.querySelector('div');
+            if (provDiv) provDiv.className = `w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent ${isProvaveisActive ? activeIconClass : inactiveIconClass}`;
             const provSpan = btnProvaveis.querySelector('span');
-            if (provSpan) {
-                provSpan.className = `text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all ${isProvaveisActive ? 'text-orange-600' : 'text-slate-400 opacity-60'}`;
-            }
+            if (provSpan) provSpan.className = `text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all ${isProvaveisActive ? 'text-orange-600' : 'text-slate-400 opacity-60'}`;
         }
 
         // Controle do botão INSTALAR
         let deferredPrompt = null;
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             const installBtn = document.getElementById('menu-instalar');
             if (installBtn) installBtn.style.display = 'flex';
         });
-
         window.addEventListener('appinstalled', () => {
             deferredPrompt = null;
             const installBtn = document.getElementById('menu-instalar');
             if (installBtn) installBtn.style.display = 'none';
         });
-
-        async function installApp() {
+        window.installApp = function() {
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                deferredPrompt = null;
-                const installBtn = document.getElementById('menu-instalar');
-                if (installBtn) installBtn.style.display = 'none';
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // Aguarda o josabet.js definir a função bmpSetViewMode
-            const interval = setInterval(() => {
-                if (typeof bmpSetViewMode !== 'undefined') {
-                    clearInterval(interval);
-                    const originalSetViewMode = window.bmpSetViewMode;
-                    window.bmpSetViewMode = function(mode) {
-                        originalSetViewMode(mode);
-                        setTimeout(() => updateSidebarActiveState(), 50);
-                    };
-                    // Também capturar mudanças de série/rodada que não alteram viewMode, mas o menu não precisa.
-                    updateSidebarActiveState(); // estado inicial
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    deferredPrompt = null;
+                    const installBtn = document.getElementById('menu-instalar');
+                    if (installBtn) installBtn.style.display = 'none';
                 }
-            }, 100);
-        });
+            });
+        };
 
-        //SCROL TOP LISTENER
+        // Observa mudanças no bmpState.viewMode via evento do josabet.js
+        document.addEventListener('viewmode-changed', updateMenuActiveState);
+        // Também atualiza após o carregamento
+        window.addEventListener('load', () => setTimeout(updateMenuActiveState, 200));
+
+        // Scroll to top
         window.addEventListener("scroll", () => {
             const topBtn = document.getElementById("scroll-to-top");
             if (!topBtn) return;
@@ -253,12 +213,6 @@
                 topBtn.style.pointerEvents = "none";
             }
         });
-
-        // GARANTE QUE OS ICONES LUCIDE SEJAM RENDERIZADOS NO MENU
-        if (typeof lucide !== "undefined") lucide.createIcons();
-    </script>
-    <script>
-
     </script>
 </body>
 </html>
