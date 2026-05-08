@@ -14,7 +14,7 @@ let bmpState = {
     activeProvaveis: false
 };
 
-const PROXY_URL = 'https://josabet-proxy.onrender.com';
+const PROXY_URL = 'https://proxy-f5nr.onrender.com';
 const API_CARTOLA = {
     MERCADO_STATUS: "https://api.cartola.globo.com/mercado/status",
     PARTIDAS: "https://api.cartola.globo.com/partidas"
@@ -250,23 +250,11 @@ function renderSidebar() {
             </div>
 
             <div class="mt-auto w-full flex flex-col items-center gap-8">
-                <!-- JOGOS -->
-                <button onclick="bmpSetViewMode('jogos'); toggleSidebar(false);" class="${btnClass}">
+                <!-- AJUDA -->
+                <button onclick="toggleSidebar(false);" class="${btnClass}">
                     <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
-                        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m11 12 2-3 2 1"></path>
-                            <path d="m11 12-2-3-2 1"></path>
-                            <path d="m11 12 1 3h3v-2l-2-1Z"></path>
-                            <path d="m11 12-1 3H7v-2l2-1Z"></path>
-                            <path d="m5.5 17 2-2"></path>
-                            <path d="m18.5 17-2-2"></path>
-                            <path d="M12 2v3"></path>
-                            <path d="m19 6-2 2"></path>
-                            <path d="m5 6 2 2"></path>
-                        </svg>
+                        <i data-lucide="help-circle" class="w-9 h-9"></i>
                     </div>
-                    <span class="${labelBase} text-slate-400 opacity-60">JOGOS</span>
                 </button>
 
                 <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
@@ -321,13 +309,6 @@ function renderContent() {
     if (bmpState.viewMode === "provaveis") {
         if (window.renderProvaveis) {
             window.renderProvaveis();
-        }
-        return;
-    }
-
-    if (bmpState.viewMode === "jogos") {
-        if (window.renderJogos) {
-            window.renderJogos();
         }
         return;
     }
@@ -545,27 +526,23 @@ function renderBottomCards(ranking) {
         const mitosRodada = { rdd: r, A: null, B: null };
         
         let bestA = -Infinity, teamA = null;
-        if (bmpData && bmpData.serieA) {
-            bmpData.serieA.forEach(t => {
-                const rd = t.rodadas.find(rd => rd.rdd === r);
-                if (rd) {
-                    const s = (rd.val || 0) + (rd.re || 0) - (rd.pen || 0);
-                    if (s > bestA) { bestA = s; teamA = { nome: t.nome, score: s, escudo: t.escudo }; }
-                }
-            });
-        }
+        bmpData.serieA.forEach(t => {
+            const rd = t.rodadas.find(rd => rd.rdd === r);
+            if (rd) {
+                const s = (rd.val || 0) + (rd.re || 0) - (rd.pen || 0);
+                if (s > bestA) { bestA = s; teamA = { nome: t.nome, score: s, escudo: t.escudo }; }
+            }
+        });
         mitosRodada.A = teamA;
 
         let bestB = -Infinity, teamB = null;
-        if (bmpData && bmpData.serieB) {
-            bmpData.serieB.forEach(t => {
-                const rd = t.rodadas.find(rd => rd.rdd === r);
-                if (rd) {
-                    const s = (rd.val || 0) + (rd.re || 0) - (rd.pen || 0);
-                    if (s > bestB) { bestB = s; teamB = { nome: t.nome, score: s, escudo: t.escudo }; }
-                }
-            });
-        }
+        bmpData.serieB.forEach(t => {
+            const rd = t.rodadas.find(rd => rd.rdd === r);
+            if (rd) {
+                const s = (rd.val || 0) + (rd.re || 0) - (rd.pen || 0);
+                if (s > bestB) { bestB = s; teamB = { nome: t.nome, score: s, escudo: t.escudo }; }
+            }
+        });
         mitosRodada.B = teamB;
         if (mitosRodada.A || mitosRodada.B) historicalMitos.push(mitosRodada);
     }
