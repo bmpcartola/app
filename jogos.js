@@ -389,11 +389,8 @@ async function carregarRodada(rodada) {
 
     main.innerHTML = `
         <div class="animate-in fade-in duration-700 max-w-4xl mx-auto pb-48">
-            <div class="text-center space-y-1 mb-8 mt-4">
-                <h2 class="font-jogos text-4xl md:text-6xl text-slate-900 leading-none tracking-tighter uppercase italic">CALENDÁRIO DE <span class="text-orange-500">JOGOS</span></h2>
-            </div>
-            ${statusHtml}
             ${seletorHtml}
+            ${statusHtml}
             <div>${cardsHtml}</div>
         </div>`;
 
@@ -474,4 +471,4 @@ window.renderJogos = async function() {
   }
 };
 
-console.log("✅ jogos.js atualizado - layout limpo e lógica sincronizada");
+console.log("✅ jogos.js sincronizado com lógica JOSA.BET");
