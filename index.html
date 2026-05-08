@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Cartola BMP</title>
+    
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FF6321">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,25 +18,85 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { primary: '#ff6321', orange: { 400: '#fb923c', 500: '#f97316', 600: '#ea580c' } },
-                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], jogos: ['FontJogos', 'sans-serif'] }
+                    colors: {
+                        primary: '#ff6321', // Orange
+                        orange: {
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        jogos: ['FontJogos', 'sans-serif']
+                    }
                 }
             }
         };
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Jersey+25&display=swap');
-        @font-face { font-family: 'FontJogos'; src: url('./FONTS/font_jogos.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
-        .font-jersey { font-family: 'Jersey 25', sans-serif; }
-        body { background-color: #f8fafc; margin: 0; padding-bottom: 100px; font-family: 'Inter', sans-serif; color: #1e293b; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
-        .gray-filter { filter: grayscale(1) opacity(0.3); }
-        .font-jogos { font-family: 'FontJogos', 'Inter', sans-serif; font-weight: 900; text-transform: uppercase; }
-        .loader { width: 48px; height: 48px; border: 3px solid #e2e8f0; border-top-color: #ff6321; border-radius: 50%; animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ff6321; }
+        
+        @font-face {
+            font-family: 'FontJogos';
+            src: url('./FONTS/font_jogos.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        .font-jersey {
+            font-family: 'Jersey 25', sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding-bottom: 100px;
+            -webkit-font-smoothing: antialiased;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .gray-filter {
+            filter: grayscale(1) opacity(0.3);
+        }
+
+        .font-jogos {
+            font-family: 'FontJogos', 'Inter', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #ff6321;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #ff6321;
+        }
     </style>
 </head>
 <body class="text-slate-900">
@@ -49,7 +111,10 @@
                     <p class="font-jogos text-[8px] text-slate-400 tracking-[0.4em] mt-1 uppercase">2026</p>
                 </div>
             </div>
-            <div id="header-controls" class="flex items-center gap-3"></div>
+            
+            <div id="header-controls" class="flex items-center gap-3">
+                <!-- Round and Serie selectors -->
+            </div>
         </div>
     </header>
 
@@ -60,131 +125,32 @@
         </div>
     </main>
 
-    <!-- Backdrop -->
+    <!-- Sidebar Backdrop -->
     <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 z-[50] bg-black/5 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500"></div>
 
-    <!-- Botão de abrir -->
+    <!-- Sidebar Toggle -->
     <button id="sidebar-toggle" onclick="toggleSidebar(true)" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/90 backdrop-blur-md border border-slate-100 p-3 py-8 rounded-r-3xl shadow-2xl hover:bg-white transition-all group">
-        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
+        <i data-lucide="chevron-right" id="sidebar-icon" class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
     </button>
 
-    <!-- MENU DEFINITIVO - AGORA FUNCIONA -->
-    <div id="sidebar-menu" class="fixed left-[-200px] top-1/2 -translate-y-1/2 z-[100] w-32 bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[40px] shadow-2xl transition-all duration-500 ease-in-out flex flex-col items-center py-6 gap-4">
-        <!-- JOSA.BET -->
-        <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="flex flex-col items-center gap-1 group w-full">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all bg-slate-100 text-slate-500 group-hover:bg-orange-500 group-hover:text-white">
-                <i data-lucide="layout-grid" class="w-7 h-7"></i>
-            </div>
-            <span class="text-[9px] font-jogos text-slate-500">JOSA.BET</span>
-        </button>
-
-        <!-- PROVÁVEIS -->
-        <button onclick="bmpSetViewMode('provaveis'); toggleSidebar(false);" class="flex flex-col items-center gap-1 group w-full">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all bg-slate-100 text-slate-500 group-hover:bg-orange-500 group-hover:text-white">
-                <i data-lucide="users" class="w-7 h-7"></i>
-            </div>
-            <span class="text-[9px] font-jogos text-slate-500">PROVÁVEIS</span>
-        </button>
-
-        <!-- INSTALAR (só aparece se tiver deferredPrompt) -->
-        <button id="install-btn" onclick="installApp(); toggleSidebar(false);" style="display:none;" class="flex flex-col items-center gap-1 group w-full">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all bg-orange-600 text-white">
-                <i data-lucide="download" class="w-7 h-7"></i>
-            </div>
-            <span class="text-[9px] font-jogos text-orange-600">INSTALAR</span>
-        </button>
-
-        <!-- JOGOS -->
-        <button onclick="toggleSidebar(false);" class="flex flex-col items-center gap-1 group w-full">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-all bg-slate-100 text-slate-500 group-hover:bg-orange-500 group-hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 256 256">
-                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm76.52,147.42H170.9l-9.26-12.76,12.63-36.78,15-4.89,26.24,20.13A87.38,87.38,0,0,1,204.52,171.42Zm-164-34.3L66.71,117l15,4.89,12.63,36.78L85.1,171.42H51.48A87.38,87.38,0,0,1,40.47,137.12Zm10-50.64,5.51,18.6L40.71,116.77A87.33,87.33,0,0,1,50.43,86.48ZM109,152,97.54,118.65,128,97.71l30.46,20.94L147,152Zm91.07-46.92,5.51-18.6a87.33,87.33,0,0,1,9.72,30.29Zm-6.2-35.38-9.51,32.08-15.07,4.89L136,83.79V68.21l29.09-20A88.58,88.58,0,0,1,193.86,69.7ZM146.07,41.87,128,54.29,109.93,41.87a88.24,88.24,0,0,1,36.14,0ZM90.91,48.21l29.09,20V83.79L86.72,106.67l-15.07-4.89L62.14,69.7A88.58,88.58,0,0,1,90.91,48.21ZM63.15,187.42H83.52l7.17,20.27A88.4,88.4,0,0,1,63.15,187.42ZM110,214.13,98.12,180.71,107.35,168h41.3l9.23,12.71-11.83,33.42a88,88,0,0,1-36.1,0Zm55.36-6.44,7.17-20.27h20.37A88.4,88.4,0,0,1,165.31,207.69Z"></path>
-                </svg>
-            </div>
-            <span class="text-[9px] font-jogos text-slate-500">JOGOS</span>
-        </button>
+    <!-- Sidebar Menu -->
+    <div id="sidebar-menu" class="fixed left-[-160px] top-1/2 -translate-y-1/2 z-[100] w-32 h-[800px] bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[50px] shadow-2xl transition-all duration-700 ease-in-out flex flex-col items-center overflow-hidden">
+        <!-- Handled dynamically by josabet.js -->
     </div>
 
+    <!-- Scroll to Top Button -->
     <button id="scroll-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-10 right-6 z-50 p-4 bg-orange-500/10 backdrop-blur-md border border-orange-200/30 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-500 hover:bg-orange-500/20 hover:scale-110 group">
         <i data-lucide="arrow-up" class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600"></i>
     </button>
 
     <script src="provaveis.js"></script>
     <script src="josabet.js"></script>
-
     <script>
-        // Toggle do menu
-        function toggleSidebar(force) {
-            const menu = document.getElementById('sidebar-menu');
-            const toggleBtn = document.getElementById('sidebar-toggle');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            if (!menu) return;
-            const isOpen = menu.style.left === '0px';
-            const shouldOpen = force !== undefined ? force : !isOpen;
-            if (shouldOpen) {
-                menu.style.left = '0px';
-                if (toggleBtn) { toggleBtn.style.opacity = '0'; toggleBtn.style.pointerEvents = 'none'; }
-                if (backdrop) { backdrop.style.opacity = '1'; backdrop.style.pointerEvents = 'auto'; }
-            } else {
-                menu.style.left = '-200px';
-                if (toggleBtn) { toggleBtn.style.opacity = '1'; toggleBtn.style.pointerEvents = 'auto'; }
-                if (backdrop) { backdrop.style.opacity = '0'; backdrop.style.pointerEvents = 'none'; }
-            }
-        }
-
-        // Botão ativo (destacar)
-        function highlightActiveButton() {
-            if (typeof bmpState === 'undefined') return;
-            const mode = bmpState.viewMode;
-            const allButtons = document.querySelectorAll('#sidebar-menu button');
-            allButtons.forEach(btn => {
-                const div = btn.querySelector('div');
-                const span = btn.querySelector('span');
-                const isActive = (mode === 'campo' && btn.innerText.includes('JOSA.BET')) ||
-                                 (mode === 'provaveis' && btn.innerText.includes('PROVÁVEIS'));
-                if (div) {
-                    if (isActive) {
-                        div.classList.remove('bg-slate-100', 'text-slate-500');
-                        div.classList.add('bg-orange-500', 'text-white');
-                    } else if (!btn.id?.includes('install')) {
-                        div.classList.remove('bg-orange-500', 'text-white');
-                        div.classList.add('bg-slate-100', 'text-slate-500');
-                    }
-                }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
             });
         }
-
-        // PWA install
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const installBtn = document.getElementById('install-btn');
-            if (installBtn) installBtn.style.display = 'flex';
-        });
-        window.addEventListener('appinstalled', () => {
-            deferredPrompt = null;
-            const installBtn = document.getElementById('install-btn');
-            if (installBtn) installBtn.style.display = 'none';
-        });
-        window.installApp = function() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => {
-                    deferredPrompt = null;
-                    const installBtn = document.getElementById('install-btn');
-                    if (installBtn) installBtn.style.display = 'none';
-                });
-            }
-        };
-
-        // Atualiza destaque quando o modo mudar
-        setInterval(highlightActiveButton, 300);
-        window.addEventListener('load', () => setTimeout(highlightActiveButton, 500));
-        window.addEventListener('scroll', () => {
-            const topBtn = document.getElementById('scroll-to-top');
-            if (topBtn) topBtn.style.opacity = window.scrollY > 400 ? '1' : '0';
-        });
     </script>
 </body>
 </html>
