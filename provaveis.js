@@ -254,7 +254,7 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         if (!atleta) throw new Error("Jogador não encontrado");
 
         // 🔥 FOTO: usa a foto do atleta, fallback escudo do time
-        const foto = atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId);
+        const foto = provavelState.mercadoData?.get(jogadorId)?.foto || (atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId));
         
         const nome = atleta.apelido_abreviado || atleta.apelido || atleta.nome || `#${jogadorId}`;
         const posAbrev = POSICOES_MAP[atleta.posicao_id] || '?';
