@@ -1,5 +1,5 @@
 /* ============================================================
-   PROVÁVEIS ESCALAÇÕES 
+   PROVÁVEIS ESCALAÇÕES – VERSÃO FINAL (TODAS CORREÇÕES)
    ============================================================ */
 
 const PROXY_URL_PROVAVEIS = 'https://proxy-f5nr.onrender.com';

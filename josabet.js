@@ -1,5 +1,6 @@
 /* ============================================================
-   JOSABET
+   script.js — Dashboard Cartola BMP 2026
+   Handles data fetching, ranking, and UI rendering.
    ============================================================ */
 
 const API_URL = "https://raw.githubusercontent.com/bmpcartola/app/main/bd/cartola.json";
@@ -249,13 +250,12 @@ function renderSidebar() {
             </div>
 
             <div class="mt-auto w-full flex flex-col items-center gap-8">
-               <!-- JOGOS (BOLA) -->
-               <button onclick="bmpSetViewMode('jogos'); toggleSidebar(false);" class="${btnClass}">
-                   <div class="${iconBase} ${bmpState.viewMode === 'jogos' ? activeIcon : 'bg-white text-slate-300 border border-slate-100 group-hover:bg-slate-100 group-hover:text-slate-500'}">
-                       <i data-lucide="futbol" class="w-9 h-9"></i>
-                   </div>
-                   <span class="${labelBase} ${bmpState.viewMode === 'jogos' ? 'text-orange-600' : 'text-slate-400 opacity-60'}">JOGOS</span>
-               </button>
+                <!-- AJUDA -->
+                <button onclick="toggleSidebar(false);" class="${btnClass}">
+                    <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
+                        <i data-lucide="help-circle" class="w-9 h-9"></i>
+                    </div>
+                </button>
 
                 <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
                     <div class="p-5 bg-orange-50 rounded-full mb-3 group-hover/brand:scale-110 transition-transform">
@@ -274,8 +274,7 @@ function renderHeaderControls() {
     const headerControls = document.getElementById("header-controls");
     if (!headerControls) return;
 
-    // Esconde completamente nos modos provaveis e jogos
-    if (bmpState.viewMode === "provaveis" || bmpState.viewMode === "jogos") {
+    if (bmpState.viewMode === "provaveis") {
         headerControls.innerHTML = "";
         return;
     }
@@ -298,8 +297,6 @@ function renderHeaderControls() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
-
-
 function renderContent() {
     const main = document.getElementById("main-content");
     if (!main) return;
@@ -310,16 +307,11 @@ function renderContent() {
     }
 
     if (bmpState.viewMode === "provaveis") {
-        if (window.renderProvaveis) window.renderProvaveis();
+        if (window.renderProvaveis) {
+            window.renderProvaveis();
+        }
         return;
     }
-
-    // ⬇️ ADICIONADO - MODO JOGOS ⬇️
-    if (bmpState.viewMode === "jogos") {
-        if (window.renderJogos) window.renderJogos();
-        return;
-    }
-    // ⬆️ FIM DA ADIÇÃO ⬆️
 
     const ranking = getRanking(bmpState.selectedRound);
     
@@ -331,13 +323,16 @@ function renderContent() {
     main.innerHTML = `
         <div class="space-y-12 max-w-5xl mx-auto">
             ${renderPodium(ranking)}
+            
             <div class="space-y-12">
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                     ${renderField(ranking)}
                 </div>
+
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
                     ${renderTable(ranking)}
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                     ${renderBottomCards(ranking)}
                 </div>
