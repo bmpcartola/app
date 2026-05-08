@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA — JOSA.BET (versão integrada)
+   JOGOS DA RODADA 
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -14,7 +14,6 @@ let currentValuation = null;
 let mercadoStatus = null;
 let maxRodadaGlobal = 38;
 
-// ========== UTILITÁRIOS ==========
 function renderJogosLoader() {
   const main = document.getElementById("main-content");
   if (main) main.innerHTML = `<div class="flex flex-col justify-center items-center h-screen"><div class="loader"></div><p class="text-xs mt-2 text-slate-400">Carregando jogos...</p></div>`;
@@ -54,17 +53,6 @@ function renderAproveitamento(aprov) {
   return `<div class="flex justify-center gap-1 mt-2">${aprov.map(r=>`<span class="w-2 h-2 rounded-full ${cores[r]||"bg-gray-100"}"></span>`).join("")}</div>`;
 }
 
-// ========== REQUISIÇÕES VIA PROXY ==========
-async function buscarMaxRodada() {
-  try {
-    const res = await fetch(`${JOGOS_PROXY_URL}/mercado/status`);
-    const data = await res.json();
-    return data.rodada_atual || 38;
-  } catch(e) {
-    return 38;
-  }
-}
-
 async function buscarPartidas(rodada) {
   const url = `${JOGOS_PROXY_URL}/partidas/${rodada}`;
   const res = await fetch(url);
@@ -79,8 +67,6 @@ async function buscarPontuados(rodada) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou: ${res.status}`);
     const data = await res.json();
-    // O proxy já retorna array de atletas (formato reduzido) ou objeto com atletas?
-    // Vamos normalizar para objeto indexado por id
     if (Array.isArray(data)) {
       const obj = {};
       data.forEach(a => { obj[a.id] = a; });
@@ -93,7 +79,6 @@ async function buscarPontuados(rodada) {
   }
 }
 
-// ========== MODAL DE SCOUTS DA PARTIDA ==========
 function fecharModalScouts() {
   const modal = document.getElementById('modal-scouts');
   if (modal) modal.remove();
@@ -199,7 +184,6 @@ async function abrirModalScouts(partida) {
   });
 }
 
-// ========== RENDERIZAÇÃO DO SELETOR (SETAS) ==========
 function renderSeletorRodada(rodadaAtual, maxRodada) {
   return `
     <div class="px-4 pt-4 pb-2 flex justify-center items-center gap-6">
@@ -214,7 +198,6 @@ function renderSeletorRodada(rodadaAtual, maxRodada) {
   `;
 }
 
-// ========== CARD COM STATUS CORRETO ==========
 function renderCardPartida(p, rodadaCard, rodadaAtual) {
   const casa = currentClubes[p.clube_casa_id];
   const fora = currentClubes[p.clube_visitante_id];
@@ -295,7 +278,6 @@ function gerarTop5Html(partida) {
   `;
 }
 
-// ========== CARREGAR UMA RODADA ESPECÍFICA (SETAS) ==========
 async function carregarRodada(rodada) {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
@@ -326,7 +308,6 @@ async function carregarRodada(rodada) {
   }
 }
 
-// ========== DELEGAÇÃO DE EVENTOS GLOBAL ==========
 function setupGlobalDelegation() {
   const main = document.getElementById("main-content");
   if (!main) return;
@@ -379,7 +360,6 @@ function setupGlobalDelegation() {
   window.globalClickHandler = clickHandler;
 }
 
-// ========== FUNÇÃO PRINCIPAL (EXPORTADA) ==========
 window.renderJogos = async function() {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
@@ -421,5 +401,4 @@ window.renderJogos = async function() {
   }
 };
 
-// Inicialização silenciosa (aguarda clique no menu)
 console.log("✅ jogos.js carregado – use o botão ⚽ no menu lateral");
