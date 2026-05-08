@@ -246,12 +246,28 @@ window.fecharModalJogador = function() {
 
 window.abrirModalJogador = async function(jogadorId, timeId) {
     try {
-        // Busca o atleta na API de mercado (garante dados atualizados)
-        const response = await fetch(`${PROXY_URL_PROVAVEIS}/mercado`);
-        if (!response.ok) throw new Error("Falha ao carregar mercado");
-        const data = await response.json();
+        // 🔥 Fetch paralelo: mercado + rodadas anteriores (MPV e CEDIDO)
+        const [mercadoRes, rodadasRes] = await Promise.all([
+            fetch(`${PROXY_URL_PROVAVEIS}/mercado`),
+            fetch(`${PROXY_URL_PROVAVEIS}/escalar/rodadas-anteriores`)
+        ]);
+
+        if (!mercadoRes.ok) throw new Error("Falha ao carregar mercado");
+        const data = await mercadoRes.json();
         const atleta = data.atletas?.find(a => a.atleta_id == jogadorId);
         if (!atleta) throw new Error("Jogador não encontrado");
+
+        // 🔥 MPV e CEDIDO vindos de /escalar/rodadas-anteriores
+        let mpv = '--';
+        let pt_ced = '--';
+        if (rodadasRes.ok) {
+            const rodadasData = await rodadasRes.json();
+            const jogadorRodada = rodadasData[jogadorId];
+            if (jogadorRodada) {
+                mpv = jogadorRodada.pm !== undefined ? jogadorRodada.pm.toFixed(1) : '--';
+                pt_ced = jogadorRodada.pc0 !== undefined ? jogadorRodada.pc0.toFixed(1) : '--';
+            }
+        }
 
         // 🔥 FOTO: usa a foto do atleta, fallback escudo do time
         const foto = provavelState.mercadoData?.get(jogadorId)?.foto || (atleta.foto && atleta.foto.startsWith('http') ? atleta.foto : getTeamShield(timeId));
@@ -265,8 +281,6 @@ window.abrirModalJogador = async function(jogadorId, timeId) {
         const jogos = atleta.jogos_num || 0;
         const ultima = atleta.pontos_num !== undefined ? atleta.pontos_num.toFixed(1) : '-';
         const media = atleta.media_num ? atleta.media_num.toFixed(1) : '0.0';
-        const mpv = '--';
-        const pt_ced = '--';
 
         const scout = atleta.scout || {};
         const ataque = {
