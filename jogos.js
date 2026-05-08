@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA 
+   JOGOS DA RODADA — JOSA.BET (versão corrigida)
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -67,6 +67,7 @@ async function buscarPontuados(rodada) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou: ${res.status}`);
     const data = await res.json();
+    // O proxy pode retornar array ou objeto com atletas
     if (Array.isArray(data)) {
       const obj = {};
       data.forEach(a => { obj[a.id] = a; });
@@ -85,11 +86,7 @@ function fecharModalScouts() {
 }
 window.fecharModalScouts = fecharModalScouts;
 
-
-
-
-
-
+// Função corrigida com emojis apenas para G, A, CA, CV, GC (GC com bola vermelha)
 async function abrirModalScouts(partida) {
   fecharModalScouts();
   const clubes = currentClubes;
