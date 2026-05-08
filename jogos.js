@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA — JOSA.BET (versão corrigida)
+   JOGOS DA RODADA — JOSA.BET (versão final estável)
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -10,7 +10,6 @@ let currentRodada = null;
 let currentPartidas = [];
 let currentClubes = {};
 let currentPontuados = {};
-let currentValuation = null;
 let mercadoStatus = null;
 let maxRodadaGlobal = 38;
 
@@ -67,7 +66,6 @@ async function buscarPontuados(rodada) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou: ${res.status}`);
     const data = await res.json();
-    // O proxy pode retornar array ou objeto com atletas
     if (Array.isArray(data)) {
       const obj = {};
       data.forEach(a => { obj[a.id] = a; });
@@ -86,7 +84,6 @@ function fecharModalScouts() {
 }
 window.fecharModalScouts = fecharModalScouts;
 
-// Função corrigida com emojis apenas para G, A, CA, CV, GC (GC com bola vermelha)
 async function abrirModalScouts(partida) {
   fecharModalScouts();
   const clubes = currentClubes;
@@ -102,12 +99,14 @@ async function abrirModalScouts(partida) {
   }
 
   const siglaPosicao = { 1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC" };
+  
+  // Emojis: G bola normal, A chuteira, CA amarelo, CV vermelho, GC bola vermelha
   const scoutEmoji = {
     "G": "⚽",
     "A": "👟",
     "CA": "🟨",
     "CV": "🟥",
-    "GC": "<span style='color:#e63946;'>⚽</span>"
+    "GC": "<span style='color:#e11d1d;'>⚽</span>"
   };
 
   const atletas = Object.values(pontuados);
