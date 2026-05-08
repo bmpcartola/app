@@ -274,13 +274,8 @@ function renderHeaderControls() {
     const headerControls = document.getElementById("header-controls");
     if (!headerControls) return;
 
-    // Se estiver no modo JOGOS, esconde os controles
-    if (bmpState.viewMode === "jogos") {
-        headerControls.innerHTML = "";
-        return;
-    }
-
-    if (bmpState.viewMode === "provaveis") {
+    // Esconde completamente nos modos provaveis e jogos
+    if (bmpState.viewMode === "provaveis" || bmpState.viewMode === "jogos") {
         headerControls.innerHTML = "";
         return;
     }
