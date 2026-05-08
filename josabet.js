@@ -250,12 +250,13 @@ function renderSidebar() {
             </div>
 
             <div class="mt-auto w-full flex flex-col items-center gap-8">
-                <!-- AJUDA -->
-                <button onclick="toggleSidebar(false);" class="${btnClass}">
-                    <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
-                        <i data-lucide="help-circle" class="w-9 h-9"></i>
-                    </div>
-                </button>
+               <!-- JOGOS -->
+               <button onclick="toggleSidebar(false);" class="${btnClass}">
+                   <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
+                       <i data-lucide="football" class="w-9 h-9"></i>
+                   </div>
+                   <span class="${labelBase} text-slate-400 opacity-60">JOGOS</span>
+               </button>
 
                 <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
                     <div class="p-5 bg-orange-50 rounded-full mb-3 group-hover/brand:scale-110 transition-transform">
