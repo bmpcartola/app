@@ -298,6 +298,8 @@ function renderHeaderControls() {
     if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
+
+
 function renderContent() {
     const main = document.getElementById("main-content");
     if (!main) return;
@@ -308,11 +310,16 @@ function renderContent() {
     }
 
     if (bmpState.viewMode === "provaveis") {
-        if (window.renderProvaveis) {
-            window.renderProvaveis();
-        }
+        if (window.renderProvaveis) window.renderProvaveis();
         return;
     }
+
+    // ⬇️ ADICIONADO - MODO JOGOS ⬇️
+    if (bmpState.viewMode === "jogos") {
+        if (window.renderJogos) window.renderJogos();
+        return;
+    }
+    // ⬆️ FIM DA ADIÇÃO ⬆️
 
     const ranking = getRanking(bmpState.selectedRound);
     
@@ -324,16 +331,13 @@ function renderContent() {
     main.innerHTML = `
         <div class="space-y-12 max-w-5xl mx-auto">
             ${renderPodium(ranking)}
-            
             <div class="space-y-12">
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                     ${renderField(ranking)}
                 </div>
-
                 <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
                     ${renderTable(ranking)}
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                     ${renderBottomCards(ranking)}
                 </div>
