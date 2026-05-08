@@ -253,7 +253,7 @@ function renderSidebar() {
                 <!-- JOGOS -->
                 <button onclick="bmpSetViewMode('jogos'); toggleSidebar(false);" class="${btnClass}">
                     <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soccer-ball"><circle cx="12" cy="12" r="10"/><path d="m11 12 2-3 2 1"/><path d="m11 12-2-3-2 1"/><path d="m11 12 1 3h3v-2l-2-1Z"/><path d="m11 12-1 3H7v-2l2-1Z"/><path d="M12 2v3"/><path d="m19 6-2 2"/><path d="m22 12-3 1"/><path d="m19 18-2-2"/><path d="M12 22v-3"/><path d="m5 18 2-2"/><path d="M2 12l3 1"/><path d="m5 6 2 2"/></svg>
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-soccer-ball"><circle cx="12" cy="12" r="10"/><path d="m14 12-4 2-1-3 4-2z"/><path d="M12 2v3"/><path d="m5 6 2 2"/><path d="M2 12h3"/><path d="m5 18 2-2"/><path d="M12 22v-3"/><path d="m19 18-2-2"/><path d="M22 12h-3"/><path d="m19 6-2 2"/></svg>
                     </div>
                     <span class="${labelBase} text-slate-400 opacity-60">JOGOS</span>
                 </button>
