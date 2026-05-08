@@ -313,6 +313,11 @@ function renderContent() {
         return;
     }
 
+   if (bmpState.viewMode === "jogos") {
+    if (window.renderJogos) window.renderJogos();
+    return;
+   }
+
     const ranking = getRanking(bmpState.selectedRound);
     
     if (ranking.length === 0) {
