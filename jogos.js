@@ -1,11 +1,11 @@
 /* ============================================================
-   JOGOS DA RODADA — BMP CARTOLA
+   JOGOS DA RODADA — JOSA.BET (SINCRONIZADO)
    ============================================================ */
 
-const PROXY_URL_JOGOS = 'https://proxy-f5nr.onrender.com';
 const ESCUDOS_PATH = "./images/escudos_brasileirao";
+const PROXY_URL_JOGOS = 'https://proxy-f5nr.onrender.com';
 
-const API_CARTOLA_JOGOS = {
+const API_CARTOLA = {
   MERCADO_STATUS: `${PROXY_URL_JOGOS}/mercado`,
   PARTIDAS: `${PROXY_URL_JOGOS}/partidas`,
   PARTIDAS_RODADA: (rodada) => `${PROXY_URL_JOGOS}/partidas/${rodada}`,
@@ -25,93 +25,91 @@ let maxRodadaGlobal = 38;
 // ========== UTILITÁRIOS ==========
 function renderLoader() {
   const main = document.getElementById("main-content");
-  if (main) main.innerHTML = `<div class="flex flex-col justify-center items-center h-[60vh]"><div class="loader"></div><p class="text-xs mt-2 font-jogos text-slate-400">Carregando...</p></div>`;
+  if (main) main.innerHTML = `<div class="flex flex-col justify-center items-center h-screen"><div class="loader"></div><p class="text-xs mt-2">Carregando...</p></div>`;
 }
-
 function renderError(msg) {
   const main = document.getElementById("main-content");
   if (main) main.innerHTML = `<div class="text-center py-10"><p class="text-red-500">${msg}</p><button onclick="window.renderJogos()" class="mt-4 px-4 py-2 bg-black text-white rounded-full">Tentar novamente</button></div>`;
 }
-
 function formatarData(iso) {
   if (!iso) return "A definir";
   const d = new Date(iso);
   return `${d.toLocaleDateString("pt-BR")} ${d.toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" })}`;
 }
-
-function formatarPosicao(pos) { return pos ? `${pos}&ordm;` : ""; }
-
-function formatarFechamento(f) { 
-    if(!f) return "--/-- --:--"; 
-    return `${String(f.dia).padStart(2,"0")}/${String(f.mes).padStart(2,"0")} ${String(f.hora).padStart(2,"0")}:${String(f.minuto).padStart(2,"0")}`; 
-}
-
+function formatarPosicao(pos) { return pos ? `${pos}º` : ""; }
+function formatarFechamento(f) { if(!f) return "--/-- --:--"; return `${String(f.dia).padStart(2,"0")}/${String(f.mes).padStart(2,"0")} ${String(f.hora).padStart(2,"0")}:${String(f.minuto).padStart(2,"0")}`; }
 function statusMercado(s) {
-  const m = {
-      1: { l:"ABERTO", c:"text-emerald-500", t:"MERCADO FECHA" },
-      2: { l:"FECHADO", c:"text-rose-500",  t:"FECHADO EM" },
-      3: { l:"ATUALIZANDO", c:"text-amber-500", t:"AGUARDE" },
-      4: { l:"MANUTENÇÃO", c:"text-gray-500", t:"EM MANUTENÇÃO" },
-      6: { l:"ENCERRADO", c:"text-gray-500", t:"FIM DE TEMPORADA" }
-  };
-  return m[s] || { l:"—", c:"text-gray-400", t:"—" };
+  const m = {1:{l:"ABERTO",c:"text-emerald-500",t:"MERCADO FECHA"},2:{l:"FECHADO",c:"text-rose-500",t:"FECHADO EM"},3:{l:"ATUALIZANDO",c:"text-amber-500",t:"AGUARDE"},4:{l:"MANUTENÇÃO",c:"text-gray-500",t:"EM MANUTENÇÃO"},6:{l:"ENCERRADO",c:"text-gray-500",t:"FIM DE TEMPORADA"}};
+  return m[s]||{l:"—",c:"text-gray-400",t:"—"};
 }
-
 function renderStatusMercado(mercado) {
   const s = statusMercado(mercado.status_mercado);
-  return `
-    <div class="bg-white rounded-[32px] shadow-sm border border-slate-100 mx-auto max-w-2xl mb-4 overflow-hidden">
-        <div class="grid grid-cols-3 divide-x divide-slate-100 p-5">
-            <div class="text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Rodada Atual</p>
-                <p class="text-2xl font-black font-mono text-slate-800">${mercado.rodada_atual??"-"}</p>
-            </div>
-            <div class="text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Status</p>
-                <p class="text-2xl font-black font-jogos ${s.c} leading-tight">${s.l}</p>
-            </div>
-            <div class="text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${s.t}</p>
-                <p class="text-lg font-black font-mono text-slate-800">${formatarFechamento(mercado.fechamento)}</p>
-            </div>
-        </div>
-    </div>`;
+  return `<div class="bg-white rounded-2xl shadow-sm border mx-4 mb-4"><div class="bg-orange-50 px-4 py-2.5 border-b"><p class="text-xl font-black text-center">Jogos da Rodada</p></div><div class="grid grid-cols-3 divide-x p-5"><div class="text-center"><p class="text-[10px] text-gray-400">Rodada Atual</p><p class="text-2xl font-black">${mercado.rodada_atual??"-"}</p></div><div class="text-center"><p class="text-[10px] text-gray-400">Status</p><p class="text-2xl font-black ${s.c}">${s.l}</p></div><div class="text-center"><p class="text-[10px] text-gray-400">${s.t}</p><p class="text-lg font-black">${formatarFechamento(mercado.fechamento)}</p></div></div></div>`;
 }
-
 function renderAproveitamento(aprov) {
   if(!Array.isArray(aprov)) return "";
-  const cores = { v: "bg-emerald-500", d: "bg-rose-500", e: "bg-slate-300" };
-  return `<div class="flex justify-center gap-1 mt-2">${aprov.map(r=>`<span class="w-2 h-2 rounded-full ${cores[r]||"bg-slate-100"}"></span>`).join("")}</div>`;
+  const cores = {v:"bg-emerald-200",d:"bg-rose-200",e:"bg-gray-200"};
+  return `<div class="flex justify-center gap-1 mt-2">${aprov.map(r=>`<span class="w-2 h-2 rounded-full ${cores[r]||"bg-gray-100"}"></span>`).join("")}</div>`;
 }
 
 // ========== REQUISIÇÕES ==========
+async function buscarMaxRodada() {
+  try {
+    const res = await fetch(API_CARTOLA.MERCADO_STATUS);
+    const data = await res.json();
+    return data.rodada_atual || 38;
+  } catch(e) {
+    return 38;
+  }
+}
 async function buscarPartidas(rodada) {
   const isCurrent = (rodada === undefined || rodada === mercadoStatus?.rodada_atual);
-  let url = isCurrent ? API_CARTOLA_JOGOS.PARTIDAS : API_CARTOLA_JOGOS.PARTIDAS_RODADA(rodada);
-  
+  let url;
+  if (isCurrent) {
+    url = API_CARTOLA.PARTIDAS;
+  } else {
+    if (typeof API_CARTOLA.PARTIDAS_RODADA === 'function') {
+      url = API_CARTOLA.PARTIDAS_RODADA(rodada);
+    } else {
+      const base = API_CARTOLA.PARTIDAS.replace(/\/$/, '');
+      url = `${base}/${rodada}`;
+    }
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   return { partidas: data.partidas || [], clubes: data.clubes || {} };
 }
-
 async function buscarPontuados(rodada) {
   if (rodada === mercadoStatus?.rodada_atual) return {};
-  const proxyUrl = API_CARTOLA_JOGOS.PONTUADOS(rodada);
+  let proxyUrl;
+  if (typeof API_CARTOLA.PONTUADOS === 'function') {
+    proxyUrl = API_CARTOLA.PONTUADOS(rodada);
+  } else {
+    const base = API_CARTOLA.PONTUADOS.replace(/\/$/, '');
+    proxyUrl = `${base}/${rodada}`;
+  }
   try {
     const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error(`Proxy falhou com status ${res.status}`);
     const data = await res.json();
     return data.atletas || {};
   } catch (err) {
-      console.error(`Não foi possível carregar scouts da rodada ${rodada}`, err);
+    const directUrl = `https://api.cartola.globo.com/atletas/pontuados/${rodada}`;
+    try {
+      const res = await fetch(directUrl);
+      if (!res.ok) throw new Error(`API direta falhou: ${res.status}`);
+      const data = await res.json();
+      return data.atletas || {};
+    } catch (directErr) {
+      console.error(`Não foi possível carregar scouts da rodada ${rodada}`, directErr);
       return {};
+    }
   }
 }
-
 async function buscarValorizacao() {
   try {
-    const rota = API_CARTOLA_JOGOS.AWS_ATLETAS_PONTUADOS;
+    const rota = API_CARTOLA.AWS_ATLETAS_PONTUADOS || `${PROXY_URL_JOGOS}/aws/atletas-pontuados`;
     const res = await fetch(rota);
     if (!res.ok) throw new Error("AWS valorização falhou");
     return await res.json();
@@ -120,10 +118,10 @@ async function buscarValorizacao() {
   }
 }
 
-// ========== MODAL DE SCOUTS ==========
+// ========== MODAL DE SCOUTS DA PARTIDA ==========
 function fecharModalScouts() {
-    const modal = document.getElementById('modal-scouts');
-    if (modal) modal.remove();
+  const modal = document.getElementById('modal-scouts');
+  if (modal) modal.remove();
 }
 window.fecharModalScouts = fecharModalScouts;
 
@@ -139,7 +137,7 @@ async function abrirModalScouts(partida) {
   const timeFora = clubes[timeForaId];
 
   if (Object.keys(pontuados).length === 0) {
-    alert("Scouts ainda não disponíveis para esta rodada.");
+    alert("Ainda não há estatísticas disponíveis para esta rodada.");
     return;
   }
 
@@ -154,56 +152,57 @@ async function abrirModalScouts(partida) {
         const v = val.valorizacao !== undefined ? val.valorizacao : val.valorizacao_real;
         if (v !== undefined && v !== null) {
           valuationMap[String(key)] = parseFloat(v);
+          if (val.idAtleta) valuationMap[String(val.idAtleta)] = parseFloat(v);
         }
       }
     });
   }
 
   const renderizarLista = (timeId) => {
-    const atletasTime = atletas.filter(a => Number(a.clube_id) === Number(timeId) && a.entrou_em_campo);
+    const atletasTime = atletas.filter(a => Number(a.clube_id) === Number(timeId) && a.entrou_em_campo === true);
     atletasTime.sort((a,b) => (a.posicao_id || 99) - (b.posicao_id || 99));
     const body = document.querySelector('#modal-scouts .modal-body');
     if (!body) return;
     if (atletasTime.length === 0) {
-      body.innerHTML = `<div class="py-12 text-center text-slate-400 font-jogos text-[10px] uppercase tracking-widest">Ninguém pontuou ainda</div>`;
+      body.innerHTML = `<div class="empty-scouts">NENHUM ATLETA EM CAMPO</div>`;
       return;
     }
     body.innerHTML = atletasTime.map(atleta => {
       const sigla = siglaPosicao[atleta.posicao_id] || "???";
-      const scoutsList = Object.entries(atleta.scout || {}).map(([k,v]) => `<span class="inline-block bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-bold">${v}${k.toUpperCase()}</span>`).join("");
+      const scoutsList = Object.entries(atleta.scout || {}).map(([k,v]) => `<span class="scout-item">${v} ${k.toUpperCase()}</span>`).join("");
       let emojis = [];
       if (atleta.scout?.G) emojis.push(scoutEmoji.G);
       if (atleta.scout?.A) emojis.push(scoutEmoji.A);
       if (atleta.scout?.CA) emojis.push(scoutEmoji.CA);
       if (atleta.scout?.CV) emojis.push(scoutEmoji.CV);
+      const emojiSpan = emojis.length ? `<span class="scout-emojis">${emojis.join(" ")}</span>` : "";
       const pontuacao = atleta.pontuacao.toFixed(1);
-      const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-500" : "text-rose-500";
+      const pontuacaoClass = atleta.pontuacao >= 0 ? "positiva" : "negativa";
 
       let valHtml = "";
-      const valor = valuationMap[String(atleta.atleta_id)];
-      if (valor !== undefined && valor !== 0) {
+      const atletaIdStr = String(atleta.atleta_id);
+      const valor = valuationMap[atletaIdStr];
+      if (valor !== undefined && valor !== null && valor !== 0) {
         const valColor = valor >= 0 ? "text-emerald-500" : "text-rose-500";
-        valHtml = `<div class="text-[10px] font-black font-mono ${valColor}">${valor > 0 ? '+' : ''}${valor.toFixed(2)}</div>`;
+        const sinal = valor > 0 ? "+" : "";
+        valHtml = `<div class="text-[11px] font-black ${valColor} leading-tight">${sinal}${valor.toFixed(2)}</div>`;
       }
 
       return `
-        <div class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-slate-50 rounded-full border border-slate-100 overflow-hidden">
-                <img src="${atleta.foto?.replace("FORMATO", "140x140") || ""}" class="w-full h-full object-contain" onerror="this.src='${ESCUDOS_PATH}/${timeId}.png'">
-            </div>
-            <div>
-              <p class="text-[8px] font-black font-jogos text-slate-400 leading-none">${sigla}</p>
-              <p class="text-sm font-bold text-slate-800">${atleta.apelido}</p>
+        <div class="atleta-card">
+          <div class="atleta-info">
+            <img src="${atleta.foto?.replace("FORMATO", "140x140") || ""}" onerror="this.src='./IMAGES/default.png'">
+            <div class="atleta-dados">
+              <div class="atleta-posicao">${sigla}</div>
+              <div class="atleta-nome">${atleta.apelido}</div>
               ${valHtml}
             </div>
           </div>
-          <div class="flex flex-col items-end gap-1">
-            <div class="flex items-center gap-1">
-              <span class="text-lg font-black font-mono ${pontuacaoClass}">${pontuacao}</span>
-              <span class="text-sm">${emojis.join("")}</span>
+          <div class="atleta-stats">
+            <div class="pontuacao-wrapper">
+              <span class="pontuacao ${pontuacaoClass}">${pontuacao}</span>${emojiSpan}
             </div>
-            <div class="flex flex-wrap gap-1 justify-end">${scoutsList}</div>
+            <div class="scouts-wrapper">${scoutsList || '<span class="no-scout">—</span>'}</div>
           </div>
         </div>
       `;
@@ -212,60 +211,58 @@ async function abrirModalScouts(partida) {
 
   const modalHtml = `
     <div id="modal-scouts" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onclick="if(event.target === this) fecharModalScouts()">
-      <div class="relative w-full max-w-md mx-3 bg-slate-50 rounded-[40px] shadow-2xl overflow-y-auto max-h-[90vh]">
-        <div class="sticky top-0 bg-white z-10 border-b border-slate-100 px-8 py-5 flex justify-between items-center">
-          <h3 class="font-black text-[10px] font-jogos text-slate-400 uppercase tracking-widest">ESTATÍSTICAS</h3>
-          <button onclick="fecharModalScouts()" class="p-2 hover:bg-slate-100 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
+      <div class="relative w-full max-w-md mx-3 bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="sticky top-0 bg-white z-10 border-b border-gray-100 px-4 py-3 flex justify-between items-center">
+          <h3 class="font-black text-lg text-gray-800">SCOUTS DA PARTIDA</h3>
+          <button onclick="fecharModalScouts()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
-        <div class="p-6">
-          <div class="flex gap-2 mb-6">
-            <button id="modal-tab-casa" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-white bg-orange-500 shadow-lg shadow-orange-500/20">
-              <img src="${ESCUDOS_PATH}/${timeCasa?.id}.png" class="w-6 h-6 object-contain" onerror="this.src='${timeCasa?.escudos?.["30x30"] || ""}'"> ${timeCasa?.abreviacao || "CASA"}
+        <div class="bg-gradient-to-r from-orange-50 to-white px-4 pb-3">
+          <div class="flex gap-2">
+            <button id="modal-tab-casa" class="flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-white bg-[#ff6321]">
+              <img src="${ESCUDOS_PATH}/${timeCasa?.id}.png" class="w-5 h-5" onerror="this.src='${timeCasa?.escudos?.["30x30"] || ""}'"> ${timeCasa?.abreviacao || "CASA"}
             </button>
-            <button id="modal-tab-fora" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-slate-400 bg-white border border-slate-100 shadow-sm">
-              <img src="${ESCUDOS_PATH}/${timeFora?.id}.png" class="w-6 h-6 object-contain" onerror="this.src='${timeFora?.escudos?.["30x30"] || ""}'"> ${timeFora?.abreviacao || "FORA"}
+            <button id="modal-tab-fora" class="flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-black bg-gray-200">
+              <img src="${ESCUDOS_PATH}/${timeFora?.id}.png" class="w-5 h-5" onerror="this.src='${timeFora?.escudos?.["30x30"] || ""}'"> ${timeFora?.abreviacao || "FORA"}
             </button>
           </div>
-          <div class="modal-body space-y-2"></div>
         </div>
+        <div class="modal-body p-4 space-y-2"></div>
       </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', modalHtml);
-  if (typeof lucide !== "undefined") lucide.createIcons();
   renderizarLista(timeCasaId);
 
   document.getElementById('modal-tab-casa')?.addEventListener('click', () => {
-    document.getElementById('modal-tab-casa').className = "flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-white bg-orange-500 shadow-lg shadow-orange-500/20";
-    document.getElementById('modal-tab-fora').className = "flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-slate-400 bg-white border border-slate-100 shadow-sm";
+    document.getElementById('modal-tab-casa').className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-white bg-[#ff6321]";
+    document.getElementById('modal-tab-fora').className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-black bg-gray-200";
     renderizarLista(timeCasaId);
   });
   document.getElementById('modal-tab-fora')?.addEventListener('click', () => {
-    document.getElementById('modal-tab-fora').className = "flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-white bg-orange-500 shadow-lg shadow-orange-500/20";
-    document.getElementById('modal-tab-casa').className = "flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-black font-jogos text-[10px] tracking-widest text-slate-400 bg-white border border-slate-100 shadow-sm";
+    document.getElementById('modal-tab-fora').className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-white bg-[#ff6321]";
+    document.getElementById('modal-tab-casa').className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-full font-bold text-black bg-gray-200";
     renderizarLista(timeForaId);
   });
 }
 
-// ========== SELETOR RODADA ==========
+// ========== RENDERIZAÇÃO DO SELETOR (SETAS) ==========
 function renderSeletorRodada(rodadaAtual, maxRodada) {
   return `
-    <div class="px-4 py-6 flex justify-center items-center gap-8">
-      <button class="btn-rodada-prev w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 disabled:opacity-20 transition-all group" ${rodadaAtual <= 1 ? 'disabled' : ''}>
-        <i data-lucide="chevron-left" class="w-6 h-6 transition-transform group-hover:-translate-x-0.5"></i>
+    <div class="px-4 pt-4 pb-2 flex justify-center items-center gap-6">
+      <button class="btn-rodada-prev w-10 h-10 rounded-full bg-white shadow-sm border flex items-center justify-center text-gray-600 hover:text-black transition disabled:opacity-30" ${rodadaAtual <= 1 ? 'disabled' : ''}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <div class="text-center font-jogos">
-        <p class="text-[10px] text-slate-300 tracking-[0.4em] mb-1">Rodada</p>
-        <p class="text-2xl font-black text-slate-800 tracking-tighter">${rodadaAtual}ª RODADA</p>
-      </div>
-      <button class="btn-rodada-next w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-orange-500 disabled:opacity-20 transition-all group" ${rodadaAtual >= maxRodada ? 'disabled' : ''}>
-        <i data-lucide="chevron-right" class="w-6 h-6 transition-transform group-hover:translate-x-0.5"></i>
+      <div class="text-base font-black text-gray-800">Rodada ${rodadaAtual}</div>
+      <button class="btn-rodada-next w-10 h-10 rounded-full bg-white shadow-sm border flex items-center justify-center text-gray-600 hover:text-black transition disabled:opacity-30" ${rodadaAtual >= maxRodada ? 'disabled' : ''}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
   `;
 }
 
-// ========== CARD PARTIDA ==========
+// ========== CARD COM STATUS CORRETO ==========
 function renderCardPartida(p, rodadaCard, rodadaAtual) {
   const casa = currentClubes[p.clube_casa_id];
   const fora = currentClubes[p.clube_visitante_id];
@@ -274,109 +271,91 @@ function renderCardPartida(p, rodadaCard, rodadaAtual) {
   const jogoIniciado = p.placar_oficial_mandante !== null;
 
   let statusTexto = "AGUARDANDO";
-  let statusCor = "text-slate-300";
+  let statusCor = "text-gray-400";
 
+  // REGRA: rodadas anteriores sempre ENCERRADA
   if (rodadaCard < rodadaAtual) {
     statusTexto = "ENCERRADA";
-    statusCor = "text-rose-500";
-  } else if (p.periodo_tr === "PRIMEIRO_TEMPO" || p.periodo_tr === "SEGUNDO_TEMPO" || p.periodo_tr === "INTERVALO") {
+    statusCor = "text-red-500";
+  } 
+  else if (p.periodo_tr === "PRIMEIRO_TEMPO" || p.periodo_tr === "SEGUNDO_TEMPO" || p.periodo_tr === "INTERVALO") {
     statusTexto = "EM ANDAMENTO";
-    statusCor = "text-emerald-500";
-  } else if (p.status_transmissao_tr === "ENCERRADA" || p.status_transmissao_tr === "POS_JOGO") {
+    statusCor = "text-green-600";
+  } 
+  else if (p.status_transmissao_tr === "ENCERRADA" || p.status_transmissao_tr === "POS_JOGO") {
     statusTexto = "ENCERRADA";
-    statusCor = "text-rose-500";
+    statusCor = "text-red-500";
   }
 
-  return `
-  <div class="match-card-v2 bg-white rounded-[40px] border border-slate-100 p-6 md:p-10 shadow-sm hover:shadow-xl transition-all cursor-pointer mb-6" data-partida-id="${p.partida_id}" data-rodada="${rodadaCard}">
-    <p class="text-[9px] font-mono font-bold text-slate-400 text-center mb-6 uppercase tracking-widest">${formatarData(p.partida_data)} • ${p.local || "-"}</p>
-    
-    <div class="flex items-center justify-between gap-4 md:gap-10">
-      <div class="flex-1 flex flex-col items-center">
-        <span class="font-jersey text-2xl text-slate-200 mb-2">${formatarPosicao(p.clube_casa_posicao)}</span>
-        <div class="w-16 h-16 md:w-24 md:h-24 bg-slate-50 p-2 md:p-4 rounded-3xl border border-slate-100 shadow-inner">
-            <img src="${ESCUDOS_PATH}/${p.clube_casa_id}.png" class="w-full h-full object-contain" onerror="this.src='${casa?.escudos?.["60x60"] || ""}'">
-        </div>
-        <span class="mt-3 font-jogos text-sm md:text-lg text-slate-800">${casa?.abreviacao || "?"}</span>
+  return `<div class="match-card-v2 bg-white rounded-2xl shadow-sm border p-4 mb-4 cursor-pointer" data-partida-id="${p.partida_id}" data-rodada="${rodadaCard}">
+    <p class="text-[10px] text-gray-400 text-center mb-2">${formatarData(p.partida_data)} • ${p.local || "-"}</p>
+    <div class="flex items-start justify-between gap-2">
+      <div class="flex-1 text-center">
+        <span class="text-[11px] text-gray-400">${formatarPosicao(p.clube_casa_posicao)}</span>
+        <img src="${ESCUDOS_PATH}/${p.clube_casa_id}.png" class="w-12 h-12 mx-auto" onerror="this.src='${casa?.escudos?.["60x60"] || ""}'">
+        <span class="text-sm font-black block">${casa?.abreviacao || "?"}</span>
         ${renderAproveitamento(p.aproveitamento_mandante)}
       </div>
-
-      <div class="flex flex-col items-center">
-        <div class="flex items-center gap-3 md:gap-8">
-          <span class="text-4xl md:text-6xl font-jersey ${jogoIniciado ? "text-slate-800" : "text-slate-200"}">${placarC}</span>
-          <span class="text-slate-200 font-jogos italic text-xl">VS</span>
-          <span class="text-4xl md:text-6xl font-jersey ${jogoIniciado ? "text-slate-800" : "text-slate-200"}">${placarF}</span>
+      <div class="text-center">
+        <div class="text-2xl font-black pt-3">
+          <span class="${jogoIniciado ? "text-black" : "text-gray-300"}">${placarC}</span>
+          <span class="text-gray-300"> × </span>
+          <span class="${jogoIniciado ? "text-black" : "text-gray-300"}">${placarF}</span>
         </div>
-        <div class="mt-4 px-4 py-1 rounded-full border border-slate-100 bg-slate-50">
-            <p class="text-[10px] font-black font-jogos uppercase tracking-[0.2em] ${statusCor}">${statusTexto}</p>
-        </div>
+        <div class="text-[9px] font-bold uppercase tracking-wider mt-1 ${statusCor}">${statusTexto}</div>
       </div>
-
-      <div class="flex-1 flex flex-col items-center">
-        <span class="font-jersey text-2xl text-slate-200 mb-2">${formatarPosicao(p.clube_visitante_posicao)}</span>
-        <div class="w-16 h-16 md:w-24 md:h-24 bg-slate-50 p-2 md:p-4 rounded-3xl border border-slate-100 shadow-inner">
-            <img src="${ESCUDOS_PATH}/${p.clube_visitante_id}.png" class="w-full h-full object-contain" onerror="this.src='${fora?.escudos?.["60x60"] || ""}'">
-        </div>
-        <span class="mt-3 font-jogos text-sm md:text-lg text-slate-800">${fora?.abreviacao || "?"}</span>
+      <div class="flex-1 text-center">
+        <span class="text-[11px] text-gray-400">${formatarPosicao(p.clube_visitante_posicao)}</span>
+        <img src="${ESCUDOS_PATH}/${p.clube_visitante_id}.png" class="w-12 h-12 mx-auto" onerror="this.src='${fora?.escudos?.["60x60"] || ""}'">
+        <span class="text-sm font-black block">${fora?.abreviacao || "?"}</span>
         ${renderAproveitamento(p.aproveitamento_visitante)}
       </div>
     </div>
-
-    <div class="top5-container hidden mt-8 pt-8 border-t border-slate-50"></div>
-    
-    <div class="mt-8 flex justify-center">
-        <button class="expand-top5-btn px-6 py-2 rounded-full bg-slate-50 border border-slate-100 text-[10px] font-black font-jogos text-slate-400 tracking-[0.2em] transition-all hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200">
-            ▼ TOP 5 PONTUADORES
-        </button>
-    </div>
+    <div class="top5-container hidden mt-4 pt-4 border-t border-gray-100" data-partida-id="${p.partida_id}"></div>
+    <button class="expand-top5-btn w-full mt-2 text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800 transition">▼ MOSTRAR TOP 5</button>
   </div>`;
 }
 
 function gerarTop5Html(partida) {
   if (Object.keys(currentPontuados).length === 0) {
-    return `<div class="text-center py-6 text-slate-300 font-jogos text-[10px] tracking-widest uppercase">Estatísticas em breve...</div>`;
+    return `<div class="text-center py-2 text-gray-400 text-[10px]">Dados estatísticos indisponíveis para esta rodada.</div>`;
   }
+  const casaId = partida.clube_casa_id;
+  const foraId = partida.clube_visitante_id;
+  const casaNome = currentClubes[casaId]?.abreviacao || "CASA";
+  const foraNome = currentClubes[foraId]?.abreviacao || "FORA";
   const atletas = Object.values(currentPontuados);
-  const atletasCasa = atletas.filter(a => Number(a.clube_id) === Number(partida.clube_casa_id) && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
-  const atletasFora = atletas.filter(a => Number(a.clube_id) === Number(partida.clube_visitante_id) && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
-  
+  const atletasCasa = atletas.filter(a => Number(a.clube_id) === Number(casaId) && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
+  const atletasFora = atletas.filter(a => Number(a.clube_id) === Number(foraId) && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
   const renderLista = (lista) => {
+    if (lista.length === 0) return `<div class="text-center py-2 text-gray-400 text-[10px]">Nenhum atleta em campo</div>`;
     return lista.map(a => `
-      <div class="flex justify-between items-center py-2 border-b border-slate-50 px-2 hover:bg-slate-50 rounded-lg transition-colors">
-        <span class="text-[11px] font-bold text-slate-600 truncate mr-2">${a.apelido}</span>
-        <span class="text-[11px] font-black font-mono ${a.pontuacao >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${a.pontuacao.toFixed(1)}</span>
+      <div class="flex justify-between items-center py-1 border-b border-gray-50">
+        <span class="text-[11px] font-bold truncate">${a.apelido}</span>
+        <span class="text-[11px] font-black ${a.pontuacao >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${a.pontuacao.toFixed(1)}</span>
       </div>
     `).join("");
   };
-
   return `
-    <div class="grid grid-cols-2 gap-8">
-      <div>
-        <p class="text-center font-black font-jogos text-[9px] text-slate-400 tracking-widest uppercase mb-4">${currentClubes[partida.clube_casa_id]?.abreviacao}</p>
-        <div class="space-y-1">${renderLista(atletasCasa)}</div>
-      </div>
-      <div>
-        <p class="text-center font-black font-jogos text-[9px] text-slate-400 tracking-widest uppercase mb-4">${currentClubes[partida.clube_visitante_id]?.abreviacao}</p>
-        <div class="space-y-1">${renderLista(atletasFora)}</div>
-      </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div><p class="text-center font-black text-[10px] uppercase mb-2">${casaNome}</p>${renderLista(atletasCasa)}</div>
+      <div><p class="text-center font-black text-[10px] uppercase mb-2">${foraNome}</p>${renderLista(atletasFora)}</div>
     </div>
   `;
 }
 
-// ========== CARREGAR RODADA ==========
+// ========== FUNÇÃO PARA CARREGAR UMA RODADA ESPECÍFICA (SETAS) ==========
 async function carregarRodada(rodada) {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
   renderLoader();
   try {
     const { partidas: novasPartidas, clubes: novosClubes } = await buscarPartidas(rodada);
-    
     let novosPontuados = {};
     const rodadaAtualAPI = mercadoStatus.rodada_atual;
     if (rodada < rodadaAtualAPI) {
       novosPontuados = await buscarPontuados(rodada);
     }
-
     currentPartidas = novasPartidas;
     currentClubes = novosClubes;
     currentPontuados = novosPontuados;
@@ -386,89 +365,117 @@ async function carregarRodada(rodada) {
     const seletorHtml = renderSeletorRodada(rodada, maxRodadaGlobal);
     const statusHtml = renderStatusMercado(mercadoStatus);
     const cardsHtml = currentPartidas.map(p => renderCardPartida(p, rodada, rodadaAtualAPI)).join("");
-
-    main.innerHTML = `
-        <div class="animate-in fade-in duration-700 max-w-4xl mx-auto pb-48">
-            ${seletorHtml}
-            ${statusHtml}
-            <div>${cardsHtml}</div>
-        </div>`;
+    main.innerHTML = `${seletorHtml}${statusHtml}<section class="px-4 pb-32">${cardsHtml}</section>`;
 
     setupGlobalDelegation();
-    if (typeof lucide !== "undefined") lucide.createIcons();
   } catch (err) {
     console.error(err);
-    renderError(`Erro ao carregar rodada ${rodada}`);
+    renderError(`Erro ao carregar rodada ${rodada}: ${err.message}`);
   } finally {
     jogosRenderizando = false;
   }
 }
 
-// ========== DELEGAÇÃO EVENTOS ==========
+// ========== DELEGAÇÃO DE EVENTOS GLOBAL ==========
 function setupGlobalDelegation() {
   const main = document.getElementById("main-content");
   if (!main) return;
-  if (window.bmpJogosClickHandler) main.removeEventListener('click', window.bmpJogosClickHandler);
+
+  if (window.bmpJogosClickHandler) {
+    main.removeEventListener('click', window.bmpJogosClickHandler);
+  }
   
   const clickHandler = (e) => {
-    const prev = e.target.closest('.btn-rodada-prev');
-    if (prev && !prev.disabled) {
+    // Botão anterior
+    const prevBtn = e.target.closest('.btn-rodada-prev');
+    if (prevBtn && !prevBtn.disabled) {
       e.stopPropagation();
-      carregarRodada(currentRodada - 1);
+      const novaRodada = currentRodada - 1;
+      if (novaRodada >= 1) carregarRodada(novaRodada);
       return;
     }
-    const next = e.target.closest('.btn-rodada-next');
-    if (next && !next.disabled) {
+    // Botão próximo
+    const nextBtn = e.target.closest('.btn-rodada-next');
+    if (nextBtn && !nextBtn.disabled) {
       e.stopPropagation();
-      carregarRodada(currentRodada + 1);
+      const novaRodada = currentRodada + 1;
+      if (novaRodada <= maxRodadaGlobal) carregarRodada(novaRodada);
       return;
     }
-    const expand = e.target.closest('.expand-top5-btn');
-    if (expand) {
+    // Botão de expandir TOP 5
+    const btn = e.target.closest('.expand-top5-btn');
+    if (btn) {
       e.stopPropagation();
-      const card = expand.closest('.match-card-v2');
+      const card = btn.closest('.match-card-v2');
       const container = card.querySelector('.top5-container');
       const isHidden = container.classList.contains('hidden');
       if (isHidden) {
-        const pId = parseInt(card.dataset.partidaId);
-        container.innerHTML = gerarTop5Html(currentPartidas.find(p => p.partida_id === pId));
-        container.classList.remove('hidden');
-        expand.innerHTML = '▲ ESCONDER TOP 5';
-        expand.classList.add('bg-orange-500', 'text-white', 'border-orange-500');
+        const partidaId = parseInt(card.dataset.partidaId);
+        const partida = currentPartidas.find(p => p.partida_id === partidaId);
+        if (partida) {
+          container.innerHTML = gerarTop5Html(partida);
+          container.classList.remove('hidden');
+          btn.innerHTML = '▲ ESCONDER TOP 5';
+        }
       } else {
         container.classList.add('hidden');
-        expand.innerHTML = '▼ TOP 5 PONTUADORES';
-        expand.classList.remove('bg-orange-500', 'text-white', 'border-orange-500');
+        btn.innerHTML = '▼ MOSTRAR TOP 5';
       }
       return;
     }
+    // Clique no card (para scouts da partida)
     const card = e.target.closest('.match-card-v2');
     if (card && !e.target.closest('.expand-top5-btn')) {
-      const pId = parseInt(card.dataset.partidaId);
-      abrirModalScouts(currentPartidas.find(p => p.partida_id === pId));
+      const partidaId = parseInt(card.dataset.partidaId);
+      const partida = currentPartidas.find(p => p.partida_id === partidaId);
+      if (partida) abrirModalScouts(partida);
     }
   };
   main.addEventListener('click', clickHandler);
   window.bmpJogosClickHandler = clickHandler;
 }
 
-// ========== ENTRY POINT ==========
+// ========== CARREGAR JOGOS (ENTRY POINT) ==========
 window.renderJogos = async function() {
   if (jogosRenderizando) return;
+  jogosRenderizando = true;
   renderLoader();
+
   try {
-    const res = await fetch(API_CARTOLA_JOGOS.MERCADO_STATUS);
-    if (!res.ok) throw new Error("Falha status mercado");
-    mercadoStatus = await res.json();
-    maxRodadaGlobal = mercadoStatus.rodada_atual || 38;
-    currentRodada = mercadoStatus.rodada_atual;
+    const resMerc = await fetch(API_CARTOLA.MERCADO_STATUS);
+    if (!resMerc.ok) throw new Error(`Status API: ${resMerc.status}`);
+    mercadoStatus = await resMerc.json();
+    const rodadaAtualAPI = mercadoStatus.rodada_atual;
+    maxRodadaGlobal = mercadoStatus.rodada_final || 38;
+
+    let rodadaSelecionada = currentRodada || rodadaAtualAPI;
     
+    const { partidas, clubes } = await buscarPartidas(rodadaSelecionada);
+    
+    let pontuados = {};
+    if (rodadaSelecionada < rodadaAtualAPI) {
+      pontuados = await buscarPontuados(rodadaSelecionada);
+    }
+
+    currentPartidas = partidas;
+    currentClubes = clubes;
+    currentPontuados = pontuados;
     currentValuation = await buscarValorizacao();
-    await carregarRodada(currentRodada);
+    currentRodada = rodadaSelecionada;
+
+    const main = document.getElementById("main-content");
+    const seletorHtml = renderSeletorRodada(rodadaSelecionada, maxRodadaGlobal);
+    const statusHtml = renderStatusMercado(mercadoStatus);
+    const cardsHtml = partidas.map(p => renderCardPartida(p, rodadaSelecionada, rodadaAtualAPI)).join("");
+    main.innerHTML = `${seletorHtml}${statusHtml}<section class="px-4 pb-32">${cardsHtml}</section>`;
+
+    setupGlobalDelegation();
   } catch(err) {
     console.error(err);
-    renderError("Falha na sincronização dos dados");
+    renderError(err.message || "Falha ao carregar dados");
+  } finally {
+    jogosRenderizando = false;
   }
 };
 
-console.log("✅ jogos.js sincronizado com lógica JOSA.BET");
+console.log("✅ jogos.js sincronizado com lógica de jogos.txt");
