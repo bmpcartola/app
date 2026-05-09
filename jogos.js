@@ -121,7 +121,7 @@ const scoutEmoji = {
   "A": "👟",
   "CA": "🟨",
   "CV": "🟥",
-  "GC": "<img src='/images/bv.png' class='inline-block w-4 h-4' alt='GC'>"
+  "GC": "<img src='images/bv.png' class='inline-block w-6 h-6' alt='GC' onerror='this.style.display=\"none\"; this.insertAdjacentHTML(\"afterend\", \"<span style=\\\"color:#e11d1d; font-size:1rem;\\\">⚽</span>\");'>"
 };
 
   const atletas = Object.values(pontuados);
