@@ -116,13 +116,13 @@ async function abrirModalScouts(partida) {
   }
 
   const siglaPosicao = { 1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC" };
-  const scoutEmoji = {
-    "G": "⚽",
-    "A": "👟",
-    "CA": "🟨",
-    "CV": "🟥",
-    "GC": "<span style='color:#e11d1d;'>⚽</span>"
-  };
+const scoutEmoji = {
+  "G": "⚽",
+  "A": "👟",
+  "CA": "🟨",
+  "CV": "🟥",
+  "GC": "<img src='/images/bv.png' class='inline-block w-4 h-4' alt='GC'>"
+};
 
   const atletas = Object.values(pontuados);
   
