@@ -189,6 +189,15 @@
         <i data-lucide="arrow-up" class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600"></i>
     </button>
 
+    <script>
+        window.API_CARTOLA = {
+            MERCADO_STATUS: "/mercado/status",
+            PARTIDAS: "/partidas",
+            PARTIDAS_RODADA: (r) => `/partidas/${r}`,
+            PONTUADOS: (r) => `/atletas/pontuados/${r}`,
+            AWS_ATLETAS_PONTUADOS: "/escalar/rodadas-anteriores"
+        };
+    </script>
     <script src="provaveis.js"></script>
     <script src="jogos.js"></script>
     <script src="josabet.js"></script>
