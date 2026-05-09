@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA — JOSA.BET (VERSÃO FINAL CORRIGIDA)
+   JOGOS DA RODADA
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -41,9 +41,25 @@ function statusMercado(s) {
   return m[s]||{l:"—",c:"text-gray-400",t:"—"};
 }
 
+// ========== ALTERAÇÃO 1: CARD DE STATUS SEM TÍTULO E SEM FUNDO LARANJA ==========
 function renderStatusMercado(mercado) {
   const s = statusMercado(mercado.status_mercado);
-  return `<div class="bg-white rounded-2xl shadow-sm border mx-4 mb-4"><div class="bg-orange-50 px-4 py-2.5 border-b"><p class="text-xl font-black text-center">Jogos da Rodada</p></div><div class="grid grid-cols-3 divide-x p-5"><div class="text-center"><p class="text-[10px] text-gray-400">Rodada Atual</p><p class="text-2xl font-black">${mercado.rodada_atual??"-"}</p></div><div class="text-center"><p class="text-[10px] text-gray-400">Status</p><p class="text-2xl font-black ${s.c}">${s.l}</p></div><div class="text-center"><p class="text-[10px] text-gray-400">${s.t}</p><p class="text-lg font-black">${formatarFechamento(mercado.fechamento)}</p></div></div></div>`;
+  return `<div class="bg-white rounded-2xl shadow-sm border mx-4 mb-4">
+    <div class="grid grid-cols-3 divide-x p-5">
+      <div class="text-center">
+        <p class="text-[10px] text-gray-400">Rodada Atual</p>
+        <p class="text-2xl font-black">${mercado.rodada_atual ?? "-"}</p>
+      </div>
+      <div class="text-center">
+        <p class="text-[10px] text-gray-400">Status</p>
+        <p class="text-2xl font-black ${s.c}">${s.l}</p>
+      </div>
+      <div class="text-center">
+        <p class="text-[10px] text-gray-400">${s.t}</p>
+        <p class="text-lg font-black">${formatarFechamento(mercado.fechamento)}</p>
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderAproveitamento(aprov) {
@@ -66,14 +82,11 @@ async function buscarPontuados(rodada) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou: ${res.status}`);
     let data = await res.json();
-    
-    // O proxy pode retornar array ou objeto. Garantir objeto com atletas
     if (Array.isArray(data)) {
       const obj = {};
       data.forEach(a => { obj[a.id] = a; });
       return obj;
     }
-    // Se já for objeto com a chave "atletas", usa ela
     if (data.atletas) return data.atletas;
     return data;
   } catch (err) {
@@ -125,7 +138,6 @@ async function abrirModalScouts(partida) {
     
     body.innerHTML = atletasTime.map(atleta => {
       const sigla = siglaPosicao[atleta.posicao_id] || "???";
-      // Pega os scouts (pode estar em scout ou scouts)
       const scoutData = atleta.scout || atleta.scouts || {};
       const scoutsList = Object.entries(scoutData)
         .map(([k, v]) => `<span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-[10px] font-mono mr-1">${v} ${k.toUpperCase()}</span>`)
@@ -137,12 +149,12 @@ async function abrirModalScouts(partida) {
       if (scoutData.CA) emojis.push(scoutEmoji.CA);
       if (scoutData.CV) emojis.push(scoutEmoji.CV);
       if (scoutData.GC) emojis.push(scoutEmoji.GC);
-      const emojiSpan = emojis.length ? `<span class="ml-1 text-lg">${emojis.join(" ")}</span>` : "";
       
       const pontuacao = atleta.pontuacao.toFixed(1);
       const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-600" : "text-rose-600";
       const fotoUrl = atleta.foto ? atleta.foto.replace("FORMATO", "140x140") : "";
       
+      // ALTERAÇÃO 2: EMOJIS À ESQUERDA DA PONTUAÇÃO (dentro do mesmo div, antes do número)
       return `
         <div class="flex items-center justify-between p-2 border-b border-gray-50">
           <div class="flex items-center gap-3">
@@ -155,9 +167,11 @@ async function abrirModalScouts(partida) {
             </div>
           </div>
           <div class="text-right">
-            <div class="font-black ${pontuacaoClass}">${pontuacao}</div>
+            <div class="font-black ${pontuacaoClass} flex items-center justify-end gap-1">
+              ${emojis.length ? `<span class="text-lg">${emojis.join(" ")}</span>` : ""}
+              <span>${pontuacao}</span>
+            </div>
             <div class="text-[10px] mt-1">${scoutsList || "—"}</div>
-            ${emojiSpan}
           </div>
         </div>
       `;
@@ -316,7 +330,8 @@ async function carregarRodada(rodada) {
     const seletorHtml = renderSeletorRodada(rodada, maxRodadaGlobal);
     const statusHtml = renderStatusMercado(mercadoStatus);
     const cardsHtml = currentPartidas.map(p => renderCardPartida(p, rodada, rodadaAtualAPI)).join("");
-    main.innerHTML = `${seletorHtml}${statusHtml}<section class="px-4">${cardsHtml}</section>`;
+    // ALTERAÇÃO 3: INVERTER ORDEM (status primeiro, depois seletor)
+    main.innerHTML = `${statusHtml}${seletorHtml}<section class="px-4">${cardsHtml}</section>`;
   } catch (err) {
     console.error(err);
     carregarJogosError(`Erro ao carregar rodada ${rodada}: ${err.message}`);
@@ -378,7 +393,7 @@ function setupGlobalDelegation() {
   window.globalClickHandler = clickHandler;
 }
 
-// Função principal exposta globalmente
+// Função principal exposta globalmente (agora chama-se carregarJogos)
 window.carregarJogos = async function() {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
@@ -409,7 +424,8 @@ window.carregarJogos = async function() {
     const seletorHtml = renderSeletorRodada(rodadaSelecionada, maxRodadaGlobal);
     const statusHtml = renderStatusMercado(mercadoStatus);
     const cardsHtml = partidas.map(p => renderCardPartida(p, rodadaSelecionada, rodadaAtualAPI)).join("");
-    main.innerHTML = `${seletorHtml}${statusHtml}<section class="px-4">${cardsHtml}</section>`;
+    // ALTERAÇÃO 3: INVERTER ORDEM (status primeiro, depois seletor)
+    main.innerHTML = `${statusHtml}${seletorHtml}<section class="px-4">${cardsHtml}</section>`;
 
     setupGlobalDelegation();
   } catch(err) {
