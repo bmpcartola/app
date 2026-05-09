@@ -14,10 +14,13 @@ let bmpState = {
     activeProvaveis: false
 };
 
-const PROXY_URL = 'https://proxy-f5nr.onrender.com';
-const API_CARTOLA = {
-    MERCADO_STATUS: "https://api.cartola.globo.com/mercado/status",
-    PARTIDAS: "https://api.cartola.globo.com/partidas"
+const PROXY_URL = '';
+window.API_CARTOLA = {
+    MERCADO_STATUS: "/mercado/status",
+    PARTIDAS: "/partidas",
+    PARTIDAS_RODADA: (r) => `/partidas/${r}`,
+    PONTUADOS: (r) => `/atletas/pontuados/${r}`,
+    AWS_ATLETAS_PONTUADOS: "/escalar/rodadas-anteriores"
 };
 
 const SLUG_TO_CARTOLA_ID = {
@@ -27,29 +30,6 @@ const SLUG_TO_CARTOLA_ID = {
     bragantino_v2: 280, 'athletico-pr_v2': 293, bahia_v2: 265, vitoria_v2: 287,
     mirassol_v2: 2305, chapecoense_v2: 315, coritiba_v2: 294, remo_v2: 364,
 };
-
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    renderApp(); 
-});
-
-window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-    renderApp();
-});
-
-async function installApp() {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-        deferredPrompt = null;
-    }
-    renderApp();
-}
 
 // ========== DATA FETCHING ==========
 
@@ -156,39 +136,6 @@ function getRanking(round) {
 
 // ========== RENDERING ==========
 
-function toggleSidebar(force) {
-    const sidebar = document.getElementById("sidebar-menu");
-    const toggleBtn = document.getElementById("sidebar-toggle");
-    const backdrop = document.getElementById("sidebar-backdrop");
-    if (!sidebar) return;
-
-    const isOpen = sidebar.style.left === "0px";
-    const nextState = force !== undefined ? force : !isOpen;
-
-    if (nextState) {
-        renderSidebar();
-        sidebar.style.left = "0px";
-        if (toggleBtn) {
-            toggleBtn.style.opacity = "0";
-            toggleBtn.style.pointerEvents = "none";
-        }
-        if (backdrop) {
-            backdrop.style.opacity = "1";
-            backdrop.style.pointerEvents = "auto";
-        }
-    } else {
-        sidebar.style.left = "-200px";
-        if (toggleBtn) {
-            toggleBtn.style.opacity = "1";
-            toggleBtn.style.pointerEvents = "auto";
-        }
-        if (backdrop) {
-            backdrop.style.opacity = "0";
-            backdrop.style.pointerEvents = "none";
-        }
-    }
-}
-
 // Scroll listener
 window.addEventListener("scroll", () => {
     const topBtn = document.getElementById("scroll-to-top");
@@ -204,72 +151,7 @@ window.addEventListener("scroll", () => {
 
 function renderApp() {
     renderHeaderControls();
-    renderSidebar();
     renderContent();
-    if (typeof lucide !== "undefined") lucide.createIcons();
-}
-
-function renderSidebar() {
-    const sidebar = document.getElementById("sidebar-menu");
-    if (!sidebar) return;
-
-    const btnClass = "flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95";
-    const iconBase = "w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent";
-    const activeIcon = "bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50";
-    const inactiveIcon = "bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100";
-    const labelBase = "text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all";
-
-    sidebar.innerHTML = `
-        <div class="flex flex-col items-center justify-between h-full py-20 w-full">
-            <div class="flex flex-col items-center gap-14 w-full">
-                <!-- JOSA.BET -->
-                <button onclick="bmpSetViewMode('campo'); toggleSidebar(false);" class="${btnClass}">
-                    <div class="${iconBase} ${bmpState.viewMode === 'campo' ? activeIcon : inactiveIcon}">
-                        <i data-lucide="layout-grid" class="w-9 h-9"></i>
-                    </div>
-                    <span class="${labelBase} ${bmpState.viewMode === 'campo' ? 'text-orange-600' : 'text-slate-400 opacity-60'}">JOSA.BET</span>
-                </button>
-
-                <!-- PROVÁVEIS -->
-                <button id="nav-provaveis" onclick="bmpSetViewMode('provaveis'); toggleSidebar(false);" class="${btnClass}">
-                    <div class="${iconBase} ${bmpState.viewMode === 'provaveis' ? activeIcon : inactiveIcon}">
-                        <i data-lucide="users" class="w-9 h-9"></i>
-                    </div>
-                    <span class="${labelBase} ${bmpState.viewMode === 'provaveis' ? 'text-orange-600' : 'text-slate-400 opacity-60'}">PROVÁVEIS</span>
-                </button>
-
-                ${deferredPrompt ? `
-                    <!-- INSTALAR -->
-                    <button onclick="installApp(); toggleSidebar(false);" class="${btnClass}">
-                        <div class="w-16 h-16 rounded-[28px] bg-orange-700 text-white flex items-center justify-center shadow-2xl">
-                            <i data-lucide="download" class="w-9 h-9"></i>
-                        </div>
-                        <span class="${labelBase} text-orange-700">INSTALAR</span>
-                    </button>
-                ` : ''}
-            </div>
-
-            <div class="mt-auto w-full flex flex-col items-center gap-8">
-               <!-- JOGOS -->
-               <button onclick="toggleSidebar(false);" class="${btnClass}">
-                   <div class="${iconBase} bg-white text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" viewBox="0 0 256 256" class="w-9 h-9">
-                           <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm76.52,147.42H170.9l-9.26-12.76,12.63-36.78,15-4.89,26.24,20.13A87.38,87.38,0,0,1,204.52,171.42Zm-164-34.3L66.71,117l15,4.89,12.63,36.78L85.1,171.42H51.48A87.38,87.38,0,0,1,40.47,137.12Zm10-50.64,5.51,18.6L40.71,116.77A87.33,87.33,0,0,1,50.43,86.48ZM109,152,97.54,118.65,128,97.71l30.46,20.94L147,152Zm91.07-46.92,5.51-18.6a87.33,87.33,0,0,1,9.72,30.29Zm-6.2-35.38-9.51,32.08-15.07,4.89L136,83.79V68.21l29.09-20A88.58,88.58,0,0,1,193.86,69.7ZM146.07,41.87,128,54.29,109.93,41.87a88.24,88.24,0,0,1,36.14,0ZM90.91,48.21l29.09,20V83.79L86.72,106.67l-15.07-4.89L62.14,69.7A88.58,88.58,0,0,1,90.91,48.21ZM63.15,187.42H83.52l7.17,20.27A88.4,88.4,0,0,1,63.15,187.42ZM110,214.13,98.12,180.71,107.35,168h41.3l9.23,12.71-11.83,33.42a88,88,0,0,1-36.1,0Zm55.36-6.44,7.17-20.27h20.37A88.4,88.4,0,0,1,165.31,207.69Z"></path>
-                       </svg>
-                   </div>
-                   <span class="${labelBase} text-slate-400 opacity-60">JOGOS</span>
-               </button>
-
-                <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
-                    <div class="p-5 bg-orange-50 rounded-full mb-3 group-hover/brand:scale-110 transition-transform">
-                        <i data-lucide="trophy" class="w-12 h-12 text-orange-800"></i>
-                    </div>
-                    <p class="text-[12px] font-black font-jogos text-orange-950 uppercase tracking-widest text-center mt-2 leading-tight">TAÇA<br>BMP</p>
-                    <div class="w-12 h-1 bg-orange-200 rounded-full mt-2"></div>
-                </div>
-            </div>
-        </div>
-    `;
     if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
@@ -277,7 +159,7 @@ function renderHeaderControls() {
     const headerControls = document.getElementById("header-controls");
     if (!headerControls) return;
 
-    if (bmpState.viewMode === "provaveis") {
+    if (bmpState.viewMode === "provaveis" || bmpState.viewMode === "jogos") {
         headerControls.innerHTML = "";
         return;
     }
@@ -312,6 +194,13 @@ function renderContent() {
     if (bmpState.viewMode === "provaveis") {
         if (window.renderProvaveis) {
             window.renderProvaveis();
+        }
+        return;
+    }
+
+    if (bmpState.viewMode === "jogos") {
+        if (window.renderJogos) {
+            window.renderJogos();
         }
         return;
     }
@@ -809,6 +698,7 @@ window.bmpSetViewMode = (m) => {
     bmpState.viewMode = m;
     bmpState.selectedTeam = null;
     renderApp();
+    if (window.updateSidebarUI) window.updateSidebarUI(m);
 };
 
 window.bmpSelectTeam = (tName) => {
@@ -839,6 +729,5 @@ window.bmpReload = () => {
 
 // ========== INIT ==========
 document.addEventListener("DOMContentLoaded", () => {
-    renderSidebar(); // Render menu structure immediately
     fetchBmpData();  // Then fetch data
 });
