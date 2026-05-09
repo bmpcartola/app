@@ -15,13 +15,6 @@ let bmpState = {
 };
 
 const PROXY_URL = '';
-window.API_CARTOLA = {
-    MERCADO_STATUS: "/mercado/status",
-    PARTIDAS: "/partidas",
-    PARTIDAS_RODADA: (r) => `/partidas/${r}`,
-    PONTUADOS: (r) => `/atletas/pontuados/${r}`,
-    AWS_ATLETAS_PONTUADOS: "/escalar/rodadas-anteriores"
-};
 
 const SLUG_TO_CARTOLA_ID = {
     corinthians_v2: 264, palmeiras_v2: 275, flamengo_v2: 262, vasco_v2: 267,
@@ -199,8 +192,8 @@ function renderContent() {
     }
 
     if (bmpState.viewMode === "jogos") {
-        if (window.renderJogos) {
-            window.renderJogos();
+        if (window.carregarJogos) {
+            window.carregarJogos();
         }
         return;
     }
