@@ -55,17 +55,19 @@ async function buscarMaxRodada() {
 }
 async function buscarPartidas(rodada) {
   const isCurrent = (rodada === undefined || rodada === mercadoStatus?.rodada_atual);
-  let url;
+  let path;
   if (isCurrent) {
-    url = API_CARTOLA.PARTIDAS;
+    path = API_CARTOLA.PARTIDAS;
   } else {
     if (typeof API_CARTOLA.PARTIDAS_RODADA === 'function') {
-      url = API_CARTOLA.PARTIDAS_RODADA(rodada);
+      path = API_CARTOLA.PARTIDAS_RODADA(rodada);
     } else {
       const base = API_CARTOLA.PARTIDAS.replace(/\/$/, '');
-      url = `${base}/${rodada}`;
+      path = `${base}/${rodada}`;
     }
   }
+  const url = new URL(path, window.location.origin).href;
+  console.log("Fetching partidas from:", url);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
@@ -73,20 +75,26 @@ async function buscarPartidas(rodada) {
 }
 async function buscarPontuados(rodada) {
   if (rodada === mercadoStatus?.rodada_atual) return {};
-  let proxyUrl;
+  let path;
   if (typeof API_CARTOLA.PONTUADOS === 'function') {
-    proxyUrl = API_CARTOLA.PONTUADOS(rodada);
+    path = API_CARTOLA.PONTUADOS(rodada);
   } else {
     const base = API_CARTOLA.PONTUADOS.replace(/\/$/, '');
-    proxyUrl = `${base}/${rodada}`;
+    path = `${base}/${rodada}`;
   }
+  
+  const url = new URL(path, window.location.origin).href;
+  console.log("Fetching pontuados from:", url);
+
   try {
-    const res = await fetch(proxyUrl);
+    const res = await fetch(url);
     if (!res.ok) throw new Error(`Proxy falhou com status ${res.status}`);
     const data = await res.json();
     return data.atletas || {};
   } catch (err) {
-    const directUrl = `/atletas/pontuados/${rodada}`;
+    const directPath = `atletas/pontuados/${rodada}`;
+    const directUrl = new URL(directPath, window.location.origin).href;
+    console.log("Fetching direct pontuados from:", directUrl);
     try {
       const res = await fetch(directUrl);
       if (!res.ok) throw new Error(`API direta falhou: ${res.status}`);
@@ -100,8 +108,10 @@ async function buscarPontuados(rodada) {
 }
 async function buscarValorizacao() {
   try {
-    const rota = API_CARTOLA.AWS_ATLETAS_PONTUADOS || "/escalar/rodadas-anteriores";
-    const res = await fetch(rota);
+    const path = API_CARTOLA.AWS_ATLETAS_PONTUADOS || "escalar/rodadas-anteriores";
+    const url = new URL(path, window.location.origin).href;
+    console.log("Fetching valorizacao from:", url);
+    const res = await fetch(url);
     if (!res.ok) throw new Error("AWS valorização falhou");
     return await res.json();
   } catch(e) {
@@ -433,9 +443,19 @@ window.carregarJogos = async function() {
   jogosRenderizando = true;
   renderLoader();
 
+  console.log("Iniciando carregarJogos...");
+  const statusUrl = new URL(API_CARTOLA.MERCADO_STATUS, window.location.origin).href;
+  console.log("Fetching status from:", statusUrl);
+
   try {
-    const resMerc = await fetch(API_CARTOLA.MERCADO_STATUS);
-    if (!resMerc.ok) throw new Error(`Status API: ${resMerc.status}`);
+    const resMerc = await fetch(statusUrl);
+    console.log("Fetch Status Response:", resMerc.status, resMerc.ok);
+    if (!resMerc.ok) {
+      if (resMerc.status === 503) {
+         throw new Error("O servidor ainda está sincronizando os dados com o Cartola. Aguarde alguns segundos e tente novamente.");
+      }
+      throw new Error(`Status API Error: ${resMerc.status}`);
+    }
     mercadoStatus = await resMerc.json();
     const rodadaAtualAPI = mercadoStatus.rodada_atual;
     maxRodadaGlobal = rodadaAtualAPI || 38;
