@@ -13,14 +13,14 @@ let currentPontuados = {};
 let mercadoStatus = null;
 let maxRodadaGlobal = 38;
 
-function renderJogosLoader() {
+function carregarJogosLoader() {
   const main = document.getElementById("main-content");
   if (main) main.innerHTML = `<div class="flex flex-col justify-center items-center h-screen"><div class="loader"></div><p class="text-xs mt-2 text-slate-400">Carregando jogos...</p></div>`;
 }
 
-function renderJogosError(msg) {
+function carregarJogosError(msg) {
   const main = document.getElementById("main-content");
-  if (main) main.innerHTML = `<div class="text-center py-10"><p class="text-red-500">${msg}</p><button onclick="window.renderJogos()" class="mt-4 px-4 py-2 bg-orange-500 text-white rounded-full text-xs font-jogos">Tentar novamente</button></div>`;
+  if (main) main.innerHTML = `<div class="text-center py-10"><p class="text-red-500">${msg}</p><button onclick="window.carregarJogos()" class="mt-4 px-4 py-2 bg-orange-500 text-white rounded-full text-xs font-jogos">Tentar novamente</button></div>`;
 }
 
 function formatarData(iso) {
@@ -299,7 +299,7 @@ function gerarTop5Html(partida) {
 async function carregarRodada(rodada) {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
-  renderJogosLoader();
+  carregarJogosLoader();
   try {
     const { partidas: novasPartidas, clubes: novosClubes } = await buscarPartidas(rodada);
     let novosPontuados = {};
@@ -319,8 +319,8 @@ async function carregarRodada(rodada) {
     main.innerHTML = `${seletorHtml}${statusHtml}<section class="px-4">${cardsHtml}</section>`;
   } catch (err) {
     console.error(err);
-    renderJogosError(`Erro ao carregar rodada ${rodada}: ${err.message}`);
-    setTimeout(() => window.renderJogos(), 2000);
+    carregarJogosError(`Erro ao carregar rodada ${rodada}: ${err.message}`);
+    setTimeout(() => window.carregarJogos(), 2000);
   } finally {
     jogosRenderizando = false;
   }
@@ -378,10 +378,11 @@ function setupGlobalDelegation() {
   window.globalClickHandler = clickHandler;
 }
 
-window.renderJogos = async function() {
+// Função principal exposta globalmente
+window.carregarJogos = async function() {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
-  renderJogosLoader();
+  carregarJogosLoader();
 
   try {
     const resMerc = await fetch(`${JOGOS_PROXY_URL}/mercado/status`);
@@ -413,10 +414,10 @@ window.renderJogos = async function() {
     setupGlobalDelegation();
   } catch(err) {
     console.error(err);
-    renderJogosError(err.message || "Falha ao carregar dados");
+    carregarJogosError(err.message || "Falha ao carregar dados");
   } finally {
     jogosRenderizando = false;
   }
 };
 
-console.log("✅ jogos.js carregado – use o botão ⚽ no menu lateral");
+console.log("✅ jogos.js carregado – use o botão JOGOS no menu lateral");
