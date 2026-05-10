@@ -1,5 +1,5 @@
 /* ============================================================
-   JOGOS DA RODADA
+   JOGOS DA RODADA — COM SCOUTS EM TEMPO REAL E VALORIZAÇÃO
    ============================================================ */
 
 const JOGOS_PROXY_URL = 'https://proxy-f5nr.onrender.com';
@@ -9,9 +9,11 @@ let jogosRenderizando = false;
 let currentRodada = null;
 let currentPartidas = [];
 let currentClubes = {};
-let currentPontuados = {};
+let currentPontuados = {};      // Para armazenar os scouts (rodada atual ou anteriores)
 let mercadoStatus = null;
 let maxRodadaGlobal = 38;
+
+// ========== FUNÇÕES AUXILIARES ==========
 
 function carregarJogosLoader() {
   const main = document.getElementById("main-content");
@@ -41,7 +43,6 @@ function statusMercado(s) {
   return m[s]||{l:"—",c:"text-gray-400",t:"—"};
 }
 
-// ========== ALTERAÇÃO 1: CARD DE STATUS SEM TÍTULO E SEM FUNDO LARANJA ==========
 function renderStatusMercado(mercado) {
   const s = statusMercado(mercado.status_mercado);
   return `<div class="bg-white rounded-2xl shadow-sm border mx-4 mb-4">
@@ -76,7 +77,40 @@ async function buscarPartidas(rodada) {
   return { partidas: data.partidas || [], clubes: data.clubes || {} };
 }
 
-async function buscarPontuados(rodada) {
+// ========== NOVA FUNÇÃO PARA BUSCAR PONTUADOS DA RODADA ATUAL (API EM TEMPO REAL) ==========
+async function buscarPontuadosRodadaAtual() {
+  try {
+    const url = 'https://pb89hpsof3.execute-api.us-east-1.amazonaws.com/prod/atletas-pontuados';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    
+    // Converte o objeto da API para o formato esperado pelo modal (compatível com o antigo)
+    const pontuadosObj = {};
+    for (const id in data) {
+      const atleta = data[id];
+      pontuadosObj[atleta.idAtleta] = {
+        id: atleta.idAtleta,
+        apelido: atleta.apelido,
+        nome: atleta.apelido,
+        clube_id: atleta.clube_id,
+        posicao_id: atleta.posicao_id,
+        pontuacao: atleta.pontuacao,
+        valorizacao: atleta.valorizacao,
+        scout: atleta.scout || {},
+        foto: atleta.foto,
+        entrou_em_campo: true   // Assume que todos estão em campo (ajuste se necessário)
+      };
+    }
+    return pontuadosObj;
+  } catch (err) {
+    console.error('Erro ao buscar pontuados da rodada atual:', err);
+    return {};
+  }
+}
+
+// Função original (para rodadas anteriores) mantida praticamente igual
+async function buscarPontuadosRodadaAnterior(rodada) {
   try {
     const url = `${JOGOS_PROXY_URL}/atletas/pontuados/${rodada}`;
     const res = await fetch(url);
@@ -94,6 +128,19 @@ async function buscarPontuados(rodada) {
     return {};
   }
 }
+
+// Função unificada: decide qual API usar com base na rodada solicitada e na rodada atual
+async function buscarPontuados(rodada, rodadaAtualAPI) {
+  if (rodada === rodadaAtualAPI) {
+    // Rodada atual: usa API de tempo real
+    return await buscarPontuadosRodadaAtual();
+  } else {
+    // Rodada anterior: usa proxy
+    return await buscarPontuadosRodadaAnterior(rodada);
+  }
+}
+
+// ========== MODAL DE SCOUTS COM VALORIZAÇÃO ==========
 
 function fecharModalScouts() {
   const modal = document.getElementById('modal-scouts');
@@ -116,18 +163,20 @@ async function abrirModalScouts(partida) {
   }
 
   const siglaPosicao = { 1: "GOL", 2: "LAT", 3: "ZAG", 4: "MEI", 5: "ATA", 6: "TEC" };
-const scoutEmoji = {
-  "G": "⚽",
-  "A": "👟",
-  "CA": "🟨",
-  "CV": "🟥",
-  "GC": "<img src='images/bv.png' class='inline-block w-5 h-5' alt='GC' onerror='this.style.display=\"none\"; this.insertAdjacentHTML(\"afterend\", \"<span style=\\\"color:#e11d1d; font-size:1rem;\\\">⚽</span>\");'>"
-};
+  
+  // Emojis para scouts (GC agora com imagem)
+  const scoutEmoji = {
+    "G": "⚽",
+    "A": "👟",
+    "CA": "🟨",
+    "CV": "🟥",
+    "GC": "<img src='images/bv.png' class='inline-block w-5 h-5' alt='GC' onerror='this.style.display=\"none\"; this.insertAdjacentHTML(\"afterend\", \"<span style=\\\"color:#e11d1d; font-size:1rem;\\\">⚽</span>\");'>"
+  };
 
   const atletas = Object.values(pontuados);
   
   const renderizarLista = (timeId) => {
-    const atletasTime = atletas.filter(a => Number(a.clube_id) === Number(timeId) && a.entrou_em_campo === true);
+    const atletasTime = atletas.filter(a => Number(a.clube_id) === Number(timeId) && (a.entrou_em_campo === true || a.entrou_em_campo === undefined));
     atletasTime.sort((a,b) => (a.posicao_id || 99) - (b.posicao_id || 99));
     const body = document.querySelector('#modal-scouts .modal-body');
     if (!body) return;
@@ -138,7 +187,7 @@ const scoutEmoji = {
     
     body.innerHTML = atletasTime.map(atleta => {
       const sigla = siglaPosicao[atleta.posicao_id] || "???";
-      const scoutData = atleta.scout || atleta.scouts || {};
+      const scoutData = atleta.scout || {};
       const scoutsList = Object.entries(scoutData)
         .map(([k, v]) => `<span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-[10px] font-mono mr-1">${v} ${k.toUpperCase()}</span>`)
         .join("");
@@ -150,11 +199,19 @@ const scoutEmoji = {
       if (scoutData.CV) emojis.push(scoutEmoji.CV);
       if (scoutData.GC) emojis.push(scoutEmoji.GC);
       
-      const pontuacao = atleta.pontuacao.toFixed(1);
+      const pontuacao = (atleta.pontuacao || 0).toFixed(1);
       const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-600" : "text-rose-600";
       const fotoUrl = atleta.foto ? atleta.foto.replace("FORMATO", "140x140") : "";
       
-      // ALTERAÇÃO 2: EMOJIS À ESQUERDA DA PONTUAÇÃO (dentro do mesmo div, antes do número)
+      // Valorização (positivo verde, negativo vermelho)
+      let valorizacaoHtml = '';
+      if (atleta.valorizacao !== undefined && atleta.valorizacao !== null && atleta.valorizacao !== 0) {
+        const valor = atleta.valorizacao;
+        const sinal = valor > 0 ? '+' : '';
+        const cor = valor > 0 ? 'text-emerald-600' : (valor < 0 ? 'text-rose-600' : 'text-gray-400');
+        valorizacaoHtml = `<span class="ml-2 text-[10px] font-mono ${cor}">${sinal}${valor.toFixed(2)}</span>`;
+      }
+      
       return `
         <div class="flex items-center justify-between p-2 border-b border-gray-50">
           <div class="flex items-center gap-3">
@@ -163,7 +220,10 @@ const scoutEmoji = {
             </div>
             <div>
               <div class="text-[10px] font-mono text-gray-400">${sigla}</div>
-              <div class="text-sm font-bold text-gray-800">${atleta.apelido || atleta.nome || "?"}</div>
+              <div class="text-sm font-bold text-gray-800 flex items-center">
+                ${atleta.apelido || atleta.nome || "?"}
+                ${valorizacaoHtml}
+              </div>
             </div>
           </div>
           <div class="text-right">
@@ -291,14 +351,14 @@ function gerarTop5Html(partida) {
   const casaNome = currentClubes[casaId]?.abreviacao || "CASA";
   const foraNome = currentClubes[foraId]?.abreviacao || "FORA";
   const atletas = Object.values(currentPontuados);
-  const atletasCasa = atletas.filter(a => a.clube_id === casaId && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
-  const atletasFora = atletas.filter(a => a.clube_id === foraId && a.entrou_em_campo).sort((a,b) => b.pontuacao - a.pontuacao).slice(0,5);
+  const atletasCasa = atletas.filter(a => a.clube_id === casaId && (a.entrou_em_campo !== false)).sort((a,b) => (b.pontuacao || 0) - (a.pontuacao || 0)).slice(0,5);
+  const atletasFora = atletas.filter(a => a.clube_id === foraId && (a.entrou_em_campo !== false)).sort((a,b) => (b.pontuacao || 0) - (a.pontuacao || 0)).slice(0,5);
   const renderLista = (lista) => {
     if (lista.length === 0) return `<div class="text-center py-2 text-gray-400 text-[10px]">Nenhum atleta em campo</div>`;
     return lista.map(a => `
       <div class="flex justify-between items-center py-1 border-b border-gray-50">
         <span class="text-[11px] font-bold truncate">${a.apelido}</span>
-        <span class="text-[11px] font-black ${a.pontuacao >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${a.pontuacao.toFixed(1)}</span>
+        <span class="text-[11px] font-black ${(a.pontuacao || 0) >= 0 ? 'text-emerald-500' : 'text-rose-500'}">${(a.pontuacao || 0).toFixed(1)}</span>
       </div>
     `).join("");
   };
@@ -318,9 +378,9 @@ async function carregarRodada(rodada) {
     const { partidas: novasPartidas, clubes: novosClubes } = await buscarPartidas(rodada);
     let novosPontuados = {};
     const rodadaAtualAPI = mercadoStatus.rodada_atual;
-    if (rodada < rodadaAtualAPI) {
-      novosPontuados = await buscarPontuados(rodada);
-    }
+    // Usa a função unificada que decide qual API chamar
+    novosPontuados = await buscarPontuados(rodada, rodadaAtualAPI);
+    
     currentPartidas = novasPartidas;
     currentClubes = novosClubes;
     currentPontuados = novosPontuados;
@@ -330,7 +390,6 @@ async function carregarRodada(rodada) {
     const seletorHtml = renderSeletorRodada(rodada, maxRodadaGlobal);
     const statusHtml = renderStatusMercado(mercadoStatus);
     const cardsHtml = currentPartidas.map(p => renderCardPartida(p, rodada, rodadaAtualAPI)).join("");
-    // ALTERAÇÃO 3: INVERTER ORDEM (status primeiro, depois seletor)
     main.innerHTML = `${statusHtml}${seletorHtml}<section class="px-4">${cardsHtml}</section>`;
   } catch (err) {
     console.error(err);
@@ -393,7 +452,8 @@ function setupGlobalDelegation() {
   window.globalClickHandler = clickHandler;
 }
 
-// Função principal exposta globalmente (agora chama-se carregarJogos)
+// ========== FUNÇÃO PRINCIPAL ==========
+
 window.carregarJogos = async function() {
   if (jogosRenderizando) return;
   jogosRenderizando = true;
@@ -410,10 +470,8 @@ window.carregarJogos = async function() {
     
     const { partidas, clubes } = await buscarPartidas(rodadaSelecionada);
     
-    let pontuados = {};
-    if (rodadaSelecionada < rodadaAtualAPI) {
-      pontuados = await buscarPontuados(rodadaSelecionada);
-    }
+    // Buscar pontuados usando a função unificada (para rodada atual)
+    let pontuados = await buscarPontuados(rodadaSelecionada, rodadaAtualAPI);
 
     currentPartidas = partidas;
     currentClubes = clubes;
@@ -424,7 +482,6 @@ window.carregarJogos = async function() {
     const seletorHtml = renderSeletorRodada(rodadaSelecionada, maxRodadaGlobal);
     const statusHtml = renderStatusMercado(mercadoStatus);
     const cardsHtml = partidas.map(p => renderCardPartida(p, rodadaSelecionada, rodadaAtualAPI)).join("");
-    // ALTERAÇÃO 3: INVERTER ORDEM (status primeiro, depois seletor)
     main.innerHTML = `${statusHtml}${seletorHtml}<section class="px-4">${cardsHtml}</section>`;
 
     setupGlobalDelegation();
@@ -436,4 +493,4 @@ window.carregarJogos = async function() {
   }
 };
 
-console.log("✅ jogos.js carregado – use o botão JOGOS no menu lateral");
+console.log("✅ jogos.js carregado – com scouts em tempo real e valorização");
