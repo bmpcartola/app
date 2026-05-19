@@ -243,7 +243,7 @@ function getShield(teamId) {
 
 function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas) {
 
-    if (!window.dadosCartola?.times) return 0;
+    if (!window.dadosCartola || !window.dadosCartola.times) return 0;
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
 
