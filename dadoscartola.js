@@ -1,6 +1,3 @@
-# dadoscartola.js — ANÁLISE DE SCOUTS CEDIDOS
-
-```javascript
 /* ============================================================
    DADOS CARTOLA — MOTOR ANALÍTICO
    ============================================================ */
