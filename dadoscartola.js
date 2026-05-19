@@ -17,6 +17,28 @@ window.analiseState = {
 
 const ANALISE_PROXY = 'https://proxy-f5nr.onrender.com';
 
+const CLUBES = {
+    262: 'FLA',
+    263: 'BOT',
+    264: 'COR',
+    265: 'BAH',
+    266: 'FLU',
+    267: 'VAS',
+    275: 'PAL',
+    276: 'SAO',
+    277: 'SAN',
+    282: 'CAM',
+    284: 'GRE',
+    285: 'INT',
+    290: 'GOI',
+    293: 'CAP',
+    294: 'CFC',
+    327: 'RBB',
+    356: 'JUV',
+    373: 'CRI',
+    1371: 'VIT'
+};
+
 const SCOUTS_MAP = {
     GOL: ['G'],
     ASSISTENCIA: ['A'],
@@ -47,7 +69,7 @@ window.renderAnaliseCartola = async function () {
 
                 <div class="flex items-center gap-5 mb-8">
 
-                    <div class="w-20 h-20 rounded-[28px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100">
+                    <div class="w-20 h-20 rounded-[28px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100 shrink-0">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
                              width="42"
@@ -70,7 +92,8 @@ window.renderAnaliseCartola = async function () {
 
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
+
                         <h1 class="font-jersey text-4xl md:text-5xl text-slate-800 leading-none">
                             ANÁLISE
                         </h1>
@@ -78,6 +101,7 @@ window.renderAnaliseCartola = async function () {
                         <p class="font-jogos text-[10px] md:text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
                             SCOUTS CEDIDOS
                         </p>
+
                     </div>
 
                 </div>
@@ -300,22 +324,9 @@ function getShield(teamId) {
     return `images/escudos_brasileirao/${teamId}.png`;
 }
 
-function getTeamName(match, tipo) {
+function getTeamName(teamId) {
 
-    if (tipo === 'CASA') {
-
-        return (
-            match.clube_casa?.abreviacao ||
-            match.clube_casa?.nome ||
-            'CASA'
-        );
-    }
-
-    return (
-        match.clube_visitante?.abreviacao ||
-        match.clube_visitante?.nome ||
-        'FORA'
-    );
+    return CLUBES[teamId] || 'TIME';
 }
 
 /* ============================================================
@@ -324,7 +335,9 @@ function getTeamName(match, tipo) {
 
 function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
-    if (!window.dadosCartola || !window.dadosCartola.times) return '0.00';
+    if (!window.dadosCartola || !window.dadosCartola.times) {
+        return '0.00';
+    }
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
 
@@ -412,7 +425,7 @@ function renderTabelaCedidos() {
             ${partidas.map(match => {
 
                 const cedidosCasa = obterScoutCedidos(
-                    match.clube_visitante_id,
+                    match.clube_casa_id,
                     analiseState.scoutSelecionado,
                     analiseState.posicaoSelecionada,
                     analiseState.ultimasRodadas,
@@ -420,7 +433,7 @@ function renderTabelaCedidos() {
                 );
 
                 const cedidosFora = obterScoutCedidos(
-                    match.clube_casa_id,
+                    match.clube_visitante_id,
                     analiseState.scoutSelecionado,
                     analiseState.posicaoSelecionada,
                     analiseState.ultimasRodadas,
@@ -434,58 +447,46 @@ function renderTabelaCedidos() {
                         <div class="flex items-center justify-between gap-4">
 
                             <!-- CASA -->
-                            <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
+                            <div class="flex flex-col items-center gap-4 flex-1 min-w-0">
 
                                 <img src="${getShield(match.clube_casa_id)}"
                                      class="w-16 h-16 md:w-20 md:h-20 object-contain">
 
-                                <div class="text-center min-w-0">
+                                <p class="font-black text-slate-800 text-lg uppercase tracking-tight">
+                                    ${getTeamName(match.clube_casa_id)}
+                                </p>
 
-                                    <p class="font-black text-slate-800 text-sm md:text-base uppercase truncate">
-                                        ${getTeamName(match, 'CASA')}
-                                    </p>
-
-                                    <div class="mt-3 inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
-                                        ${cedidosCasa}
-                                    </div>
-
+                                <div class="inline-flex items-center justify-center min-w-[100px] h-16 rounded-3xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-3xl shadow-sm px-5">
+                                    ${cedidosCasa}
                                 </div>
 
                             </div>
 
-                            <!-- CENTRO -->
-                            <div class="flex flex-col items-center gap-3">
+                            <!-- X -->
+                            <div class="flex items-center justify-center">
 
-                                <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
 
-                                    <span class="font-jogos text-[10px] text-slate-400 tracking-[0.2em] text-center leading-tight">
-                                        ${analiseState.scoutSelecionado}
+                                    <span class="font-jogos text-lg text-slate-300">
+                                        X
                                     </span>
 
-                                </div>
-
-                                <div class="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] font-black tracking-[0.2em] uppercase">
-                                    ${analiseState.modoAnalise}
                                 </div>
 
                             </div>
 
                             <!-- FORA -->
-                            <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
+                            <div class="flex flex-col items-center gap-4 flex-1 min-w-0">
 
                                 <img src="${getShield(match.clube_visitante_id)}"
                                      class="w-16 h-16 md:w-20 md:h-20 object-contain">
 
-                                <div class="text-center min-w-0">
+                                <p class="font-black text-slate-800 text-lg uppercase tracking-tight">
+                                    ${getTeamName(match.clube_visitante_id)}
+                                </p>
 
-                                    <p class="font-black text-slate-800 text-sm md:text-base uppercase truncate">
-                                        ${getTeamName(match, 'FORA')}
-                                    </p>
-
-                                    <div class="mt-3 inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
-                                        ${cedidosFora}
-                                    </div>
-
+                                <div class="inline-flex items-center justify-center min-w-[100px] h-16 rounded-3xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-3xl shadow-sm px-5">
+                                    ${cedidosFora}
                                 </div>
 
                             </div>
