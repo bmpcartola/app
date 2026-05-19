@@ -18,6 +18,7 @@ window.analiseState = {
 const ANALISE_PROXY = 'https://proxy-f5nr.onrender.com';
 
 const CLUBES = {
+    2305: 'MIR',
     262: 'FLA',
     263: 'BOT',
     264: 'COR',
@@ -27,16 +28,16 @@ const CLUBES = {
     275: 'PAL',
     276: 'SAO',
     277: 'SAN',
+    280: 'RBB',
     282: 'CAM',
+    283: 'CRU',
     284: 'GRE',
     285: 'INT',
-    290: 'GOI',
     293: 'CAP',
     294: 'CFC',
-    327: 'RBB',
-    356: 'JUV',
-    373: 'CRI',
-    1371: 'VIT'
+    287: 'VIT',
+    315: 'CHA',
+    364: 'REM'
 };
 
 const SCOUTS_MAP = {
