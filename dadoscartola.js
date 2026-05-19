@@ -356,6 +356,67 @@ function getTeamName(teamId) {
     return CLUBES[teamId] || 'TIME';
 }
 
+function getSortIcon(coluna) {
+
+    if (analiseState.sortColumn !== coluna) {
+
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="14"
+                 height="14"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="opacity-40">
+
+                <path d="m7 15 5 5 5-5"/>
+                <path d="m7 9 5-5 5 5"/>
+
+            </svg>
+        `;
+    }
+
+    if (analiseState.sortDirection === 'asc') {
+
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="14"
+                 height="14"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2.4"
+                 stroke-linecap="round"
+                 stroke-linejoin="round"
+                 class="text-orange-500">
+
+                <path d="m7 15 5 5 5-5"/>
+
+            </svg>
+        `;
+    }
+
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="14"
+             height="14"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2.4"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             class="text-orange-500">
+
+            <path d="m7 9 5-5 5 5"/>
+
+        </svg>
+    `;
+}
+
 /* ============================================================
    CONQUISTADO
    ============================================================ */
@@ -576,60 +637,73 @@ function renderTabelaCedidos() {
 
         <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm overflow-hidden">
 
-            <div class="overflow-x-auto">
+            <div class="w-full overflow-x-auto">
 
-                <table class="w-full min-w-[900px]">
+                <table class="w-full min-w-[760px]">
 
                     <!-- HEADER -->
                     <thead class="bg-slate-50 border-b border-slate-100">
 
                         <tr>
 
-                            <th class="px-6 py-5 text-left">
+                            <!-- CASA -->
+                            <th class="px-4 md:px-6 py-5 text-left">
 
                                 <button onclick="window.sortTabelaAnalise('casa')"
-                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                                     CASA
+
+                                    ${getSortIcon('casa')}
 
                                 </button>
 
                             </th>
 
-                            <th class="px-6 py-5 text-center">
+                            <!-- VALOR CASA -->
+                            <th class="px-4 md:px-6 py-5 text-center">
 
                                 <button onclick="window.sortTabelaAnalise('valorCasa')"
-                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                                     ${analiseState.modoAnalise === 'MANDANTE'
                                         ? 'CONQUISTADO'
                                         : 'CEDIDO'}
 
+                                    ${getSortIcon('valorCasa')}
+
                                 </button>
 
                             </th>
 
-                            <th class="px-6 py-5 text-center"></th>
+                            <!-- X -->
+                            <th class="px-4 md:px-6 py-5 text-center"></th>
 
-                            <th class="px-6 py-5 text-center">
+                            <!-- VALOR FORA -->
+                            <th class="px-4 md:px-6 py-5 text-center">
 
                                 <button onclick="window.sortTabelaAnalise('valorFora')"
-                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                                     ${analiseState.modoAnalise === 'MANDANTE'
                                         ? 'CEDIDO'
                                         : 'CONQUISTADO'}
 
+                                    ${getSortIcon('valorFora')}
+
                                 </button>
 
                             </th>
 
-                            <th class="px-6 py-5 text-right">
+                            <!-- FORA -->
+                            <th class="px-4 md:px-6 py-5 text-right">
 
                                 <button onclick="window.sortTabelaAnalise('fora')"
-                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                                     FORA
+
+                                    ${getSortIcon('fora')}
 
                                 </button>
 
@@ -647,14 +721,14 @@ function renderTabelaCedidos() {
                             <tr class="border-b border-slate-50 hover:bg-orange-50/40 transition-all">
 
                                 <!-- CASA -->
-                                <td class="px-6 py-5">
+                                <td class="px-4 md:px-6 py-5">
 
                                     <div class="flex items-center gap-4">
 
                                         <img src="${getShield(item.casaId)}"
-                                             class="w-12 h-12 object-contain shrink-0">
+                                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
 
-                                        <span class="font-black text-slate-800 text-base">
+                                        <span class="font-black text-slate-800 text-sm md:text-base">
 
                                             ${item.casa}
 
@@ -665,17 +739,17 @@ function renderTabelaCedidos() {
                                 </td>
 
                                 <!-- VALOR CASA -->
-                                <td class="px-6 py-5 text-center">
+                                <td class="px-4 md:px-6 py-5 text-center">
 
                                     <div class="${analiseState.modoAnalise === 'MANDANTE'
                                         ? 'bg-green-50 border-green-100 text-green-700'
                                         : 'bg-orange-50 border-orange-100 text-orange-700'}
                                         inline-flex items-center justify-center
-                                        min-w-[120px]
-                                        h-14
+                                        min-w-[100px]
+                                        h-12 md:h-14
                                         rounded-2xl
                                         border
-                                        font-black text-2xl">
+                                        font-black text-xl md:text-2xl">
 
                                         ${item.valorCasa.toFixed(2)}
 
@@ -684,9 +758,9 @@ function renderTabelaCedidos() {
                                 </td>
 
                                 <!-- X -->
-                                <td class="px-6 py-5 text-center">
+                                <td class="px-4 md:px-6 py-5 text-center">
 
-                                    <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 inline-flex items-center justify-center">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-50 border border-slate-100 inline-flex items-center justify-center">
 
                                         <span class="font-jogos text-slate-300 text-lg">
                                             X
@@ -697,17 +771,17 @@ function renderTabelaCedidos() {
                                 </td>
 
                                 <!-- VALOR FORA -->
-                                <td class="px-6 py-5 text-center">
+                                <td class="px-4 md:px-6 py-5 text-center">
 
                                     <div class="${analiseState.modoAnalise === 'MANDANTE'
                                         ? 'bg-orange-50 border-orange-100 text-orange-700'
                                         : 'bg-green-50 border-green-100 text-green-700'}
                                         inline-flex items-center justify-center
-                                        min-w-[120px]
-                                        h-14
+                                        min-w-[100px]
+                                        h-12 md:h-14
                                         rounded-2xl
                                         border
-                                        font-black text-2xl">
+                                        font-black text-xl md:text-2xl">
 
                                         ${item.valorFora.toFixed(2)}
 
@@ -716,18 +790,18 @@ function renderTabelaCedidos() {
                                 </td>
 
                                 <!-- FORA -->
-                                <td class="px-6 py-5">
+                                <td class="px-4 md:px-6 py-5">
 
                                     <div class="flex items-center justify-end gap-4">
 
-                                        <span class="font-black text-slate-800 text-base">
+                                        <span class="font-black text-slate-800 text-sm md:text-base">
 
                                             ${item.fora}
 
                                         </span>
 
                                         <img src="${getShield(item.foraId)}"
-                                             class="w-12 h-12 object-contain shrink-0">
+                                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
 
                                     </div>
 
