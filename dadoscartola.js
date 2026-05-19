@@ -635,185 +635,173 @@ function renderTabelaCedidos() {
 
     container.innerHTML = `
 
-        <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm overflow-hidden">
 
-            <div class="w-full overflow-x-auto">
+            <!-- HEADER -->
+            <div class="grid grid-cols-[1fr_110px_50px_110px_1fr]
+                        md:grid-cols-[1fr_140px_60px_140px_1fr]
+                        gap-2
+                        px-3 md:px-6
+                        py-4
+                        bg-slate-50
+                        border-b border-slate-100">
 
-                <table class="w-full min-w-[760px]">
+                <!-- CASA -->
+                <div class="flex items-center">
 
-                    <!-- HEADER -->
-                    <thead class="bg-slate-50 border-b border-slate-100">
+                    <span class="text-[9px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
+                        CASA
+                    </span>
 
-                        <tr>
+                </div>
 
-                            <!-- CASA -->
-                            <th class="px-4 md:px-6 py-5 text-left">
+                <!-- VALOR CASA -->
+                <div class="flex items-center justify-center">
 
-                                <button onclick="window.sortTabelaAnalise('casa')"
-                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    <button onclick="window.sortTabelaAnalise('valorCasa')"
+                            class="inline-flex items-center gap-1 md:gap-2 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
-                                    CASA
+                        ${analiseState.modoAnalise === 'MANDANTE'
+                            ? 'CONQ'
+                            : 'CED'}
 
-                                    ${getSortIcon('casa')}
+                        ${getSortIcon('valorCasa')}
 
-                                </button>
+                    </button>
 
-                            </th>
+                </div>
 
-                            <!-- VALOR CASA -->
-                            <th class="px-4 md:px-6 py-5 text-center">
+                <!-- X -->
+                <div></div>
 
-                                <button onclick="window.sortTabelaAnalise('valorCasa')"
-                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                <!-- VALOR FORA -->
+                <div class="flex items-center justify-center">
 
-                                    ${analiseState.modoAnalise === 'MANDANTE'
-                                        ? 'CONQUISTADO'
-                                        : 'CEDIDO'}
+                    <button onclick="window.sortTabelaAnalise('valorFora')"
+                            class="inline-flex items-center gap-1 md:gap-2 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
-                                    ${getSortIcon('valorCasa')}
+                        ${analiseState.modoAnalise === 'MANDANTE'
+                            ? 'CED'
+                            : 'CONQ'}
 
-                                </button>
+                        ${getSortIcon('valorFora')}
 
-                            </th>
+                    </button>
 
-                            <!-- X -->
-                            <th class="px-4 md:px-6 py-5 text-center"></th>
+                </div>
 
-                            <!-- VALOR FORA -->
-                            <th class="px-4 md:px-6 py-5 text-center">
+                <!-- FORA -->
+                <div class="flex items-center justify-end">
 
-                                <button onclick="window.sortTabelaAnalise('valorFora')"
-                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    <span class="text-[9px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
+                        FORA
+                    </span>
 
-                                    ${analiseState.modoAnalise === 'MANDANTE'
-                                        ? 'CEDIDO'
-                                        : 'CONQUISTADO'}
+                </div>
 
-                                    ${getSortIcon('valorFora')}
+            </div>
 
-                                </button>
+            <!-- BODY -->
+            <div>
 
-                            </th>
+                ${linhas.map(item => `
 
-                            <!-- FORA -->
-                            <th class="px-4 md:px-6 py-5 text-right">
+                    <div class="grid grid-cols-[1fr_110px_50px_110px_1fr]
+                                md:grid-cols-[1fr_140px_60px_140px_1fr]
+                                gap-2
+                                px-3 md:px-6
+                                py-4
+                                border-b border-slate-50
+                                hover:bg-orange-50/40
+                                transition-all
+                                items-center">
 
-                                <button onclick="window.sortTabelaAnalise('fora')"
-                                        class="inline-flex items-center gap-2 text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                        <!-- CASA -->
+                        <div class="flex items-center gap-2 md:gap-4 min-w-0">
 
-                                    FORA
+                            <img src="${getShield(item.casaId)}"
+                                 class="w-8 h-8 md:w-12 md:h-12 object-contain shrink-0">
 
-                                    ${getSortIcon('fora')}
+                            <span class="font-black text-slate-800 text-[11px] md:text-base truncate">
 
-                                </button>
+                                ${item.casa}
 
-                            </th>
+                            </span>
 
-                        </tr>
+                        </div>
 
-                    </thead>
+                        <!-- VALOR CASA -->
+                        <div class="flex justify-center">
 
-                    <!-- BODY -->
-                    <tbody>
+                            <div class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'bg-green-50 border-green-100 text-green-700'
+                                : 'bg-orange-50 border-orange-100 text-orange-700'}
+                                w-full
+                                max-w-[90px]
+                                md:max-w-[120px]
+                                h-10 md:h-14
+                                rounded-xl md:rounded-2xl
+                                border
+                                flex items-center justify-center
+                                font-black text-lg md:text-2xl">
 
-                        ${linhas.map(item => `
+                                ${item.valorCasa.toFixed(2)}
 
-                            <tr class="border-b border-slate-50 hover:bg-orange-50/40 transition-all">
+                            </div>
 
-                                <!-- CASA -->
-                                <td class="px-4 md:px-6 py-5">
+                        </div>
 
-                                    <div class="flex items-center gap-4">
+                        <!-- X -->
+                        <div class="flex justify-center">
 
-                                        <img src="${getShield(item.casaId)}"
-                                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
+                            <div class="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
 
-                                        <span class="font-black text-slate-800 text-sm md:text-base">
+                                <span class="font-jogos text-slate-300 text-sm md:text-lg">
+                                    X
+                                </span>
 
-                                            ${item.casa}
+                            </div>
 
-                                        </span>
+                        </div>
 
-                                    </div>
+                        <!-- VALOR FORA -->
+                        <div class="flex justify-center">
 
-                                </td>
+                            <div class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'bg-orange-50 border-orange-100 text-orange-700'
+                                : 'bg-green-50 border-green-100 text-green-700'}
+                                w-full
+                                max-w-[90px]
+                                md:max-w-[120px]
+                                h-10 md:h-14
+                                rounded-xl md:rounded-2xl
+                                border
+                                flex items-center justify-center
+                                font-black text-lg md:text-2xl">
 
-                                <!-- VALOR CASA -->
-                                <td class="px-4 md:px-6 py-5 text-center">
+                                ${item.valorFora.toFixed(2)}
 
-                                    <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                        ? 'bg-green-50 border-green-100 text-green-700'
-                                        : 'bg-orange-50 border-orange-100 text-orange-700'}
-                                        inline-flex items-center justify-center
-                                        min-w-[100px]
-                                        h-12 md:h-14
-                                        rounded-2xl
-                                        border
-                                        font-black text-xl md:text-2xl">
+                            </div>
 
-                                        ${item.valorCasa.toFixed(2)}
+                        </div>
 
-                                    </div>
+                        <!-- FORA -->
+                        <div class="flex items-center justify-end gap-2 md:gap-4 min-w-0">
 
-                                </td>
+                            <span class="font-black text-slate-800 text-[11px] md:text-base truncate">
 
-                                <!-- X -->
-                                <td class="px-4 md:px-6 py-5 text-center">
+                                ${item.fora}
 
-                                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-50 border border-slate-100 inline-flex items-center justify-center">
+                            </span>
 
-                                        <span class="font-jogos text-slate-300 text-lg">
-                                            X
-                                        </span>
+                            <img src="${getShield(item.foraId)}"
+                                 class="w-8 h-8 md:w-12 md:h-12 object-contain shrink-0">
 
-                                    </div>
+                        </div>
 
-                                </td>
+                    </div>
 
-                                <!-- VALOR FORA -->
-                                <td class="px-4 md:px-6 py-5 text-center">
-
-                                    <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                        ? 'bg-orange-50 border-orange-100 text-orange-700'
-                                        : 'bg-green-50 border-green-100 text-green-700'}
-                                        inline-flex items-center justify-center
-                                        min-w-[100px]
-                                        h-12 md:h-14
-                                        rounded-2xl
-                                        border
-                                        font-black text-xl md:text-2xl">
-
-                                        ${item.valorFora.toFixed(2)}
-
-                                    </div>
-
-                                </td>
-
-                                <!-- FORA -->
-                                <td class="px-4 md:px-6 py-5">
-
-                                    <div class="flex items-center justify-end gap-4">
-
-                                        <span class="font-black text-slate-800 text-sm md:text-base">
-
-                                            ${item.fora}
-
-                                        </span>
-
-                                        <img src="${getShield(item.foraId)}"
-                                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        `).join('')}
-
-                    </tbody>
-
-                </table>
+                `).join('')}
 
             </div>
 
