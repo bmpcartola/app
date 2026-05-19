@@ -69,15 +69,15 @@ window.renderAnaliseCartola = async function () {
         <div class="max-w-[1800px] mx-auto space-y-6">
 
             <!-- HEADER -->
-            <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm p-5 md:p-8">
+            <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm p-4 md:p-8">
 
-                <div class="flex items-center gap-5 mb-8">
+                <div class="flex items-center gap-4 md:gap-5 mb-8">
 
-                    <div class="w-20 h-20 rounded-[28px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100 shrink-0">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100 shrink-0">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
-                             width="42"
-                             height="42"
+                             width="38"
+                             height="38"
                              viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor"
@@ -98,11 +98,11 @@ window.renderAnaliseCartola = async function () {
 
                     <div>
 
-                        <h1 class="font-jersey text-5xl text-slate-800 leading-none">
+                        <h1 class="font-jersey text-4xl md:text-5xl text-slate-800 leading-none">
                             ANÁLISE
                         </h1>
 
-                        <p class="font-jogos text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
+                        <p class="font-jogos text-[10px] md:text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
                             MATCHUPS ANALÍTICOS
                         </p>
 
@@ -111,7 +111,7 @@ window.renderAnaliseCartola = async function () {
                 </div>
 
                 <!-- CONTROLES -->
-                <div class="grid grid-cols-1 xl:grid-cols-4 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
 
                     <!-- SCOUT -->
                     <div>
@@ -122,7 +122,7 @@ window.renderAnaliseCartola = async function () {
 
                         <select id="select-scout"
                                 onchange="window.handleScoutChange(this.value)"
-                                class="w-full h-14 rounded-2xl border border-slate-200 bg-slate-50 px-5 font-black text-slate-700 outline-none focus:border-orange-400">
+                                class="w-full h-12 md:h-14 rounded-2xl border border-slate-200 bg-slate-50 px-4 md:px-5 font-black text-sm md:text-base text-slate-700 outline-none focus:border-orange-400">
 
                             <option value="GOL">GOL</option>
                             <option value="ASSISTENCIA">ASSISTÊNCIA</option>
@@ -146,7 +146,7 @@ window.renderAnaliseCartola = async function () {
 
                         <select id="select-posicao"
                                 onchange="window.handlePosicaoChange(this.value)"
-                                class="w-full h-14 rounded-2xl border border-slate-200 bg-slate-50 px-5 font-black text-slate-700 outline-none focus:border-orange-400">
+                                class="w-full h-12 md:h-14 rounded-2xl border border-slate-200 bg-slate-50 px-4 md:px-5 font-black text-sm md:text-base text-slate-700 outline-none focus:border-orange-400">
 
                             <option value="GERAL">GERAL</option>
                             <option value="GOL">GOL</option>
@@ -196,13 +196,13 @@ window.renderAnaliseCartola = async function () {
 
                             <button onclick="window.handleModoAnalise('MANDANTE')"
                                     id="btn-mandante"
-                                    class="flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all">
+                                    class="flex-1 h-12 md:h-14 rounded-2xl bg-orange-500 text-white font-black text-xs md:text-sm transition-all">
                                 MANDANTE
                             </button>
 
                             <button onclick="window.handleModoAnalise('VISITANTE')"
                                     id="btn-visitante"
-                                    class="flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all">
+                                    class="flex-1 h-12 md:h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-xs md:text-sm transition-all">
                                 VISITANTE
                             </button>
 
@@ -308,18 +308,18 @@ window.handleModoAnalise = function(modo) {
     if (modo === 'MANDANTE') {
 
         btnMandante.className =
-            'flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+            'flex-1 h-12 md:h-14 rounded-2xl bg-orange-500 text-white font-black text-xs md:text-sm transition-all';
 
         btnVisitante.className =
-            'flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+            'flex-1 h-12 md:h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-xs md:text-sm transition-all';
 
     } else {
 
         btnVisitante.className =
-            'flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+            'flex-1 h-12 md:h-14 rounded-2xl bg-orange-500 text-white font-black text-xs md:text-sm transition-all';
 
         btnMandante.className =
-            'flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+            'flex-1 h-12 md:h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-xs md:text-sm transition-all';
     }
 
     renderTabelaCedidos();
@@ -362,8 +362,8 @@ function getSortIcon(coluna) {
 
         return `
             <svg xmlns="http://www.w3.org/2000/svg"
-                 width="14"
-                 height="14"
+                 width="12"
+                 height="12"
                  viewBox="0 0 24 24"
                  fill="none"
                  stroke="currentColor"
@@ -383,8 +383,8 @@ function getSortIcon(coluna) {
 
         return `
             <svg xmlns="http://www.w3.org/2000/svg"
-                 width="14"
-                 height="14"
+                 width="12"
+                 height="12"
                  viewBox="0 0 24 24"
                  fill="none"
                  stroke="currentColor"
@@ -401,8 +401,8 @@ function getSortIcon(coluna) {
 
     return `
         <svg xmlns="http://www.w3.org/2000/svg"
-             width="14"
-             height="14"
+             width="12"
+             height="12"
              viewBox="0 0 24 24"
              fill="none"
              stroke="currentColor"
@@ -424,7 +424,11 @@ function getSortIcon(coluna) {
 function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
 
     if (!window.dadosCartola || !window.dadosCartola.times) {
-        return 0;
+
+        return {
+            total: 0,
+            media: 0
+        };
     }
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
@@ -433,7 +437,13 @@ function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
 
     const partidas = window.dadosCartola.times[getTeamName(clubeId)];
 
-    if (!partidas) return 0;
+    if (!partidas) {
+
+        return {
+            total: 0,
+            media: 0
+        };
+    }
 
     let partidasValidas = partidas
         .filter(p => p.rodada < analiseState.rodadaAtual)
@@ -466,9 +476,15 @@ function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
 
     });
 
-    if (!partidasValidas.length) return 0;
+    const media =
+        partidasValidas.length > 0
+            ? Number((total / partidasValidas.length).toFixed(2))
+            : 0;
 
-    return Number((total / partidasValidas.length).toFixed(2));
+    return {
+        total: Number(total.toFixed(2)),
+        media
+    };
 }
 
 /* ============================================================
@@ -478,7 +494,11 @@ function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
 function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
     if (!window.dadosCartola || !window.dadosCartola.times) {
-        return 0;
+
+        return {
+            total: 0,
+            media: 0
+        };
     }
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
@@ -531,9 +551,15 @@ function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
     });
 
-    if (!partidasValidas.length) return 0;
+    const media =
+        partidasValidas.length > 0
+            ? Number((total / partidasValidas.length).toFixed(2))
+            : 0;
 
-    return Number((total / partidasValidas.length).toFixed(2));
+    return {
+        total: Number(total.toFixed(2)),
+        media
+    };
 }
 
 /* ============================================================
@@ -550,8 +576,15 @@ function renderTabelaCedidos() {
 
     analiseState.partidas.forEach(match => {
 
-        let valorCasa = 0;
-        let valorFora = 0;
+        let valorCasa = {
+            total: 0,
+            media: 0
+        };
+
+        let valorFora = {
+            total: 0,
+            media: 0
+        };
 
         if (analiseState.modoAnalise === 'MANDANTE') {
 
@@ -617,11 +650,21 @@ function renderTabelaCedidos() {
                     ? 1
                     : -1;
 
-            if (a[analiseState.sortColumn] < b[analiseState.sortColumn]) {
+            const valorA =
+                typeof a[analiseState.sortColumn] === 'object'
+                    ? a[analiseState.sortColumn].total
+                    : a[analiseState.sortColumn];
+
+            const valorB =
+                typeof b[analiseState.sortColumn] === 'object'
+                    ? b[analiseState.sortColumn].total
+                    : b[analiseState.sortColumn];
+
+            if (valorA < valorB) {
                 return -1 * dir;
             }
 
-            if (a[analiseState.sortColumn] > b[analiseState.sortColumn]) {
+            if (valorA > valorB) {
                 return 1 * dir;
             }
 
@@ -638,7 +681,7 @@ function renderTabelaCedidos() {
         <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm overflow-hidden">
 
             <!-- HEADER -->
-            <div class="grid grid-cols-[1fr_110px_50px_110px_1fr]
+            <div class="grid grid-cols-[1fr_95px_34px_95px_1fr]
                         md:grid-cols-[1fr_140px_60px_140px_1fr]
                         gap-2
                         px-3 md:px-6
@@ -656,10 +699,10 @@ function renderTabelaCedidos() {
                 </div>
 
                 <!-- VALOR CASA -->
-                <div class="flex items-center justify-center">
+                <div class="flex flex-col items-center justify-center">
 
                     <button onclick="window.sortTabelaAnalise('valorCasa')"
-                            class="inline-flex items-center gap-1 md:gap-2 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                            class="inline-flex items-center gap-1 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                         ${analiseState.modoAnalise === 'MANDANTE'
                             ? 'CONQ'
@@ -669,16 +712,20 @@ function renderTabelaCedidos() {
 
                     </button>
 
+                    <span class="text-[7px] md:text-[10px] font-jogos tracking-[0.12em] text-slate-300 uppercase mt-1">
+                        TOTAL / MED
+                    </span>
+
                 </div>
 
                 <!-- X -->
                 <div></div>
 
                 <!-- VALOR FORA -->
-                <div class="flex items-center justify-center">
+                <div class="flex flex-col items-center justify-center">
 
                     <button onclick="window.sortTabelaAnalise('valorFora')"
-                            class="inline-flex items-center gap-1 md:gap-2 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                            class="inline-flex items-center gap-1 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                         ${analiseState.modoAnalise === 'MANDANTE'
                             ? 'CED'
@@ -687,6 +734,10 @@ function renderTabelaCedidos() {
                         ${getSortIcon('valorFora')}
 
                     </button>
+
+                    <span class="text-[7px] md:text-[10px] font-jogos tracking-[0.12em] text-slate-300 uppercase mt-1">
+                        TOTAL / MED
+                    </span>
 
                 </div>
 
@@ -706,7 +757,7 @@ function renderTabelaCedidos() {
 
                 ${linhas.map(item => `
 
-                    <div class="grid grid-cols-[1fr_110px_50px_110px_1fr]
+                    <div class="grid grid-cols-[1fr_95px_34px_95px_1fr]
                                 md:grid-cols-[1fr_140px_60px_140px_1fr]
                                 gap-2
                                 px-3 md:px-6
@@ -739,13 +790,23 @@ function renderTabelaCedidos() {
                                 w-full
                                 max-w-[90px]
                                 md:max-w-[120px]
-                                h-10 md:h-14
+                                min-h-[58px]
+                                md:min-h-[76px]
                                 rounded-xl md:rounded-2xl
                                 border
-                                flex items-center justify-center
-                                font-black text-lg md:text-2xl">
+                                flex flex-col items-center justify-center">
 
-                                ${item.valorCasa.toFixed(2)}
+                                <span class="font-black text-lg md:text-2xl leading-none">
+
+                                    ${item.valorCasa.total.toFixed(2)}
+
+                                </span>
+
+                                <span class="text-[9px] md:text-[11px] font-bold opacity-60 mt-1">
+
+                                    ${item.valorCasa.media.toFixed(2)}
+
+                                </span>
 
                             </div>
 
@@ -773,13 +834,23 @@ function renderTabelaCedidos() {
                                 w-full
                                 max-w-[90px]
                                 md:max-w-[120px]
-                                h-10 md:h-14
+                                min-h-[58px]
+                                md:min-h-[76px]
                                 rounded-xl md:rounded-2xl
                                 border
-                                flex items-center justify-center
-                                font-black text-lg md:text-2xl">
+                                flex flex-col items-center justify-center">
 
-                                ${item.valorFora.toFixed(2)}
+                                <span class="font-black text-lg md:text-2xl leading-none">
+
+                                    ${item.valorFora.total.toFixed(2)}
+
+                                </span>
+
+                                <span class="text-[9px] md:text-[11px] font-bold opacity-60 mt-1">
+
+                                    ${item.valorFora.media.toFixed(2)}
+
+                                </span>
 
                             </div>
 
