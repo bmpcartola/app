@@ -8,7 +8,10 @@ window.analiseState = {
     scoutSelecionado: 'GOL',
     posicaoSelecionada: 'GERAL',
     ultimasRodadas: 5,
-    modoAnalise: 'GERAL'
+    modoAnalise: 'MANDANTE',
+
+    sortColumn: 'matchup',
+    sortDirection: 'desc'
 };
 
 /* ============================================================
@@ -33,9 +36,9 @@ const CLUBES = {
     283: 'CRU',
     284: 'GRE',
     285: 'INT',
+    287: 'VIT',
     293: 'CAP',
     294: 'CFC',
-    287: 'VIT',
     315: 'CHA',
     364: 'REM'
 };
@@ -63,7 +66,7 @@ window.renderAnaliseCartola = async function () {
 
     main.innerHTML = `
 
-        <div class="max-w-[1800px] mx-auto space-y-6">
+        <div class="max-w-[1900px] mx-auto space-y-6">
 
             <!-- HEADER -->
             <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm p-5 md:p-8">
@@ -100,7 +103,7 @@ window.renderAnaliseCartola = async function () {
                         </h1>
 
                         <p class="font-jogos text-[10px] md:text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
-                            SCOUTS CEDIDOS
+                            MATCHUPS ANALÍTICOS
                         </p>
 
                     </div>
@@ -108,7 +111,7 @@ window.renderAnaliseCartola = async function () {
                 </div>
 
                 <!-- CONTROLES -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 xl:grid-cols-4 gap-5">
 
                     <!-- SCOUT -->
                     <div>
@@ -180,18 +183,27 @@ window.renderAnaliseCartola = async function () {
                                onchange="window.handleRangeChange(this.value)"
                                class="w-full accent-orange-500 cursor-pointer">
 
-                        <div class="flex gap-3 pt-2">
+                    </div>
 
-                            <button onclick="window.handleModoAnalise('GERAL')"
-                                    id="btn-geral"
-                                    class="flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all">
-                                GERAL
+                    <!-- MODO -->
+                    <div>
+
+                        <label class="block text-[10px] font-jogos tracking-[0.25em] text-slate-400 uppercase mb-2">
+                            Análise
+                        </label>
+
+                        <div class="flex gap-3">
+
+                            <button onclick="window.handleModoAnalise('MANDANTE')"
+                                    id="btn-mandante"
+                                    class="flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all">
+                                MANDANTE
                             </button>
 
-                            <button onclick="window.handleModoAnalise('MANDO')"
-                                    id="btn-mando"
-                                    class="flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all">
-                                MANDO
+                            <button onclick="window.handleModoAnalise('VISITANTE')"
+                                    id="btn-visitante"
+                                    class="flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all">
+                                VISITANTE
                             </button>
 
                         </div>
@@ -294,24 +306,42 @@ window.handleModoAnalise = function(modo) {
 
     analiseState.modoAnalise = modo;
 
-    const btnGeral = document.getElementById('btn-geral');
-    const btnMando = document.getElementById('btn-mando');
+    const btnMandante = document.getElementById('btn-mandante');
+    const btnVisitante = document.getElementById('btn-visitante');
 
-    if (modo === 'GERAL') {
+    if (modo === 'MANDANTE') {
 
-        btnGeral.className =
-            'flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+        btnMandante.className =
+            'flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
 
-        btnMando.className =
-            'flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+        btnVisitante.className =
+            'flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
 
     } else {
 
-        btnMando.className =
-            'flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+        btnVisitante.className =
+            'flex-1 h-14 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
 
-        btnGeral.className =
-            'flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+        btnMandante.className =
+            'flex-1 h-14 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+    }
+
+    renderTabelaCedidos();
+};
+
+window.sortTabelaAnalise = function(coluna) {
+
+    if (analiseState.sortColumn === coluna) {
+
+        analiseState.sortDirection =
+            analiseState.sortDirection === 'asc'
+                ? 'desc'
+                : 'asc';
+
+    } else {
+
+        analiseState.sortColumn = coluna;
+        analiseState.sortDirection = 'desc';
     }
 
     renderTabelaCedidos();
@@ -331,13 +361,78 @@ function getTeamName(teamId) {
 }
 
 /* ============================================================
-   ANALISE SCOUTS CEDIDOS
+   SCOUT CONQUISTADO
+   ============================================================ */
+
+function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
+
+    if (!window.dadosCartola || !window.dadosCartola.times) {
+        return 0;
+    }
+
+    const scoutsAlvo = SCOUTS_MAP[scout] || [];
+
+    let total = 0;
+    let partidasValidas = [];
+
+    const partidas = window.dadosCartola.times[getTeamName(clubeId)];
+
+    if (!partidas) return 0;
+
+    partidas.forEach(partida => {
+
+        if (partida.rodada >= analiseState.rodadaAtual) return;
+
+        if (partida.mando !== mando) return;
+
+        partidasValidas.push(partida);
+
+    });
+
+    partidasValidas = partidasValidas
+        .sort((a, b) => b.rodada - a.rodada)
+        .slice(0, ultimasRodadas);
+
+    partidasValidas.forEach(partida => {
+
+        if (scout === 'SG') {
+
+            const teveSG = partida.atletas.some(a => Number(a.SG) > 0);
+
+            if (teveSG) {
+                total += 1;
+            }
+
+            return;
+        }
+
+        partida.atletas.forEach(atleta => {
+
+            if (posicao !== 'GERAL' && atleta.pos !== posicao) {
+                return;
+            }
+
+            scoutsAlvo.forEach(sc => {
+                total += Number(atleta[sc] || 0);
+            });
+
+        });
+
+    });
+
+    if (partidasValidas.length === 0) return 0;
+
+    return Number((total / partidasValidas.length).toFixed(2));
+}
+
+/* ============================================================
+   SCOUT CEDIDO
    ============================================================ */
 
 function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
     if (!window.dadosCartola || !window.dadosCartola.times) {
-        return '0.00';
+        return 0;
     }
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
@@ -353,17 +448,7 @@ function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
             if (partida.rodada >= analiseState.rodadaAtual) return;
 
-            if (analiseState.modoAnalise === 'MANDO') {
-
-                if (tipoMando === 'CASA' && partida.mando !== 'CASA') {
-                    return;
-                }
-
-                if (tipoMando === 'FORA' && partida.mando !== 'FORA') {
-                    return;
-                }
-
-            }
+            if (partida.mando !== tipoMando) return;
 
             partidasValidas.push(partida);
 
@@ -402,9 +487,9 @@ function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
     });
 
-    if (partidasValidas.length === 0) return '0.00';
+    if (partidasValidas.length === 0) return 0;
 
-    return (total / partidasValidas.length).toFixed(2);
+    return Number((total / partidasValidas.length).toFixed(2));
 }
 
 /* ============================================================
@@ -417,88 +502,225 @@ function renderTabelaCedidos() {
 
     if (!container) return;
 
-    const partidas = analiseState.partidas;
+    let matchups = [];
+
+    analiseState.partidas.forEach(match => {
+
+        let valorCasa = 0;
+        let valorFora = 0;
+
+        if (analiseState.modoAnalise === 'MANDANTE') {
+
+            valorCasa = obterScoutConquistado(
+                match.clube_casa_id,
+                analiseState.scoutSelecionado,
+                analiseState.posicaoSelecionada,
+                analiseState.ultimasRodadas,
+                'CASA'
+            );
+
+            valorFora = obterScoutCedidos(
+                match.clube_visitante_id,
+                analiseState.scoutSelecionado,
+                analiseState.posicaoSelecionada,
+                analiseState.ultimasRodadas,
+                'FORA'
+            );
+
+        } else {
+
+            valorCasa = obterScoutCedidos(
+                match.clube_casa_id,
+                analiseState.scoutSelecionado,
+                analiseState.posicaoSelecionada,
+                analiseState.ultimasRodadas,
+                'CASA'
+            );
+
+            valorFora = obterScoutConquistado(
+                match.clube_visitante_id,
+                analiseState.scoutSelecionado,
+                analiseState.posicaoSelecionada,
+                analiseState.ultimasRodadas,
+                'FORA'
+            );
+        }
+
+        matchups.push({
+
+            casaId: match.clube_casa_id,
+            foraId: match.clube_visitante_id,
+
+            casa: getTeamName(match.clube_casa_id),
+            fora: getTeamName(match.clube_visitante_id),
+
+            valorCasa,
+            valorFora,
+
+            matchup: Number((valorCasa + valorFora).toFixed(2))
+        });
+
+    });
+
+    /* ============================================================
+       SORT
+       ============================================================ */
+
+    matchups.sort((a, b) => {
+
+        const dir = analiseState.sortDirection === 'asc' ? 1 : -1;
+
+        if (a[analiseState.sortColumn] < b[analiseState.sortColumn]) {
+            return -1 * dir;
+        }
+
+        if (a[analiseState.sortColumn] > b[analiseState.sortColumn]) {
+            return 1 * dir;
+        }
+
+        return 0;
+    });
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
 
     container.innerHTML = `
 
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
 
-            ${partidas.map(match => {
+            <!-- HEADER -->
+            <div class="grid grid-cols-[1.1fr_110px_70px_110px_1.1fr_130px] md:grid-cols-[1.2fr_140px_80px_140px_1.2fr_160px] gap-2 px-4 md:px-8 py-5 bg-slate-50 border-b border-slate-100">
 
-                const cedidosCasa = obterScoutCedidos(
-                    match.clube_casa_id,
-                    analiseState.scoutSelecionado,
-                    analiseState.posicaoSelecionada,
-                    analiseState.ultimasRodadas,
-                    'CASA'
-                );
+                <button onclick="window.sortTabelaAnalise('casa')"
+                        class="text-left text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    CASA
+                </button>
 
-                const cedidosFora = obterScoutCedidos(
-                    match.clube_visitante_id,
-                    analiseState.scoutSelecionado,
-                    analiseState.posicaoSelecionada,
-                    analiseState.ultimasRodadas,
-                    'FORA'
-                );
+                <button onclick="window.sortTabelaAnalise('valorCasa')"
+                        class="text-center text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    ${analiseState.modoAnalise === 'MANDANTE' ? 'CONQ' : 'CED'}
+                </button>
 
-                return `
+                <div></div>
 
-                    <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm p-5 md:p-7 hover:shadow-xl transition-all">
+                <button onclick="window.sortTabelaAnalise('valorFora')"
+                        class="text-center text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    ${analiseState.modoAnalise === 'MANDANTE' ? 'CED' : 'CONQ'}
+                </button>
 
-                        <div class="flex items-center justify-between gap-4">
+                <button onclick="window.sortTabelaAnalise('fora')"
+                        class="text-right text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    FORA
+                </button>
 
-                            <!-- CASA -->
-                            <div class="flex flex-col items-center gap-4 flex-1 min-w-0">
+                <button onclick="window.sortTabelaAnalise('matchup')"
+                        class="text-center text-[10px] md:text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                    MATCHUP
+                </button>
 
-                                <img src="${getShield(match.clube_casa_id)}"
-                                     class="w-16 h-16 md:w-20 md:h-20 object-contain">
+            </div>
 
-                                <p class="font-black text-slate-800 text-lg uppercase tracking-tight">
-                                    ${getTeamName(match.clube_casa_id)}
-                                </p>
+            <!-- LINHAS -->
+            ${matchups.map(item => `
 
-                                <div class="inline-flex items-center justify-center min-w-[100px] h-16 rounded-3xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-3xl shadow-sm px-5">
-                                    ${cedidosCasa}
-                                </div>
+                <div class="grid grid-cols-[1.1fr_110px_70px_110px_1.1fr_130px] md:grid-cols-[1.2fr_140px_80px_140px_1.2fr_160px] gap-2 px-4 md:px-8 py-5 border-b border-slate-50 hover:bg-orange-50/40 transition-all items-center">
 
-                            </div>
+                    <!-- CASA -->
+                    <div class="flex items-center gap-3 min-w-0">
 
-                            <!-- X -->
-                            <div class="flex items-center justify-center">
+                        <img src="${getShield(item.casaId)}"
+                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
 
-                                <div class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                        <span class="font-black text-slate-800 text-sm md:text-base truncate">
+                            ${item.casa}
+                        </span>
 
-                                    <span class="font-jogos text-lg text-slate-300">
-                                        X
-                                    </span>
+                    </div>
 
-                                </div>
+                    <!-- VALOR CASA -->
+                    <div class="flex justify-center">
 
-                            </div>
+                        <div class="${analiseState.modoAnalise === 'MANDANTE'
+                            ? 'bg-green-50 border-green-100 text-green-700'
+                            : 'bg-orange-50 border-orange-100 text-orange-700'}
+                            min-w-[80px] md:min-w-[100px]
+                            h-12 md:h-14
+                            rounded-2xl
+                            border
+                            flex items-center justify-center
+                            font-black text-xl md:text-2xl">
 
-                            <!-- FORA -->
-                            <div class="flex flex-col items-center gap-4 flex-1 min-w-0">
-
-                                <img src="${getShield(match.clube_visitante_id)}"
-                                     class="w-16 h-16 md:w-20 md:h-20 object-contain">
-
-                                <p class="font-black text-slate-800 text-lg uppercase tracking-tight">
-                                    ${getTeamName(match.clube_visitante_id)}
-                                </p>
-
-                                <div class="inline-flex items-center justify-center min-w-[100px] h-16 rounded-3xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-3xl shadow-sm px-5">
-                                    ${cedidosFora}
-                                </div>
-
-                            </div>
+                            ${item.valorCasa.toFixed(2)}
 
                         </div>
 
                     </div>
 
-                `;
+                    <!-- X -->
+                    <div class="flex justify-center">
 
-            }).join('')}
+                        <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+
+                            <span class="font-jogos text-slate-300 text-lg">
+                                X
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- VALOR FORA -->
+                    <div class="flex justify-center">
+
+                        <div class="${analiseState.modoAnalise === 'MANDANTE'
+                            ? 'bg-orange-50 border-orange-100 text-orange-700'
+                            : 'bg-green-50 border-green-100 text-green-700'}
+                            min-w-[80px] md:min-w-[100px]
+                            h-12 md:h-14
+                            rounded-2xl
+                            border
+                            flex items-center justify-center
+                            font-black text-xl md:text-2xl">
+
+                            ${item.valorFora.toFixed(2)}
+
+                        </div>
+
+                    </div>
+
+                    <!-- FORA -->
+                    <div class="flex items-center justify-end gap-3 min-w-0">
+
+                        <span class="font-black text-slate-800 text-sm md:text-base truncate">
+                            ${item.fora}
+                        </span>
+
+                        <img src="${getShield(item.foraId)}"
+                             class="w-10 h-10 md:w-12 md:h-12 object-contain shrink-0">
+
+                    </div>
+
+                    <!-- MATCHUP -->
+                    <div class="flex justify-center">
+
+                        <div class="min-w-[90px] md:min-w-[120px]
+                                    h-12 md:h-14
+                                    rounded-2xl
+                                    bg-slate-900
+                                    text-white
+                                    flex items-center justify-center
+                                    font-black text-xl md:text-2xl">
+
+                            ${item.matchup.toFixed(2)}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join('')}
 
         </div>
 
