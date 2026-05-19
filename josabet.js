@@ -191,6 +191,13 @@ function renderContent() {
         return;
     }
 
+   if (bmpState.viewMode === "analise") {
+       if (window.renderAnaliseCartola) {
+           window.renderAnaliseCartola();
+       }
+       return;
+   }
+      
     if (bmpState.viewMode === "jogos") {
         if (window.carregarJogos) {
             window.carregarJogos();
