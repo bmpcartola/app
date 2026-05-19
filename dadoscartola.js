@@ -66,18 +66,18 @@ window.renderAnaliseCartola = async function () {
 
     main.innerHTML = `
 
-        <div class="max-w-[1800px] mx-auto space-y-6">
+        <div class="max-w-[1800px] mx-auto space-y-5">
 
             <!-- HEADER -->
-            <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm p-4 md:p-8">
+            <div class="bg-white rounded-[28px] border border-slate-100 shadow-sm p-4 md:p-8">
 
-                <div class="flex items-center gap-4 md:gap-5 mb-8">
+                <div class="flex items-center gap-4 mb-8">
 
                     <div class="w-16 h-16 md:w-20 md:h-20 rounded-[24px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100 shrink-0">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
-                             width="38"
-                             height="38"
+                             width="36"
+                             height="36"
                              viewBox="0 0 24 24"
                              fill="none"
                              stroke="currentColor"
@@ -362,8 +362,8 @@ function getSortIcon(coluna) {
 
         return `
             <svg xmlns="http://www.w3.org/2000/svg"
-                 width="12"
-                 height="12"
+                 width="10"
+                 height="10"
                  viewBox="0 0 24 24"
                  fill="none"
                  stroke="currentColor"
@@ -383,8 +383,8 @@ function getSortIcon(coluna) {
 
         return `
             <svg xmlns="http://www.w3.org/2000/svg"
-                 width="12"
-                 height="12"
+                 width="10"
+                 height="10"
                  viewBox="0 0 24 24"
                  fill="none"
                  stroke="currentColor"
@@ -401,8 +401,8 @@ function getSortIcon(coluna) {
 
     return `
         <svg xmlns="http://www.w3.org/2000/svg"
-             width="12"
-             height="12"
+             width="10"
+             height="10"
              viewBox="0 0 24 24"
              fill="none"
              stroke="currentColor"
@@ -678,21 +678,21 @@ function renderTabelaCedidos() {
 
     container.innerHTML = `
 
-        <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
 
             <!-- HEADER -->
-            <div class="grid grid-cols-[1fr_95px_34px_95px_1fr]
-                        md:grid-cols-[1fr_140px_60px_140px_1fr]
-                        gap-2
-                        px-3 md:px-6
-                        py-4
+            <div class="grid grid-cols-[1fr_72px_26px_72px_1fr]
+                        md:grid-cols-[1fr_110px_40px_110px_1fr]
+                        gap-1 md:gap-2
+                        px-2 md:px-6
+                        py-3 md:py-4
                         bg-slate-50
                         border-b border-slate-100">
 
                 <!-- CASA -->
-                <div class="flex items-center">
+                <div class="flex items-center justify-center">
 
-                    <span class="text-[9px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
+                    <span class="text-[8px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
                         CASA
                     </span>
 
@@ -702,7 +702,7 @@ function renderTabelaCedidos() {
                 <div class="flex flex-col items-center justify-center">
 
                     <button onclick="window.sortTabelaAnalise('valorCasa')"
-                            class="inline-flex items-center gap-1 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                            class="inline-flex items-center gap-1 text-[8px] md:text-xs font-jogos tracking-[0.08em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                         ${analiseState.modoAnalise === 'MANDANTE'
                             ? 'CONQ'
@@ -712,8 +712,8 @@ function renderTabelaCedidos() {
 
                     </button>
 
-                    <span class="text-[7px] md:text-[10px] font-jogos tracking-[0.12em] text-slate-300 uppercase mt-1">
-                        TOTAL / MED
+                    <span class="text-[6px] md:text-[9px] font-jogos tracking-[0.08em] text-slate-300 uppercase mt-[2px]">
+                        TOTAL/MED
                     </span>
 
                 </div>
@@ -725,7 +725,7 @@ function renderTabelaCedidos() {
                 <div class="flex flex-col items-center justify-center">
 
                     <button onclick="window.sortTabelaAnalise('valorFora')"
-                            class="inline-flex items-center gap-1 text-[9px] md:text-xs font-jogos tracking-[0.12em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+                            class="inline-flex items-center gap-1 text-[8px] md:text-xs font-jogos tracking-[0.08em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
                         ${analiseState.modoAnalise === 'MANDANTE'
                             ? 'CED'
@@ -735,16 +735,16 @@ function renderTabelaCedidos() {
 
                     </button>
 
-                    <span class="text-[7px] md:text-[10px] font-jogos tracking-[0.12em] text-slate-300 uppercase mt-1">
-                        TOTAL / MED
+                    <span class="text-[6px] md:text-[9px] font-jogos tracking-[0.08em] text-slate-300 uppercase mt-[2px]">
+                        TOTAL/MED
                     </span>
 
                 </div>
 
                 <!-- FORA -->
-                <div class="flex items-center justify-end">
+                <div class="flex items-center justify-center">
 
-                    <span class="text-[9px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
+                    <span class="text-[8px] md:text-xs font-jogos tracking-[0.18em] text-slate-400 uppercase">
                         FORA
                     </span>
 
@@ -757,23 +757,23 @@ function renderTabelaCedidos() {
 
                 ${linhas.map(item => `
 
-                    <div class="grid grid-cols-[1fr_95px_34px_95px_1fr]
-                                md:grid-cols-[1fr_140px_60px_140px_1fr]
-                                gap-2
-                                px-3 md:px-6
-                                py-4
+                    <div class="grid grid-cols-[1fr_72px_26px_72px_1fr]
+                                md:grid-cols-[1fr_110px_40px_110px_1fr]
+                                gap-1 md:gap-2
+                                px-2 md:px-6
+                                py-3 md:py-4
                                 border-b border-slate-50
                                 hover:bg-orange-50/40
                                 transition-all
                                 items-center">
 
                         <!-- CASA -->
-                        <div class="flex items-center gap-2 md:gap-4 min-w-0">
+                        <div class="flex flex-col items-center justify-center min-w-0">
 
                             <img src="${getShield(item.casaId)}"
-                                 class="w-8 h-8 md:w-12 md:h-12 object-contain shrink-0">
+                                 class="w-12 h-12 md:w-16 md:h-16 object-contain shrink-0">
 
-                            <span class="font-black text-slate-800 text-[11px] md:text-base truncate">
+                            <span class="font-black text-slate-800 text-[9px] md:text-sm mt-1 truncate">
 
                                 ${item.casa}
 
@@ -782,91 +782,71 @@ function renderTabelaCedidos() {
                         </div>
 
                         <!-- VALOR CASA -->
-                        <div class="flex justify-center">
+                        <div class="flex flex-col items-center justify-center">
 
-                            <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                ? 'bg-green-50 border-green-100 text-green-700'
-                                : 'bg-orange-50 border-orange-100 text-orange-700'}
-                                w-full
-                                max-w-[90px]
-                                md:max-w-[120px]
-                                min-h-[58px]
-                                md:min-h-[76px]
-                                rounded-xl md:rounded-2xl
-                                border
-                                flex flex-col items-center justify-center">
+                            <span class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'text-green-700'
+                                : 'text-orange-700'}
+                                font-black text-xl md:text-3xl leading-none">
 
-                                <span class="font-black text-lg md:text-2xl leading-none">
+                                ${item.valorCasa.total.toFixed(2)}
 
-                                    ${item.valorCasa.total.toFixed(2)}
+                            </span>
 
-                                </span>
+                            <span class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'text-green-500'
+                                : 'text-orange-500'}
+                                text-[9px] md:text-xs font-bold mt-1 leading-none">
 
-                                <span class="text-[9px] md:text-[11px] font-bold opacity-60 mt-1">
+                                ${item.valorCasa.media.toFixed(2)}
 
-                                    ${item.valorCasa.media.toFixed(2)}
-
-                                </span>
-
-                            </div>
+                            </span>
 
                         </div>
 
                         <!-- X -->
                         <div class="flex justify-center">
 
-                            <div class="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
-
-                                <span class="font-jogos text-slate-300 text-sm md:text-lg">
-                                    X
-                                </span>
-
-                            </div>
+                            <span class="font-jogos text-slate-300 text-sm md:text-xl">
+                                X
+                            </span>
 
                         </div>
 
                         <!-- VALOR FORA -->
-                        <div class="flex justify-center">
+                        <div class="flex flex-col items-center justify-center">
 
-                            <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                ? 'bg-orange-50 border-orange-100 text-orange-700'
-                                : 'bg-green-50 border-green-100 text-green-700'}
-                                w-full
-                                max-w-[90px]
-                                md:max-w-[120px]
-                                min-h-[58px]
-                                md:min-h-[76px]
-                                rounded-xl md:rounded-2xl
-                                border
-                                flex flex-col items-center justify-center">
+                            <span class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'text-orange-700'
+                                : 'text-green-700'}
+                                font-black text-xl md:text-3xl leading-none">
 
-                                <span class="font-black text-lg md:text-2xl leading-none">
+                                ${item.valorFora.total.toFixed(2)}
 
-                                    ${item.valorFora.total.toFixed(2)}
+                            </span>
 
-                                </span>
+                            <span class="${analiseState.modoAnalise === 'MANDANTE'
+                                ? 'text-orange-500'
+                                : 'text-green-500'}
+                                text-[9px] md:text-xs font-bold mt-1 leading-none">
 
-                                <span class="text-[9px] md:text-[11px] font-bold opacity-60 mt-1">
+                                ${item.valorFora.media.toFixed(2)}
 
-                                    ${item.valorFora.media.toFixed(2)}
-
-                                </span>
-
-                            </div>
+                            </span>
 
                         </div>
 
                         <!-- FORA -->
-                        <div class="flex items-center justify-end gap-2 md:gap-4 min-w-0">
+                        <div class="flex flex-col items-center justify-center min-w-0">
 
-                            <span class="font-black text-slate-800 text-[11px] md:text-base truncate">
+                            <img src="${getShield(item.foraId)}"
+                                 class="w-12 h-12 md:w-16 md:h-16 object-contain shrink-0">
+
+                            <span class="font-black text-slate-800 text-[9px] md:text-sm mt-1 truncate">
 
                                 ${item.fora}
 
                             </span>
-
-                            <img src="${getShield(item.foraId)}"
-                                 class="w-8 h-8 md:w-12 md:h-12 object-contain shrink-0">
 
                         </div>
 
