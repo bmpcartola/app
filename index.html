@@ -14,12 +14,13 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#ff6321', // Orange
+                        primary: '#ff6321',
                         orange: {
                             400: '#fb923c',
                             500: '#f97316',
@@ -35,6 +36,7 @@
             }
         };
     </script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Jersey+25&display=swap');
         
@@ -81,114 +83,228 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #e2e8f0;
             border-radius: 10px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #ff6321;
         }
     </style>
 </head>
+
 <body class="text-slate-900">
+
+    <!-- HEADER -->
     <header class="bg-white border-b border-slate-100 sticky top-0 z-40 px-4 py-4 shadow-sm">
+
         <div class="max-w-7xl mx-auto flex items-center justify-between">
+
             <div class="flex items-center gap-4">
+
                 <div class="w-12 h-12 flex items-center justify-center">
-                    <img src="images/logo/CARTOLA.png" class="w-full h-full object-contain" onerror="this.onerror=null; this.style.opacity='0.5';">
+                    <img src="images/logo/CARTOLA.png"
+                         class="w-full h-full object-contain"
+                         onerror="this.onerror=null; this.style.opacity='0.5';">
                 </div>
+
                 <div>
-                    <h1 class="font-jogos text-xl md:text-2xl text-slate-800 tracking-tight leading-none">TAÇA <span class="text-orange-500">BMP</span></h1>
-                    <p class="font-jogos text-[8px] text-slate-400 tracking-[0.4em] mt-1 uppercase">2026</p>
+                    <h1 class="font-jogos text-xl md:text-2xl text-slate-800 tracking-tight leading-none">
+                        TAÇA <span class="text-orange-500">BMP</span>
+                    </h1>
+
+                    <p class="font-jogos text-[8px] text-slate-400 tracking-[0.4em] mt-1 uppercase">
+                        2026
+                    </p>
                 </div>
+
             </div>
-            
+
             <div id="header-controls" class="flex items-center gap-3">
                 <!-- Round and Serie selectors -->
             </div>
+
         </div>
+
     </header>
 
+    <!-- MAIN -->
     <main id="main-content" class="max-w-7xl mx-auto p-4 md:p-8">
+
         <div class="flex flex-col items-center justify-center min-h-[60vh] gap-4">
             <div class="loader"></div>
-            <p class="text-slate-400 font-jogos text-sm tracking-widest animate-pulse uppercase">SINCRONIZANDO DADOS...</p>
+
+            <p class="text-slate-400 font-jogos text-sm tracking-widest animate-pulse uppercase">
+                SINCRONIZANDO DADOS...
+            </p>
         </div>
+
     </main>
 
-    <!-- Sidebar Backdrop -->
-    <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 z-[50] bg-black/5 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500"></div>
+    <!-- SIDEBAR BACKDROP -->
+    <div id="sidebar-backdrop"
+         onclick="toggleSidebar(false)"
+         class="fixed inset-0 z-[50] bg-black/5 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500">
+    </div>
 
-    <!-- Sidebar Toggle -->
-    <button id="sidebar-toggle" onclick="toggleSidebar(true)" class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/90 backdrop-blur-md border border-slate-100 p-3 py-8 rounded-r-3xl shadow-2xl hover:bg-white transition-all group">
-        <i data-lucide="chevron-right" id="sidebar-icon" class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform"></i>
+    <!-- SIDEBAR TOGGLE -->
+    <button id="sidebar-toggle"
+            onclick="toggleSidebar(true)"
+            class="fixed left-0 top-1/2 -translate-y-1/2 z-[60] bg-white/90 backdrop-blur-md border border-slate-100 p-3 py-8 rounded-r-3xl shadow-2xl hover:bg-white transition-all group">
+
+        <i data-lucide="chevron-right"
+           id="sidebar-icon"
+           class="w-5 h-5 text-slate-400 group-hover:text-orange-500 transition-transform">
+        </i>
+
     </button>
 
-    <!-- Sidebar Menu -->
-    <div id="sidebar-menu" class="fixed left-[-200px] top-1/2 -translate-y-1/2 z-[100] w-32 h-[800px] bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[50px] shadow-2xl transition-all duration-700 ease-in-out flex flex-col items-center overflow-hidden">
+    <!-- SIDEBAR -->
+    <div id="sidebar-menu"
+         class="fixed left-[-200px] top-1/2 -translate-y-1/2 z-[100] w-32 h-[800px] bg-white/95 backdrop-blur-2xl border border-slate-100 rounded-r-[50px] shadow-2xl transition-all duration-700 ease-in-out flex flex-col items-center overflow-hidden">
+
         <div class="flex flex-col items-center justify-between h-full py-20 w-full">
+
             <div class="flex flex-col items-center gap-14 w-full">
+
                 <!-- JOSA.BET -->
-                <button onclick="handleSidebarClick('campo')" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn" data-view="campo">
+                <button onclick="handleSidebarClick('campo')"
+                        class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn"
+                        data-view="campo">
+
                     <div class="sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50">
                         <i data-lucide="layout-grid" class="w-9 h-9"></i>
                     </div>
-                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-600">JOSA.BET</span>
+
+                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-600">
+                        JOSA.BET
+                    </span>
+
                 </button>
 
                 <!-- PROVÁVEIS -->
-                <button onclick="handleSidebarClick('provaveis')" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn" data-view="provaveis">
+                <button onclick="handleSidebarClick('provaveis')"
+                        class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn"
+                        data-view="provaveis">
+
                     <div class="sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100">
                         <i data-lucide="users" class="w-9 h-9"></i>
                     </div>
-                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">PROVÁVEIS</span>
+
+                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">
+                        PROVÁVEIS
+                    </span>
+
                 </button>
 
                 <!-- JOGOS -->
-                <button onclick="handleSidebarClick('jogos')" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn" data-view="jogos">
+                <button onclick="handleSidebarClick('jogos')"
+                        class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn"
+                        data-view="jogos">
+
                     <div class="sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
-                       <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" viewBox="0 0 256 256" class="w-9 h-9">
-                           <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm76.52,147.42H170.9l-9.26-12.76,12.63-36.78,15-4.89,26.24,20.13A87.38,87.38,0,0,1,204.52,171.42Zm-164-34.3L66.71,117l15,4.89,12.63,36.78L85.1,171.42H51.48A87.38,87.38,0,0,1,40.47,137.12Zm10-50.64,5.51,18.6L40.71,116.77A87.33,87.33,0,0,1,50.43,86.48ZM109,152,97.54,118.65,128,97.71l30.46,20.94L147,152Zm91.07-46.92,5.51-18.6a87.33,87.33,0,0,1,9.72,30.29Zm-6.2-35.38-9.51,32.08-15.07,4.89L136,83.79V68.21l29.09-20A88.58,88.58,0,0,1,193.86,69.7ZM146.07,41.87,128,54.29,109.93,41.87a88.24,88.24,0,0,1,36.14,0ZM90.91,48.21l29.09,20V83.79L86.72,106.67l-15.07-4.89L62.14,69.7A88.58,88.58,0,0,1,90.91,48.21ZM63.15,187.42H83.52l7.17,20.27A88.4,88.4,0,0,1,63.15,187.42ZM110,214.13,98.12,180.71,107.35,168h41.3l9.23,12.71-11.83,33.42a88,88,0,0,1-36.1,0Zm55.36-6.44,7.17-20.27h20.37A88.4,88.4,0,0,1,165.31,207.69Z"></path>
-                       </svg>
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="36"
+                             height="36"
+                             fill="currentColor"
+                             viewBox="0 0 256 256"
+                             class="w-9 h-9">
+
+                            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Z"></path>
+
+                        </svg>
+
                     </div>
-                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">JOGOS</span>
+
+                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">
+                        JOGOS
+                    </span>
+
+                </button>
+
+                <!-- ANALISE -->
+                <button onclick="handleSidebarClick('analise')"
+                        class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn"
+                        data-view="analise">
+
+                    <div class="sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-300 border border-slate-100 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="36"
+                             height="36"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2.4"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             class="w-9 h-9">
+
+                            <path d="M3 3v18h18"/>
+                            <path d="M7 14l3-3 3 2 4-5"/>
+                            <circle cx="7" cy="14" r="1" fill="currentColor"/>
+                            <circle cx="10" cy="11" r="1" fill="currentColor"/>
+                            <circle cx="13" cy="13" r="1" fill="currentColor"/>
+                            <circle cx="17" cy="8" r="1" fill="currentColor"/>
+
+                        </svg>
+
+                    </div>
+
+                    <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">
+                        ANÁLISE
+                    </span>
+
                 </button>
 
                 <!-- INSTALAR -->
-                <button id="btn-install" onclick="if(window.installApp) window.installApp(); toggleSidebar(false);" class="hidden flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
+                <button id="btn-install"
+                        onclick="if(window.installApp) window.installApp(); toggleSidebar(false);"
+                        class="hidden flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
+
                     <div class="w-16 h-16 rounded-[28px] bg-orange-700 text-white flex items-center justify-center shadow-2xl">
                         <i data-lucide="download" class="w-9 h-9"></i>
                     </div>
-                    <span class="text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-700">INSTALAR</span>
+
+                    <span class="text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-700">
+                        INSTALAR
+                    </span>
+
                 </button>
+
             </div>
 
-            <div class="mt-auto w-full flex flex-col items-center gap-8">
-                <div class="flex flex-col items-center opacity-40 hover:opacity-100 transition-all pb-8 group/brand">
-                    <div class="p-5 bg-orange-50 rounded-full mb-3 group-hover/brand:scale-110 transition-transform">
-                        <i data-lucide="trophy" class="w-12 h-12 text-orange-800"></i>
-                    </div>
-                    <p class="text-[12px] font-black font-jogos text-orange-950 uppercase tracking-widest text-center mt-2 leading-tight">TAÇA<br>BMP</p>
-                    <div class="w-12 h-1 bg-orange-200 rounded-full mt-2"></div>
-                </div>
-            </div>
         </div>
+
     </div>
 
-    <!-- Scroll to Top Button -->
-    <button id="scroll-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-10 right-6 z-50 p-4 bg-orange-500/10 backdrop-blur-md border border-orange-200/30 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-500 hover:bg-orange-500/20 hover:scale-110 group">
-        <i data-lucide="arrow-up" class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600"></i>
+    <!-- SCROLL TOP -->
+    <button id="scroll-to-top"
+            onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            class="fixed bottom-10 right-6 z-50 p-4 bg-orange-500/10 backdrop-blur-md border border-orange-200/30 rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-500 hover:bg-orange-500/20 hover:scale-110 group">
+
+        <i data-lucide="arrow-up"
+           class="w-5 h-5 text-orange-600/60 group-hover:text-orange-600">
+        </i>
+
     </button>
 
+    <!-- API -->
     <script>
         window.API_CARTOLA = {
             MERCADO_STATUS: "mercado/status",
@@ -198,35 +314,50 @@
             AWS_ATLETAS_PONTUADOS: "escalar/rodadas-anteriores"
         };
     </script>
+
+    <!-- SCRIPTS -->
     <script src="provaveis.js"></script>
     <script src="jogos.js"></script>
+    <script src="dadoscartola.js"></script>
     <script src="josabet.js"></script>
+
+    <!-- APP -->
     <script>
+
         function toggleSidebar(force) {
+
             const sidebar = document.getElementById("sidebar-menu");
             const toggleBtn = document.getElementById("sidebar-toggle");
             const backdrop = document.getElementById("sidebar-backdrop");
+
             if (!sidebar) return;
 
             const isOpen = sidebar.style.left === "0px";
             const nextState = force !== undefined ? force : !isOpen;
 
             if (nextState) {
+
                 sidebar.style.left = "0px";
+
                 if (toggleBtn) {
                     toggleBtn.style.opacity = "0";
                     toggleBtn.style.pointerEvents = "none";
                 }
+
                 if (backdrop) {
                     backdrop.style.opacity = "1";
                     backdrop.style.pointerEvents = "auto";
                 }
+
             } else {
+
                 sidebar.style.left = "-200px";
+
                 if (toggleBtn) {
                     toggleBtn.style.opacity = "1";
                     toggleBtn.style.pointerEvents = "auto";
                 }
+
                 if (backdrop) {
                     backdrop.style.opacity = "0";
                     backdrop.style.pointerEvents = "none";
@@ -235,45 +366,71 @@
         }
 
         function handleSidebarClick(view) {
-            if (window.bmpSetViewMode) window.bmpSetViewMode(view);
+
+            if (window.bmpSetViewMode)
+                window.bmpSetViewMode(view);
+
             updateSidebarUI(view);
+
             toggleSidebar(false);
         }
 
         window.updateSidebarUI = function(activeView) {
+
             const buttons = document.querySelectorAll('.sidebar-btn');
+
             buttons.forEach(btn => {
+
                 const view = btn.getAttribute('data-view');
                 const container = btn.querySelector('.sidebar-icon-container');
                 const label = btn.querySelector('.sidebar-label');
-                
+
                 if (!container || !label) return;
 
                 if (view === activeView) {
-                    container.className = "sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50";
-                    label.className = "sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-600";
+
+                    container.className =
+                        "sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-orange-600 text-white shadow-2xl shadow-orange-600/40 border-orange-400 ring-4 ring-orange-50";
+
+                    label.className =
+                        "sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-orange-600";
+
                 } else {
-                    container.className = "sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100";
-                    label.className = "sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60";
+
+                    container.className =
+                        "sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-400 border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-100";
+
+                    label.className =
+                        "sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60";
                 }
             });
-            if (typeof lucide !== "undefined") lucide.createIcons();
-        }
 
-        // Install button visibility
+            if (typeof lucide !== "undefined") {
+                lucide.createIcons();
+            }
+        };
+
+        // INSTALL BUTTON
+
         setInterval(() => {
+
             const btnInstall = document.getElementById('btn-install');
+
             if (btnInstall) {
+
                 if (window.deferredPrompt) {
                     btnInstall.classList.remove('hidden');
                 } else {
                     btnInstall.classList.add('hidden');
                 }
             }
+
         }, 1000);
 
-        // PWA Install Logic
+        // PWA INSTALL
+
         window.deferredPrompt = null;
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             window.deferredPrompt = e;
@@ -284,19 +441,29 @@
         });
 
         window.installApp = async function() {
+
             if (!window.deferredPrompt) return;
+
             window.deferredPrompt.prompt();
+
             const { outcome } = await window.deferredPrompt.userChoice;
+
             if (outcome === 'accepted') {
                 window.deferredPrompt = null;
             }
         };
 
+        // SERVICE WORKER
+
         if ('serviceWorker' in navigator) {
+
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js');
             });
+
         }
+
     </script>
+
 </body>
 </html>
