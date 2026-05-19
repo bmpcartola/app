@@ -10,7 +10,7 @@ window.analiseState = {
     ultimasRodadas: 5,
     modoAnalise: 'MANDANTE',
 
-    sortColumn: 'matchup',
+    sortColumn: null,
     sortDirection: 'desc'
 };
 
@@ -66,10 +66,10 @@ window.renderAnaliseCartola = async function () {
 
     main.innerHTML = `
 
-        <div class="max-w-[1900px] mx-auto space-y-6">
+        <div class="max-w-[1800px] mx-auto space-y-6">
 
             <!-- HEADER -->
-            <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm p-5 md:p-8">
+            <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm p-5 md:p-8">
 
                 <div class="flex items-center gap-5 mb-8">
 
@@ -96,13 +96,13 @@ window.renderAnaliseCartola = async function () {
 
                     </div>
 
-                    <div class="min-w-0">
+                    <div>
 
-                        <h1 class="font-jersey text-4xl md:text-5xl text-slate-800 leading-none">
+                        <h1 class="font-jersey text-5xl text-slate-800 leading-none">
                             ANÁLISE
                         </h1>
 
-                        <p class="font-jogos text-[10px] md:text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
+                        <p class="font-jogos text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
                             MATCHUPS ANALÍTICOS
                         </p>
 
@@ -357,7 +357,7 @@ function getTeamName(teamId) {
 }
 
 /* ============================================================
-   SCOUT CONQUISTADO
+   CONQUISTADO
    ============================================================ */
 
 function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
@@ -369,23 +369,14 @@ function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
 
     let total = 0;
-    let partidasValidas = [];
 
     const partidas = window.dadosCartola.times[getTeamName(clubeId)];
 
     if (!partidas) return 0;
 
-    partidas.forEach(partida => {
-
-        if (partida.rodada >= analiseState.rodadaAtual) return;
-
-        if (partida.mando !== mando) return;
-
-        partidasValidas.push(partida);
-
-    });
-
-    partidasValidas = partidasValidas
+    let partidasValidas = partidas
+        .filter(p => p.rodada < analiseState.rodadaAtual)
+        .filter(p => p.mando === mando)
         .sort((a, b) => b.rodada - a.rodada)
         .slice(0, ultimasRodadas);
 
@@ -414,13 +405,13 @@ function obterScoutConquistado(clubeId, scout, posicao, ultimasRodadas, mando) {
 
     });
 
-    if (partidasValidas.length === 0) return 0;
+    if (!partidasValidas.length) return 0;
 
     return Number((total / partidasValidas.length).toFixed(2));
 }
 
 /* ============================================================
-   SCOUT CEDIDO
+   CEDIDO
    ============================================================ */
 
 function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
@@ -479,7 +470,7 @@ function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
 
     });
 
-    if (partidasValidas.length === 0) return 0;
+    if (!partidasValidas.length) return 0;
 
     return Number((total / partidasValidas.length).toFixed(2));
 }
@@ -494,7 +485,7 @@ function renderTabelaCedidos() {
 
     if (!container) return;
 
-    let matchups = [];
+    let linhas = [];
 
     analiseState.partidas.forEach(match => {
 
@@ -538,7 +529,7 @@ function renderTabelaCedidos() {
             );
         }
 
-        matchups.push({
+        linhas.push({
 
             casaId: match.clube_casa_id,
             foraId: match.clube_visitante_id,
@@ -547,9 +538,7 @@ function renderTabelaCedidos() {
             fora: getTeamName(match.clube_visitante_id),
 
             valorCasa,
-            valorFora,
-
-            matchup: Number((valorCasa + valorFora).toFixed(2))
+            valorFora
         });
 
     });
@@ -558,20 +547,26 @@ function renderTabelaCedidos() {
        SORT
        ============================================================ */
 
-    matchups.sort((a, b) => {
+    if (analiseState.sortColumn) {
 
-        const dir = analiseState.sortDirection === 'asc' ? 1 : -1;
+        linhas.sort((a, b) => {
 
-        if (a[analiseState.sortColumn] < b[analiseState.sortColumn]) {
-            return -1 * dir;
-        }
+            const dir =
+                analiseState.sortDirection === 'asc'
+                    ? 1
+                    : -1;
 
-        if (a[analiseState.sortColumn] > b[analiseState.sortColumn]) {
-            return 1 * dir;
-        }
+            if (a[analiseState.sortColumn] < b[analiseState.sortColumn]) {
+                return -1 * dir;
+            }
 
-        return 0;
-    });
+            if (a[analiseState.sortColumn] > b[analiseState.sortColumn]) {
+                return 1 * dir;
+            }
+
+            return 0;
+        });
+    }
 
     /* ============================================================
        RENDER
@@ -579,216 +574,174 @@ function renderTabelaCedidos() {
 
     container.innerHTML = `
 
-        <!-- DESKTOP -->
-        <div class="hidden lg:block bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm overflow-hidden">
 
-            <!-- HEADER -->
-            <div class="grid grid-cols-[1.2fr_140px_80px_140px_1.2fr_160px] gap-2 px-8 py-5 bg-slate-50 border-b border-slate-100">
+            <div class="overflow-x-auto">
 
-                <button onclick="window.sortTabelaAnalise('casa')"
-                        class="text-left text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
-                    CASA
-                </button>
+                <table class="w-full min-w-[900px]">
 
-                <button onclick="window.sortTabelaAnalise('valorCasa')"
-                        class="text-center text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
-                    ${analiseState.modoAnalise === 'MANDANTE' ? 'CONQ' : 'CED'}
-                </button>
+                    <!-- HEADER -->
+                    <thead class="bg-slate-50 border-b border-slate-100">
 
-                <div></div>
+                        <tr>
 
-                <button onclick="window.sortTabelaAnalise('valorFora')"
-                        class="text-center text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
-                    ${analiseState.modoAnalise === 'MANDANTE' ? 'CED' : 'CONQ'}
-                </button>
+                            <th class="px-6 py-5 text-left">
 
-                <button onclick="window.sortTabelaAnalise('fora')"
-                        class="text-right text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
-                    FORA
-                </button>
+                                <button onclick="window.sortTabelaAnalise('casa')"
+                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
 
-                <button onclick="window.sortTabelaAnalise('matchup')"
-                        class="text-center text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
-                    MATCHUP
-                </button>
+                                    CASA
+
+                                </button>
+
+                            </th>
+
+                            <th class="px-6 py-5 text-center">
+
+                                <button onclick="window.sortTabelaAnalise('valorCasa')"
+                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+
+                                    ${analiseState.modoAnalise === 'MANDANTE'
+                                        ? 'CONQUISTADO'
+                                        : 'CEDIDO'}
+
+                                </button>
+
+                            </th>
+
+                            <th class="px-6 py-5 text-center"></th>
+
+                            <th class="px-6 py-5 text-center">
+
+                                <button onclick="window.sortTabelaAnalise('valorFora')"
+                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+
+                                    ${analiseState.modoAnalise === 'MANDANTE'
+                                        ? 'CEDIDO'
+                                        : 'CONQUISTADO'}
+
+                                </button>
+
+                            </th>
+
+                            <th class="px-6 py-5 text-right">
+
+                                <button onclick="window.sortTabelaAnalise('fora')"
+                                        class="text-xs font-jogos tracking-[0.2em] text-slate-400 uppercase hover:text-orange-500 transition-all">
+
+                                    FORA
+
+                                </button>
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <!-- BODY -->
+                    <tbody>
+
+                        ${linhas.map(item => `
+
+                            <tr class="border-b border-slate-50 hover:bg-orange-50/40 transition-all">
+
+                                <!-- CASA -->
+                                <td class="px-6 py-5">
+
+                                    <div class="flex items-center gap-4">
+
+                                        <img src="${getShield(item.casaId)}"
+                                             class="w-12 h-12 object-contain shrink-0">
+
+                                        <span class="font-black text-slate-800 text-base">
+
+                                            ${item.casa}
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- VALOR CASA -->
+                                <td class="px-6 py-5 text-center">
+
+                                    <div class="${analiseState.modoAnalise === 'MANDANTE'
+                                        ? 'bg-green-50 border-green-100 text-green-700'
+                                        : 'bg-orange-50 border-orange-100 text-orange-700'}
+                                        inline-flex items-center justify-center
+                                        min-w-[120px]
+                                        h-14
+                                        rounded-2xl
+                                        border
+                                        font-black text-2xl">
+
+                                        ${item.valorCasa.toFixed(2)}
+
+                                    </div>
+
+                                </td>
+
+                                <!-- X -->
+                                <td class="px-6 py-5 text-center">
+
+                                    <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 inline-flex items-center justify-center">
+
+                                        <span class="font-jogos text-slate-300 text-lg">
+                                            X
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- VALOR FORA -->
+                                <td class="px-6 py-5 text-center">
+
+                                    <div class="${analiseState.modoAnalise === 'MANDANTE'
+                                        ? 'bg-orange-50 border-orange-100 text-orange-700'
+                                        : 'bg-green-50 border-green-100 text-green-700'}
+                                        inline-flex items-center justify-center
+                                        min-w-[120px]
+                                        h-14
+                                        rounded-2xl
+                                        border
+                                        font-black text-2xl">
+
+                                        ${item.valorFora.toFixed(2)}
+
+                                    </div>
+
+                                </td>
+
+                                <!-- FORA -->
+                                <td class="px-6 py-5">
+
+                                    <div class="flex items-center justify-end gap-4">
+
+                                        <span class="font-black text-slate-800 text-base">
+
+                                            ${item.fora}
+
+                                        </span>
+
+                                        <img src="${getShield(item.foraId)}"
+                                             class="w-12 h-12 object-contain shrink-0">
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        `).join('')}
+
+                    </tbody>
+
+                </table>
 
             </div>
-
-            ${matchups.map(item => `
-
-                <div class="grid grid-cols-[1.2fr_140px_80px_140px_1.2fr_160px] gap-2 px-8 py-5 border-b border-slate-50 hover:bg-orange-50/40 transition-all items-center">
-
-                    <!-- CASA -->
-                    <div class="flex items-center gap-3 min-w-0">
-
-                        <img src="${getShield(item.casaId)}"
-                             class="w-12 h-12 object-contain shrink-0">
-
-                        <span class="font-black text-slate-800 text-base truncate">
-                            ${item.casa}
-                        </span>
-
-                    </div>
-
-                    <!-- VALOR CASA -->
-                    <div class="flex justify-center">
-
-                        <div class="${analiseState.modoAnalise === 'MANDANTE'
-                            ? 'bg-green-50 border-green-100 text-green-700'
-                            : 'bg-orange-50 border-orange-100 text-orange-700'}
-                            min-w-[100px]
-                            h-14
-                            rounded-2xl
-                            border
-                            flex items-center justify-center
-                            font-black text-2xl">
-
-                            ${item.valorCasa.toFixed(2)}
-
-                        </div>
-
-                    </div>
-
-                    <!-- X -->
-                    <div class="flex justify-center">
-
-                        <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
-
-                            <span class="font-jogos text-slate-300 text-lg">
-                                X
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                    <!-- VALOR FORA -->
-                    <div class="flex justify-center">
-
-                        <div class="${analiseState.modoAnalise === 'MANDANTE'
-                            ? 'bg-orange-50 border-orange-100 text-orange-700'
-                            : 'bg-green-50 border-green-100 text-green-700'}
-                            min-w-[100px]
-                            h-14
-                            rounded-2xl
-                            border
-                            flex items-center justify-center
-                            font-black text-2xl">
-
-                            ${item.valorFora.toFixed(2)}
-
-                        </div>
-
-                    </div>
-
-                    <!-- FORA -->
-                    <div class="flex items-center justify-end gap-3 min-w-0">
-
-                        <span class="font-black text-slate-800 text-base truncate">
-                            ${item.fora}
-                        </span>
-
-                        <img src="${getShield(item.foraId)}"
-                             class="w-12 h-12 object-contain shrink-0">
-
-                    </div>
-
-                    <!-- MATCHUP -->
-                    <div class="flex justify-center">
-
-                        <div class="min-w-[120px]
-                                    h-14
-                                    rounded-2xl
-                                    bg-slate-900
-                                    text-white
-                                    flex items-center justify-center
-                                    font-black text-2xl">
-
-                            ${item.matchup.toFixed(2)}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `).join('')}
-
-        </div>
-
-        <!-- MOBILE -->
-        <div class="lg:hidden space-y-4">
-
-            ${matchups.map(item => `
-
-                <div class="bg-white rounded-[30px] border border-slate-100 shadow-sm p-5">
-
-                    <div class="flex items-center justify-between gap-4">
-
-                        <!-- CASA -->
-                        <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
-
-                            <img src="${getShield(item.casaId)}"
-                                 class="w-14 h-14 object-contain">
-
-                            <p class="font-black text-slate-800 text-sm uppercase truncate">
-                                ${item.casa}
-                            </p>
-
-                            <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                ? 'bg-green-50 border-green-100 text-green-700'
-                                : 'bg-orange-50 border-orange-100 text-orange-700'}
-                                w-full h-12 rounded-2xl border flex items-center justify-center font-black text-xl">
-
-                                ${item.valorCasa.toFixed(2)}
-
-                            </div>
-
-                        </div>
-
-                        <!-- CENTRO -->
-                        <div class="flex flex-col items-center gap-3">
-
-                            <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
-
-                                <span class="font-jogos text-slate-300">
-                                    X
-                                </span>
-
-                            </div>
-
-                            <div class="w-16 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg">
-                                ${item.matchup.toFixed(2)}
-                            </div>
-
-                        </div>
-
-                        <!-- FORA -->
-                        <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
-
-                            <img src="${getShield(item.foraId)}"
-                                 class="w-14 h-14 object-contain">
-
-                            <p class="font-black text-slate-800 text-sm uppercase truncate">
-                                ${item.fora}
-                            </p>
-
-                            <div class="${analiseState.modoAnalise === 'MANDANTE'
-                                ? 'bg-orange-50 border-orange-100 text-orange-700'
-                                : 'bg-green-50 border-green-100 text-green-700'}
-                                w-full h-12 rounded-2xl border flex items-center justify-center font-black text-xl">
-
-                                ${item.valorFora.toFixed(2)}
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `).join('')}
 
         </div>
 
