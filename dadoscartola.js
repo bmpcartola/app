@@ -7,7 +7,8 @@ window.analiseState = {
     partidas: [],
     scoutSelecionado: 'GOL',
     posicaoSelecionada: 'GERAL',
-    ultimasRodadas: 5
+    ultimasRodadas: 5,
+    modoAnalise: 'GERAL'
 };
 
 /* ============================================================
@@ -27,8 +28,6 @@ const SCOUTS_MAP = {
     PONTUACAO: ['pontuacao']
 };
 
-const POSICOES_VALIDAS = ['GERAL', 'GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
-
 /* ============================================================
    RENDER PRINCIPAL
    ============================================================ */
@@ -41,32 +40,42 @@ window.renderAnaliseCartola = async function () {
 
     main.innerHTML = `
 
-        <div class="max-w-7xl mx-auto space-y-6">
+        <div class="max-w-[1800px] mx-auto space-y-6">
 
             <!-- HEADER -->
-            <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm p-8">
+            <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm p-5 md:p-8">
 
                 <div class="flex items-center gap-5 mb-8">
 
                     <div class="w-20 h-20 rounded-[28px] bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100">
 
-                        <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="42"
+                             height="42"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2.4"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
                             <path d="M3 3v18h18"/>
                             <path d="M7 14l3-3 3 2 4-5"/>
                             <circle cx="7" cy="14" r="1" fill="currentColor"/>
                             <circle cx="10" cy="11" r="1" fill="currentColor"/>
                             <circle cx="13" cy="13" r="1" fill="currentColor"/>
                             <circle cx="17" cy="8" r="1" fill="currentColor"/>
+
                         </svg>
 
                     </div>
 
                     <div>
-                        <h1 class="font-jersey text-5xl text-slate-800 leading-none">
+                        <h1 class="font-jersey text-4xl md:text-5xl text-slate-800 leading-none">
                             ANÁLISE
                         </h1>
 
-                        <p class="font-jogos text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
+                        <p class="font-jogos text-[10px] md:text-xs tracking-[0.35em] text-slate-400 uppercase mt-2">
                             SCOUTS CEDIDOS
                         </p>
                     </div>
@@ -74,10 +83,11 @@ window.renderAnaliseCartola = async function () {
                 </div>
 
                 <!-- CONTROLES -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
                     <!-- SCOUT -->
                     <div>
+
                         <label class="block text-[10px] font-jogos tracking-[0.25em] text-slate-400 uppercase mb-2">
                             Scout
                         </label>
@@ -87,7 +97,7 @@ window.renderAnaliseCartola = async function () {
                                 class="w-full h-14 rounded-2xl border border-slate-200 bg-slate-50 px-5 font-black text-slate-700 outline-none focus:border-orange-400">
 
                             <option value="GOL">GOL</option>
-                            <option value="ASSISTENCIA">ASSISTENCIA</option>
+                            <option value="ASSISTENCIA">ASSISTÊNCIA</option>
                             <option value="FINALIZACAO">FINALIZAÇÃO</option>
                             <option value="DESARMES">DESARMES</option>
                             <option value="SG">SG</option>
@@ -96,10 +106,12 @@ window.renderAnaliseCartola = async function () {
                             <option value="PONTUACAO">PONTUAÇÃO</option>
 
                         </select>
+
                     </div>
 
-                    <!-- POSICAO -->
+                    <!-- POSIÇÃO -->
                     <div>
+
                         <label class="block text-[10px] font-jogos tracking-[0.25em] text-slate-400 uppercase mb-2">
                             Posição
                         </label>
@@ -116,19 +128,23 @@ window.renderAnaliseCartola = async function () {
                             <option value="ATA">ATA</option>
 
                         </select>
+
                     </div>
 
                     <!-- RODADAS -->
-                    <div>
+                    <div class="space-y-4">
 
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between">
+
                             <label class="text-[10px] font-jogos tracking-[0.25em] text-slate-400 uppercase">
                                 Últimas Rodadas
                             </label>
 
-                            <span id="range-value" class="text-sm font-black text-orange-600">
+                            <span id="range-value"
+                                  class="text-sm font-black text-orange-600">
                                 5
                             </span>
+
                         </div>
 
                         <input type="range"
@@ -138,6 +154,22 @@ window.renderAnaliseCartola = async function () {
                                value="5"
                                onchange="window.handleRangeChange(this.value)"
                                class="w-full accent-orange-500 cursor-pointer">
+
+                        <div class="flex gap-3 pt-2">
+
+                            <button onclick="window.handleModoAnalise('GERAL')"
+                                    id="btn-geral"
+                                    class="flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all">
+                                GERAL
+                            </button>
+
+                            <button onclick="window.handleModoAnalise('MANDO')"
+                                    id="btn-mando"
+                                    class="flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all">
+                                MANDO
+                            </button>
+
+                        </div>
 
                     </div>
 
@@ -233,6 +265,33 @@ window.handleRangeChange = function(valor) {
     renderTabelaCedidos();
 };
 
+window.handleModoAnalise = function(modo) {
+
+    analiseState.modoAnalise = modo;
+
+    const btnGeral = document.getElementById('btn-geral');
+    const btnMando = document.getElementById('btn-mando');
+
+    if (modo === 'GERAL') {
+
+        btnGeral.className =
+            'flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+
+        btnMando.className =
+            'flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+
+    } else {
+
+        btnMando.className =
+            'flex-1 h-11 rounded-2xl bg-orange-500 text-white font-black text-sm transition-all';
+
+        btnGeral.className =
+            'flex-1 h-11 rounded-2xl bg-slate-100 text-slate-400 font-black text-sm transition-all';
+    }
+
+    renderTabelaCedidos();
+};
+
 /* ============================================================
    HELPERS
    ============================================================ */
@@ -241,14 +300,36 @@ function getShield(teamId) {
     return `images/escudos_brasileirao/${teamId}.png`;
 }
 
-function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas) {
+function getTeamName(match, tipo) {
 
-    if (!window.dadosCartola || !window.dadosCartola.times) return 0;
+    if (tipo === 'CASA') {
+
+        return (
+            match.clube_casa?.abreviacao ||
+            match.clube_casa?.nome ||
+            'CASA'
+        );
+    }
+
+    return (
+        match.clube_visitante?.abreviacao ||
+        match.clube_visitante?.nome ||
+        'FORA'
+    );
+}
+
+/* ============================================================
+   ANALISE SCOUTS CEDIDOS
+   ============================================================ */
+
+function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas, tipoMando) {
+
+    if (!window.dadosCartola || !window.dadosCartola.times) return '0.00';
 
     const scoutsAlvo = SCOUTS_MAP[scout] || [];
 
     let total = 0;
-    let partidasContadas = 0;
+    let partidasValidas = [];
 
     Object.values(window.dadosCartola.times).forEach(partidas => {
 
@@ -258,39 +339,58 @@ function obterScoutCedidos(clubeId, scout, posicao, ultimasRodadas) {
 
             if (partida.rodada >= analiseState.rodadaAtual) return;
 
-            partidasContadas++;
+            if (analiseState.modoAnalise === 'MANDO') {
 
-            partida.atletas.forEach(atleta => {
-
-                if (posicao !== 'GERAL' && atleta.pos !== posicao) {
+                if (tipoMando === 'CASA' && partida.mando !== 'CASA') {
                     return;
                 }
 
-                scoutsAlvo.forEach(sc => {
+                if (tipoMando === 'FORA' && partida.mando !== 'FORA') {
+                    return;
+                }
 
-                    if (scout === 'SG') {
+            }
 
-                        if (Number(atleta[sc]) > 0) {
-                            total += 1;
-                        }
+            partidasValidas.push(partida);
 
-                    } else {
+        });
 
-                        total += Number(atleta[sc] || 0);
+    });
 
-                    }
+    partidasValidas = partidasValidas
+        .sort((a, b) => b.rodada - a.rodada)
+        .slice(0, ultimasRodadas);
 
-                });
+    partidasValidas.forEach(partida => {
 
+        if (scout === 'SG') {
+
+            const teveSG = partida.atletas.some(a => Number(a.SG) > 0);
+
+            if (teveSG) {
+                total += 1;
+            }
+
+            return;
+        }
+
+        partida.atletas.forEach(atleta => {
+
+            if (posicao !== 'GERAL' && atleta.pos !== posicao) {
+                return;
+            }
+
+            scoutsAlvo.forEach(sc => {
+                total += Number(atleta[sc] || 0);
             });
 
         });
 
     });
 
-    if (partidasContadas === 0) return 0;
+    if (partidasValidas.length === 0) return '0.00';
 
-    return (total / ultimasRodadas).toFixed(2);
+    return (total / partidasValidas.length).toFixed(2);
 }
 
 /* ============================================================
@@ -307,143 +407,96 @@ function renderTabelaCedidos() {
 
     container.innerHTML = `
 
-        <div class="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
-            <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+            ${partidas.map(match => {
 
-                <div>
-                    <h2 class="font-jersey text-4xl text-slate-800 leading-none">
-                        SCOUTS CEDIDOS
-                    </h2>
+                const cedidosCasa = obterScoutCedidos(
+                    match.clube_visitante_id,
+                    analiseState.scoutSelecionado,
+                    analiseState.posicaoSelecionada,
+                    analiseState.ultimasRodadas,
+                    'CASA'
+                );
 
-                    <p class="font-jogos text-[10px] tracking-[0.25em] text-slate-400 uppercase mt-2">
-                        MÉDIA DAS ÚLTIMAS ${analiseState.ultimasRodadas} RODADAS
-                    </p>
-                </div>
+                const cedidosFora = obterScoutCedidos(
+                    match.clube_casa_id,
+                    analiseState.scoutSelecionado,
+                    analiseState.posicaoSelecionada,
+                    analiseState.ultimasRodadas,
+                    'FORA'
+                );
 
-            </div>
+                return `
 
-            <div class="overflow-x-auto">
+                    <div class="bg-white rounded-[34px] border border-slate-100 shadow-sm p-5 md:p-7 hover:shadow-xl transition-all">
 
-                <table class="w-full min-w-[900px]">
+                        <div class="flex items-center justify-between gap-4">
 
-                    <thead>
-                        <tr class="border-b border-slate-100 bg-slate-50">
+                            <!-- CASA -->
+                            <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
 
-                            <th class="px-6 py-5 text-left text-[10px] font-jogos tracking-[0.2em] text-slate-400 uppercase">
-                                Mandante
-                            </th>
+                                <img src="${getShield(match.clube_casa_id)}"
+                                     class="w-16 h-16 md:w-20 md:h-20 object-contain">
 
-                            <th class="px-6 py-5 text-center text-[10px] font-jogos tracking-[0.2em] text-slate-400 uppercase">
-                                Cedidos
-                            </th>
+                                <div class="text-center min-w-0">
 
-                            <th class="px-6 py-5 text-center text-[10px] font-jogos tracking-[0.2em] text-slate-400 uppercase">
-                                Scout
-                            </th>
+                                    <p class="font-black text-slate-800 text-sm md:text-base uppercase truncate">
+                                        ${getTeamName(match, 'CASA')}
+                                    </p>
 
-                            <th class="px-6 py-5 text-center text-[10px] font-jogos tracking-[0.2em] text-slate-400 uppercase">
-                                Cedidos
-                            </th>
+                                    <div class="mt-3 inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
+                                        ${cedidosCasa}
+                                    </div>
 
-                            <th class="px-6 py-5 text-right text-[10px] font-jogos tracking-[0.2em] text-slate-400 uppercase">
-                                Visitante
-                            </th>
+                                </div>
 
-                        </tr>
-                    </thead>
+                            </div>
 
-                    <tbody>
+                            <!-- CENTRO -->
+                            <div class="flex flex-col items-center gap-3">
 
-                        ${partidas.map(match => {
+                                <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
 
-                            const cedidosCasa = obterScoutCedidos(
-                                match.clube_visitante_id,
-                                analiseState.scoutSelecionado,
-                                analiseState.posicaoSelecionada,
-                                analiseState.ultimasRodadas
-                            );
+                                    <span class="font-jogos text-[10px] text-slate-400 tracking-[0.2em] text-center leading-tight">
+                                        ${analiseState.scoutSelecionado}
+                                    </span>
 
-                            const cedidosFora = obterScoutCedidos(
-                                match.clube_casa_id,
-                                analiseState.scoutSelecionado,
-                                analiseState.posicaoSelecionada,
-                                analiseState.ultimasRodadas
-                            );
+                                </div>
 
-                            return `
+                                <div class="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] font-black tracking-[0.2em] uppercase">
+                                    ${analiseState.modoAnalise}
+                                </div>
 
-                                <tr class="border-b border-slate-50 hover:bg-orange-50/40 transition-all">
+                            </div>
 
-                                    <td class="px-6 py-5">
+                            <!-- FORA -->
+                            <div class="flex flex-col items-center gap-3 flex-1 min-w-0">
 
-                                        <div class="flex items-center gap-4">
+                                <img src="${getShield(match.clube_visitante_id)}"
+                                     class="w-16 h-16 md:w-20 md:h-20 object-contain">
 
-                                            <img src="${getShield(match.clube_casa_id)}"
-                                                 class="w-12 h-12 object-contain">
+                                <div class="text-center min-w-0">
 
-                                            <div>
-                                                <p class="font-black text-slate-800 text-sm uppercase">
-                                                    ${match.clube_casa_nome}
-                                                </p>
-                                            </div>
+                                    <p class="font-black text-slate-800 text-sm md:text-base uppercase truncate">
+                                        ${getTeamName(match, 'FORA')}
+                                    </p>
 
-                                        </div>
+                                    <div class="mt-3 inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
+                                        ${cedidosFora}
+                                    </div>
 
-                                    </td>
+                                </div>
 
-                                    <td class="px-6 py-5 text-center">
+                            </div>
 
-                                        <div class="inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
-                                            ${cedidosCasa}
-                                        </div>
+                        </div>
 
-                                    </td>
+                    </div>
 
-                                    <td class="px-6 py-5 text-center">
+                `;
 
-                                        <span class="font-jogos text-xs tracking-[0.2em] text-slate-400 uppercase">
-                                            ${analiseState.scoutSelecionado}
-                                        </span>
-
-                                    </td>
-
-                                    <td class="px-6 py-5 text-center">
-
-                                        <div class="inline-flex items-center justify-center min-w-[90px] h-14 rounded-2xl bg-orange-50 border border-orange-100 text-orange-700 font-black text-2xl shadow-sm">
-                                            ${cedidosFora}
-                                        </div>
-
-                                    </td>
-
-                                    <td class="px-6 py-5">
-
-                                        <div class="flex items-center justify-end gap-4">
-
-                                            <div class="text-right">
-                                                <p class="font-black text-slate-800 text-sm uppercase">
-                                                    ${match.clube_visitante_nome}
-                                                </p>
-                                            </div>
-
-                                            <img src="${getShield(match.clube_visitante_id)}"
-                                                 class="w-12 h-12 object-contain">
-
-                                        </div>
-
-                                    </td>
-
-                                </tr>
-
-                            `;
-
-                        }).join('')}
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            }).join('')}
 
         </div>
 
