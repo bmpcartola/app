@@ -185,13 +185,17 @@ async function abrirModalScouts(partida) {
       const scoutsList = Object.entries(scoutData)
         .map(([k, v]) => `<span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-[10px] font-mono mr-1">${v} ${k.toUpperCase()}</span>`)
         .join("");
+       
       
-      let emojis = [];
-      if (scoutData.G) emojis.push(scoutEmoji.G);
-      if (scoutData.A) emojis.push(scoutEmoji.A);
+let emojis = [];
+      //  Multiplica a string do emoji pela quantidade registrada no scout do jogador
+      if (scoutData.G)  emojis.push(scoutEmoji.G.repeat(scoutData.G));
+      if (scoutData.A)  emojis.push(scoutEmoji.A.repeat(scoutData.A));
+      if (scoutData.GC) emojis.push(scoutEmoji.GC.repeat(scoutData.GC));
+      
+      // Mantém exibindo apenas uma vez para cartões, independente do valor
       if (scoutData.CA) emojis.push(scoutEmoji.CA);
       if (scoutData.CV) emojis.push(scoutEmoji.CV);
-      if (scoutData.GC) emojis.push(scoutEmoji.GC);
       
       const pontuacao = (atleta.pontuacao || 0).toFixed(1);
       const pontuacaoClass = atleta.pontuacao >= 0 ? "text-emerald-600" : "text-rose-600";
@@ -221,13 +225,15 @@ async function abrirModalScouts(partida) {
           </div>
           <div class="text-right">
             <div class="font-black font-jersey ${pontuacaoClass} flex items-center justify-end gap-1">
-              ${emojis.length ? `<span class="text-lg">${emojis.join(" ")}</span>` : ""}
+              ${emojis.length ? `<span class="text-sm flex items-center gap-0.5 tracking-tight">${emojis.join(" ")}</span>` : ""}
               <span>${pontuacao}</span>
             </div>
             <div class="text-[10px] mt-1">${scoutsList || "—"}</div>
           </div>
         </div>
       `;
+
+       
     }).join("");
   };
 
