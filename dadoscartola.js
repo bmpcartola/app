@@ -1039,7 +1039,28 @@ function processarIRP() {
         // Média por mando
         let media = 0, totJogosMando = 0;
  
-        if (filtros.mando === "CASA") {
+        if (filtros.mando === "MANDO_RODADA") {
+            // Detecta o mando do clube do atleta na rodada atual
+            const partidas = analiseState.partidas || [];
+            let mandoRodada = null;
+            for (const p of partidas) {
+                const casaSigla = getTeamName(p.clube_casa_id);
+                const foraSigla = getTeamName(p.clube_visitante_id);
+                if (casaSigla === hist.clube) { mandoRodada = "CASA"; break; }
+                if (foraSigla === hist.clube) { mandoRodada = "FORA"; break; }
+            }
+            if (mandoRodada === "CASA") {
+                totJogosMando = hist.jogosCasa;
+                media = totJogosMando ? hist.somaCasa / totJogosMando : 0;
+            } else if (mandoRodada === "FORA") {
+                totJogosMando = hist.jogosFora;
+                media = totJogosMando ? hist.somaFora / totJogosMando : 0;
+            } else {
+                // Clube sem jogo na rodada: usa geral como fallback
+                totJogosMando = hist.jogosGeral;
+                media = totJogosMando ? hist.somaGeral / totJogosMando : 0;
+            }
+        } else if (filtros.mando === "CASA") {
             totJogosMando = hist.jogosCasa;
             media = totJogosMando ? hist.somaCasa / totJogosMando : 0;
         } else if (filtros.mando === "FORA") {
@@ -1342,10 +1363,8 @@ window.renderPainelIRP = async function() {
                     <div class="flex gap-2">
                         <button onclick="window.handleIRPMando('GERAL')" data-valor="GERAL"
                                 class="irp-mando-btn flex-1 h-10 rounded-xl bg-orange-500 text-white font-black text-xs transition-all">GERAL</button>
-                        <button onclick="window.handleIRPMando('CASA')" data-valor="CASA"
-                                class="irp-mando-btn flex-1 h-10 rounded-xl bg-slate-100 text-slate-400 font-black text-xs transition-all">CASA</button>
-                        <button onclick="window.handleIRPMando('FORA')" data-valor="FORA"
-                                class="irp-mando-btn flex-1 h-10 rounded-xl bg-slate-100 text-slate-400 font-black text-xs transition-all">FORA</button>
+                        <button onclick="window.handleIRPMando('MANDO_RODADA')" data-valor="MANDO_RODADA"
+                                class="irp-mando-btn flex-1 h-10 rounded-xl bg-slate-100 text-slate-400 font-black text-xs transition-all">CASA / FORA</button>
                     </div>
                 </div>
  
