@@ -990,12 +990,14 @@ function processarIRP() {
                         clube: sigla,
                         somaGeral: 0, jogosGeral: 0,
                         somaCasa: 0, jogosCasa: 0,
-                        somaFora: 0, jogosFora: 0
+                        somaFora: 0, jogosFora: 0,
+                        pontuacoes: [] // [{rodada, pontuacao}] para desvio padrão e fase
                     };
                 }
  
                 mapa[id].somaGeral += atleta.pontuacao;
                 mapa[id].jogosGeral++;
+                mapa[id].pontuacoes.push({ rodada: partida.rodada, pontuacao: atleta.pontuacao });
  
                 if (mandoRodada === "CASA") {
                     mapa[id].somaCasa += atleta.pontuacao;
@@ -1072,12 +1074,47 @@ function processarIRP() {
         }
  
         if (totJogosMando <= 0 || media <= 0) return;
- 
-        // FÓRMULA IRP
+
+        // ── CRITÉRIO 1: Eficiência (media / mpv) ─────────────────────────
+        const eficiencia = media / mpv;
+
+        // ── CRITÉRIO 2: Margem absoluta (media - mpv) ────────────────────
+        const margem = Math.max(0, media - mpv);
+
+        // ── CRITÉRIO 3: Consistência via desvio padrão ───────────────────
+        const ponts = (hist.pontuacoes || []).map(p => p.pontuacao);
+        let consistencia = 1;
+        if (ponts.length >= 2) {
+            const mediaGeralCalc = hist.somaGeral / hist.jogosGeral;
+            const variancia = ponts.reduce((acc, p) => acc + Math.pow(p - mediaGeralCalc, 2), 0) / ponts.length;
+            const desvio = Math.sqrt(variancia);
+            consistencia = 1 / (1 + desvio);
+        }
+
+        // ── CRITÉRIO 4: Penalização suave por MPV alto (acima de 3) ──────
+        // MPV 3 → 1.0 | MPV 5 → 0.625 | MPV 8 → 0.4
+        const fatorMPV = 1 / (1 + Math.max(0, mpv - 3) * 0.3);
+
+        // ── CRITÉRIO 5: Confiança amostral (satura em 10 jogos) ──────────
         const confianca = Math.min(totJogosMando, 10) / 10;
-        const razao = media / mpv;
-        const irp = razao * preco * confianca;
- 
+
+        // ── CRITÉRIO 6: Fase (média últimos 3 jogos vs média geral) ──────
+        // Independente de mando | neutro (1.0) se menos de 3 jogos
+        let fatorFase = 1.0;
+        if (hist.pontuacoes && hist.pontuacoes.length >= 3) {
+            const ultimas3 = hist.pontuacoes
+                .slice()
+                .sort((a, b) => b.rodada - a.rodada)
+                .slice(0, 3);
+            const mediaFase = ultimas3.reduce((s, p) => s + p.pontuacao, 0) / 3;
+            const mediaGeralAtleta = hist.somaGeral / hist.jogosGeral;
+            // Limita entre 0.5 (má fase) e 1.5 (boa fase)
+            fatorFase = Math.min(1.5, Math.max(0.5, mediaFase / mediaGeralAtleta));
+        }
+
+        // ── COMPOSIÇÃO FINAL ─────────────────────────────────────────────
+        const irp = eficiencia * margem * consistencia * fatorMPV * confianca * fatorFase;
+
         resultado.push({
             id: hist.id,
             nome: hist.nome,
@@ -1088,18 +1125,19 @@ function processarIRP() {
             jogos: totJogosMando,
             media,
             mpv,
-            razao,
+            razao: eficiencia,
             preco,
+            fatorFase,
             irp
         });
     });
- 
+
     window.irpState.cacheProcessado = resultado;
- 
+
     // Normalização: raiz quadrada + escala 0-10
     // Reduz disparidade visual sem alterar o ranking
     if (resultado.length) {
-        const sqrts = resultado.map(r => Math.sqrt(r.irp));
+        const sqrts = resultado.map(r => Math.sqrt(Math.max(0, r.irp)));
         const maxSqrt = Math.max(...sqrts);
         if (maxSqrt > 0) {
             resultado.forEach((r, i) => {
