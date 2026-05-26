@@ -546,7 +546,7 @@ window.renderProvaveis = async function() {
     }
 
     // 4. RENDERIZA O CONTEÚDO FINAL
-    const rodada = provavelState.partidasData.rodada_id || '';
+    const rodada = provavelState.partidasData.rodada || '';
     main.innerHTML = `
         <div class="max-w-7xl mx-auto pb-48 pt-2 px-4 md:px-8 space-y-8 animate-in fade-in duration-1000">
             <div class="text-center space-y-1 mb-2">
