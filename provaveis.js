@@ -397,11 +397,13 @@ const graficoPlaceholder = `
                     textoColor = item.pontuacao >= 0 ? "text-emerald-500" : "text-red-500";
                 }
 
-                // CASO 1: NÃO ATUOU NA RODADA (Traço centralizado abaixo do zero)
+                // CASO 1: NÃO ATUOU NA RODADA (Barra levemente para CIMA, traço ABAIXO)
                 if (!item.atuou) {
                     return `
                         <div class="flex flex-col h-full flex-1 min-w-0 z-10">
-                            <div class="h-1/2"></div>
+                            <div class="flex flex-col items-center h-1/2 justify-end">
+                                <div class="${barraColor} w-[14px] rounded-t-md" style="height:8px"></div>
+                            </div>
                             <div class="flex flex-col items-center h-1/2 pt-2">
                                 <span class="${textoColor} text-[10px] font-black leading-none">-</span>
                             </div>
@@ -409,27 +411,29 @@ const graficoPlaceholder = `
                     `;
                 }
 
-                // CASO 2: PONTUAÇÃO POSITIVA (Fica inteiramente ABAIXO do nível 0, em Verde)
+                // CASO 2: PONTUAÇÃO POSITIVA (Barra para CIMA, nota em Verde ABAIXO)
                 if (item.pontuacao >= 0) {
                     return `
                         <div class="flex flex-col h-full flex-1 min-w-0 z-10">
-                            <div class="h-1/2"></div>
-                            <div class="flex flex-col items-center h-1/2 justify-start">
-                                <div class="${barraColor} w-[14px] rounded-b-md" style="height:${altura}px"></div>
-                                <span class="${textoColor} text-[10px] font-black mt-1 leading-none">${item.pontuacao.toFixed(1)}</span>
+                            <div class="flex flex-col items-center h-1/2 justify-end">
+                                <div class="${barraColor} w-[14px] rounded-t-md" style="height:${altura}px"></div>
+                            </div>
+                            <div class="flex flex-col items-center h-1/2 pt-2">
+                                <span class="${textoColor} text-[10px] font-black leading-none">${item.pontuacao.toFixed(1)}</span>
                             </div>
                         </div>
                     `;
                 }
 
-                // CASO 3: PONTUAÇÃO NEGATIVA (Fica inteiramente ACIMA do nível 0, em Vermelho)
+                // CASO 3: PONTUAÇÃO NEGATIVA (Nota em Vermelho ACIMA, barra para BAIXO)
                 return `
                     <div class="flex flex-col h-full flex-1 min-w-0 z-10">
-                        <div class="flex flex-col items-center h-1/2 justify-end">
-                            <span class="${textoColor} text-[10px] font-black mb-1 leading-none">${item.pontuacao.toFixed(1)}</span>
-                            <div class="${barraColor} w-[14px] rounded-t-md" style="height:${altura}px"></div>
+                        <div class="flex flex-col items-center h-1/2 justify-end pb-2">
+                            <span class="${textoColor} text-[10px] font-black leading-none">${item.pontuacao.toFixed(1)}</span>
                         </div>
-                        <div class="h-1/2"></div>
+                        <div class="flex flex-col items-center h-1/2 justify-start">
+                            <div class="${barraColor} w-[14px] rounded-b-md" style="height:${altura}px"></div>
+                        </div>
                     </div>
                 `;
             }).join("")}
