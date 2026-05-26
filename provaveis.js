@@ -377,100 +377,89 @@ const maxPontuacao = Math.max(
 );
 
        
-const graficoPlaceholder = `
-    
-    <div class="w-full px-2">
+ const graficoPlaceholder = `
+            <div class="w-full px-2">
+                <div class="relative w-full h-[140px] flex items-center justify-between gap-1">
+                    <div class="absolute top-1/2 left-0 w-full border-t border-slate-300 z-0"></div>
 
-        <div class="relative w-full h-[120px] flex items-center justify-between gap-1">
+                    ${ultimasPontuacoes.map(item => {
+                        let altura = 8;
+                        if (item.atuou) {
+                            // Calcula a altura limitando ao espaço de metade do gráfico (70px) menos a margem do texto
+                            altura = (Math.abs(item.pontuacao) / maxPontuacao) * 45;
+                            altura = Math.max(altura, 8);
+                        }
 
-            <div class="absolute top-1/2 left-0 w-full border-t border-slate-300"></div>
+                        let barraColor = "bg-slate-300/50";
+                        let textoColor = "text-slate-400";
 
-            ${ultimasPontuacoes.map(item => {
+                        if (item.atuou) {
+                            barraColor = item.mando === "CASA" ? "bg-sky-400/40" : "bg-orange-400/40";
+                            textoColor = item.pontuacao >= 0 ? "text-emerald-500" : "text-red-500";
+                        }
 
-                let altura = 8;
+                        // CASO 1: NÃO ATUOU NA RODADA (Fica centralizado abaixo do 0)
+                        if (!item.atuou) {
+                            return `
+                                <div class="flex flex-col h-full flex-1 min-w-0 z-10">
+                                    <div class="h-1/2"></div>
+                                    <div class="flex flex-col items-center h-1/2 pt-2">
+                                        <span class="${textoColor} text-[10px] font-black leading-none">-</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
 
-                if (item.atuou) {
-                    altura = (Math.abs(item.pontuacao) / maxPontuacao) * 52;
-                    altura = Math.max(altura, 10);
-                }
+                        // CASO 2: PONTUAÇÃO POSITIVA (Fica totalmente ABAIXO do nível 0, em Verde)
+                        if (item.pontuacao >= 0) {
+                            return `
+                                <div class="flex flex-col h-full flex-1 min-w-0 z-10">
+                                    <div class="h-1/2"></div>
+                                    <div class="flex flex-col items-center h-1/2 justify-start">
+                                        <div class="${barraColor} w-[14px] rounded-b-md" style="height:${altura}px"></div>
+                                        <span class="${textoColor} text-[10px] font-black mt-1 leading-none">${item.pontuacao.toFixed(1)}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
 
-                let barraColor = "bg-slate-300/50";
-                let textoColor = "text-slate-400";
-
-                if (item.atuou) {
-                    barraColor = item.mando === "CASA" ? "bg-sky-400/40" : "bg-orange-400/40";
-                    textoColor = item.pontuacao >= 0 ? "text-emerald-500" : "text-red-500";
-                }
-
-                // CASO 1: NÃO ATUOU NA RODADA
-                if (!item.atuou) {
-                    return `
-                        <div class="flex flex-col items-center justify-center h-full flex-1 min-w-0">
-                            <div class="flex items-end h-1/2">
-                                <div class="${barraColor} w-[14px] rounded-t-md" style="height:${altura}px"></div>
+                        // CASO 3: PONTUAÇÃO NEGATIVA (Fica totalmente ACIMA do nível 0, em Vermelho)
+                        return `
+                            <div class="flex flex-col h-full flex-1 min-w-0 z-10">
+                                <div class="flex flex-col items-center h-1/2 justify-end">
+                                    <span class="${textoColor} text-[10px] font-black mb-1 leading-none">${item.pontuacao.toFixed(1)}</span>
+                                    <div class="${barraColor} w-[14px] rounded-t-md" style="height:${altura}px"></div>
+                                </div>
+                                <div class="h-1/2"></div>
                             </div>
-                            <div class="flex items-start justify-center pt-2 h-1/2">
-                                <span class="${textoColor} text-[10px] font-black leading-none">-</span>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // CASO 2: PONTUAÇÃO POSITIVA (Texto fica abaixo do nível 0, barra para cima)
-                if (item.pontuacao >= 0) {
-                    return `
-                        <div class="flex flex-col items-center justify-center h-full flex-1">
-                            <div class="flex items-end h-1/2">
-                                <div class="${barraColor} w-[14px] rounded-t-md" style="height:${altura}px"></div>
-                            </div>
-                            <div class="flex items-start justify-center pt-2 h-1/2">
-                                <span class="${textoColor} text-[10px] font-black">${item.pontuacao.toFixed(1)}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                // CASO 3: PONTUAÇÃO NEGATIVA (Texto fica acima do nível 0, barra para baixo)
-                return `
-                    <div class="flex flex-col items-center justify-center h-full flex-1">
-                        <div class="flex flex-col items-center justify-end h-1/2 pb-2">
-                            <span class="${textoColor} text-[10px] font-black">${item.pontuacao.toFixed(1)}</span>
-                        </div>
-                        <div class="flex items-start h-1/2">
-                            <div class="${barraColor} w-[14px] rounded-b-md" style="height:${altura}px"></div>
-                        </div>
-                    </div>
-                `;
-
-            }).join("")}
-
-        </div>
-
-        <div class="w-full flex items-center justify-between gap-1 mt-1 mb-4 select-none">
-            ${ultimasPontuacoes.map(item => `
-                <div class="flex-1 text-center text-[9px] text-slate-400 font-mono font-bold">
-                    ${item.rodada}
+                        `;
+                    }).join("")}
                 </div>
-            `).join("")}
-        </div>
 
-        <div class="w-full flex items-center justify-center gap-3 pb-1">
-            <div class="flex items-center gap-1">
-                <div class="w-2 h-2 rounded-full bg-sky-400/60"></div>
-                <span class="text-[8px] text-slate-400 font-medium uppercase">Casa</span>
-            </div>
-            <div class="flex items-center gap-1">
-                <div class="w-2 h-2 rounded-full bg-orange-400/60"></div>
-                <span class="text-[8px] text-slate-400 font-medium uppercase">Fora</span>
-            </div>
-            <div class="flex items-center gap-1">
-                <div class="w-2 h-2 rounded-full bg-slate-300"></div>
-                <span class="text-[8px] text-slate-400 font-medium uppercase">Não jogou</span>
-            </div>
-        </div>
+                <div class="w-full flex items-center justify-between gap-1 mt-2 mb-4 select-none">
+                    ${ultimasPontuacoes.map(item => `
+                        <div class="flex-1 text-center text-[10px] text-slate-400 font-mono font-bold">
+                            ${item.rodada}
+                        </div>
+                    `).join("")}
+                </div>
 
-    </div>
-`;
+                <div class="w-full flex items-center justify-center gap-3 pb-1">
+                    <div class="flex items-center gap-1">
+                        <div class="w-2 h-2 rounded-full bg-sky-400/60"></div>
+                        <span class="text-[8px] text-slate-400 font-medium uppercase">Casa</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <div class="w-2 h-2 rounded-full bg-orange-400/60"></div>
+                        <span class="text-[8px] text-slate-400 font-medium uppercase">Fora</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <div class="w-2 h-2 rounded-full bg-slate-300"></div>
+                        <span class="text-[8px] text-slate-400 font-medium uppercase">Não jogou</span>
+                    </div>
+                </div>
+            </div>
+        `;
                    
 
 }
