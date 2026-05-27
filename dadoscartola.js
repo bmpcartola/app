@@ -1554,13 +1554,6 @@ window.renderPainelIRP = async function() {
                 </div>
             </div>
  
-            <!-- FÓRMULA — abaixo da tabela, tom suave -->
-            <div class="mt-4 px-1">
-                <p class="text-[9px] font-mono" style="color:#d1d5db;">
-                    IRP = (Média ÷ MPV) × Preço × (min(jogos, 10) ÷ 10) &nbsp;·&nbsp; MPV negativo ou zero tratado como 0.01
-                </p>
-            </div>
- 
         </div>
     `;
  
