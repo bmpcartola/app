@@ -971,16 +971,7 @@ function processarIRP() {
  
                 if (filtros.posicoes.length && !filtros.posicoes.includes(atleta.pos)) return;
  
-                const jogou = (
-                    atleta.pontuacao !== 0 ||
-                    atleta.G > 0 || atleta.A > 0 ||
-                    atleta.DS > 0 || atleta.DE > 0 ||
-                    atleta.FC > 0 || atleta.FS > 0 ||
-                    atleta.CA > 0 || atleta.CV > 0 ||
-                    atleta.GS > 0
-                );
- 
-                if (!jogou) return;
+
  
                 if (!mapa[id]) {
                     mapa[id] = {
