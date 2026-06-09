@@ -5504,7 +5504,7 @@
       "rdd": 17,
       "val": 2.27,
       "re": 0,
-      "pen": 0,
+      "pen": 2.27,
       "formacao": 433,
       "jogadores": [
         {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":-0.62,"status":"T"},
@@ -5530,7 +5530,7 @@
       "rdd": 18,
       "val": 7.72,
       "re": 0,
-      "pen": 0,
+      "pen": 7.72,
       "formacao": 433,
       "jogadores": [
         {"nome":"SANTOS","pos":"GOL","clube":"CAP","val":1.13,"status":"T"},
