@@ -95,6 +95,18 @@ function getMaxRound() {
     return max;
 }
 
+function getAvailableRounds() {
+    const serieData = getSerieData();
+    if (!serieData || serieData.length === 0) return [1];
+    const roundSet = new Set();
+    serieData.forEach(team => {
+        team.rodadas.forEach(round => {
+            roundSet.add(round.rdd);
+        });
+    });
+    return Array.from(roundSet).sort((a, b) => a - b);
+}
+
 function getRanking(round) {
     const serieData = getSerieData();
     if (!serieData) return [];
@@ -161,8 +173,7 @@ function renderHeaderControls() {
         return;
     }
 
-    const maxRound = getMaxRound();
-    const rounds = Array.from({ length: maxRound }, (_, i) => i + 1).reverse();
+    const rounds = getAvailableRounds().reverse();
 
     headerControls.innerHTML = `
         <div class="flex items-center gap-2 md:gap-3">
