@@ -635,7 +635,7 @@
       "rdd": 20,
       "val": 6.36,
       "re": -5,
-      "pen": 0,
+      "pen": 6.36,
       "formacao": 433,
       "jogadores": [
         {"nome":"HUGO SOUZA","pos":"GOL","clube":"COR","val":-0.69,"status":"T"},
@@ -852,7 +852,7 @@
       "rdd": 20,
       "val": 3.53,
       "re": 0,
-      "pen": 0,
+      "pen": 3.53,
       "formacao": 433,
       "jogadores": [
         {"nome":"TIAGO VOLPI","pos":"GOL","clube":"RBB","val":0.1,"status":"T"},
