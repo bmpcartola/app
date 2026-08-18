@@ -1165,7 +1165,7 @@
       "rdd": 23,
       "val": 2.8,
       "re": 0,
-      "pen": 0,
+      "pen": 2.8,
       "formacao": 451,
       "jogadores": [
         {"nome":"GABRIEL BRAZÃO","pos":"GOL","clube":"SAN","val":1.23,"status":"T"},
