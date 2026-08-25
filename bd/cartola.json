@@ -1441,7 +1441,7 @@
       "rdd": 24,
       "val": 0.97,
       "re": 0,
-      "pen": 0,
+      "pen": 0.97,
       "formacao": 451,
       "jogadores": [
         {"nome":"GABRIEL BRAZÃO","pos":"GOL","clube":"SAN","val":-1.04,"status":"T"},
@@ -1515,7 +1515,7 @@
       "rdd": 22,
       "val": 6.39,
       "re": 0,
-      "pen": 0,
+      "pen": 6.39,
       "formacao": 433,
       "jogadores": [
         {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.28,"status":"T"},
@@ -1541,7 +1541,7 @@
       "rdd": 23,
       "val": 8.86,
       "re": 0,
-      "pen": 0,
+      "pen": 8.86,
       "formacao": 433,
       "jogadores": [
         {"nome":"TIAGO VOLPI","pos":"GOL","clube":"RBB","val":1.07,"status":"T"},
@@ -1567,7 +1567,7 @@
       "rdd": 24,
       "val": 6.48,
       "re": 0,
-      "pen": 0,
+      "pen": 6.48,
       "formacao": 433,
       "jogadores": [
         {"nome":"RONALDO","pos":"GOL","clube":"BAH","val":1.61,"status":"T"},
@@ -2029,7 +2029,7 @@
       "rdd": 22,
       "val": 7.14,
       "re": 0,
-      "pen": 0,
+      "pen": 7.14,
       "formacao": 433,
       "jogadores": [
         {"nome":"WALTER","pos":"GOL","clube":"MIR","val":0,"status":"T"},
@@ -2076,7 +2076,7 @@
       "rdd": 24,
       "val": 7.07,
       "re": 0,
-      "pen": 0,
+      "pen": 7.07,
       "formacao": 433,
       "jogadores": [
         {"nome":"WALTER","pos":"GOL","clube":"MIR","val":1.37,"status":"T"},
