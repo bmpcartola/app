@@ -210,6 +210,32 @@
         {"nome":"ERICK PULGAR","pos":"MEI","clube":"FLA","val":0.34,"status":"R"},
         {"nome":"ISIDRO PITTA","pos":"ATA","clube":"RBB","val":0.2,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 6.74,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"DANTAS","pos":"ZAG","clube":"CAP","val":-0.26,"status":"T"},
+        {"nome":"YAGO PIKACHU","pos":"MEI","clube":"REM","val":0.62,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"DENILSON","pos":"MEI","clube":"MIR","val":0.37,"status":"T"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"PEDRO GABRIEL","pos":"LAT","clube":"GRE","val":1.69,"status":"R"},
+        {"nome":"CACÁ","pos":"ZAG","clube":"VIT","val":0.38,"status":"R"},
+        {"nome":"CHICO KIM","pos":"MEI","clube":"MIR","val":0.25,"status":"R"},
+        {"nome":"FERNANDINHO","pos":"ATA","clube":"MIR","val":0,"status":"R"}
+      ]
       }
     ]
   },
@@ -424,6 +450,32 @@
         {"nome":"REINIER","pos":"MEI","clube":"CAM","val":2.59,"status":"R"},
         {"nome":"ISIDRO PITTA","pos":"ATA","clube":"RBB","val":0.2,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 8.95,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"REINALDO","pos":"LAT","clube":"MIR","val":0.97,"status":"T"},
+        {"nome":"FABRÍCIO BRUNO","pos":"ZAG","clube":"CRU","val":0.23,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"T"},
+        {"nome":"GANSO","pos":"MEI","clube":"FLU","val":0.89,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"THIAGO CARPINI","pos":"TEC","clube":"REM","val":0.63,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"PEDRO GABRIEL","pos":"LAT","clube":"GRE","val":1.69,"status":"R"},
+        {"nome":"EDUARDO DOMA","pos":"ZAG","clube":"CHA","val":0.55,"status":"R"},
+        {"nome":"ALLAN","pos":"MEI","clube":"COR","val":0,"status":"R"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"R"}
+      ]
       }
     ]
   },
@@ -626,6 +678,32 @@
         {"nome":"FREYTES","pos":"ZAG","clube":"FLU","val":0.12,"status":"R"},
         {"nome":"ALAN PATRICK","pos":"MEI","clube":"INT","val":0.45,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 6.49,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"DANTAS","pos":"ZAG","clube":"CAP","val":-0.26,"status":"T"},
+        {"nome":"ANDREAS PEREIRA","pos":"MEI","clube":"PAL","val":0.39,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"PEDRO GABRIEL","pos":"LAT","clube":"GRE","val":1.69,"status":"R"},
+        {"nome":"CACÁ","pos":"ZAG","clube":"VIT","val":0.38,"status":"R"},
+        {"nome":"MARLON FREITAS","pos":"MEI","clube":"PAL","val":0.81,"status":"R"},
+        {"nome":"MINDA","pos":"ATA","clube":"CAM","val":0.26,"status":"R"}
       ]
       }
     ]
@@ -841,6 +919,32 @@
         {"nome":"REINIER","pos":"MEI","clube":"CAM","val":2.59,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 8.68,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"PEDRO LIMA","pos":"LAT","clube":"SAO","val":3.27,"status":"T"},
+        {"nome":"VITOR HUGO","pos":"ZAG","clube":"CAM","val":-0.35,"status":"T"},
+        {"nome":"FABRÍCIO BRUNO","pos":"ZAG","clube":"CRU","val":0.23,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"T"},
+        {"nome":"ARTUR","pos":"ATA","clube":"SAO","val":0.05,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"CALLERI","pos":"ATA","clube":"SAO","val":0.77,"status":"T"},
+        {"nome":"THIAGO CARPINI","pos":"TEC","clube":"REM","val":0.63,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"BUSTOS","pos":"LAT","clube":"CFC","val":-0.7,"status":"R"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"R"},
+        {"nome":"DENILSON","pos":"MEI","clube":"MIR","val":0.37,"status":"R"},
+        {"nome":"MINDA","pos":"ATA","clube":"CAM","val":0.26,"status":"R"}
+      ]
       }
     ]
   },
@@ -1049,6 +1153,32 @@
         {"nome":"DAVID DUARTE","pos":"ZAG","clube":"BAH","val":-0.03,"status":"R"},
         {"nome":"ZIYECH","pos":"MEI","clube":"BOT","val":0,"status":"R"},
         {"nome":"TÚLIO EDUARDO","pos":"ATA","clube":"CHA","val":-0.15,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 6.09,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"EDUARDO DOMA","pos":"ZAG","clube":"CHA","val":0.55,"status":"T"},
+        {"nome":"ZIYECH","pos":"MEI","clube":"BOT","val":-0.73,"status":"T"},
+        {"nome":"CARRASCAL","pos":"MEI","clube":"FLA","val":1.39,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"SANTOS","pos":"GOL","clube":"CAP","val":0,"status":"R"},
+        {"nome":"ENZO DÍAZ","pos":"LAT","clube":"SAO","val":0,"status":"R"},
+        {"nome":"BRUNO FUCHS","pos":"ZAG","clube":"PAL","val":0,"status":"R"},
+        {"nome":"BRENO BIDON","pos":"MEI","clube":"COR","val":0.53,"status":"R"},
+        {"nome":"FERNANDINHO","pos":"ATA","clube":"MIR","val":0,"status":"R"}
       ]
       }
     ]
@@ -1262,6 +1392,31 @@
         {"nome":"OTÁVIO","pos":"MEI","clube":"FLU","val":0.77,"status":"R"},
         {"nome":"ISIDRO PITTA","pos":"ATA","clube":"RBB","val":0.2,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 8.86,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"PEDRO GABRIEL","pos":"LAT","clube":"GRE","val":1.69,"status":"T"},
+        {"nome":"TIAGO CÓSER","pos":"ZAG","clube":"CFC","val":0.26,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"GANSO","pos":"MEI","clube":"FLU","val":0.89,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"KANU","pos":"ZAG","clube":"BAH","val":-0.08,"status":"R"},
+        {"nome":"ALAN FRANCO","pos":"MEI","clube":"CAM","val":0,"status":"R"},
+        {"nome":"FERNANDINHO","pos":"ATA","clube":"MIR","val":0,"status":"R"}
+      ]
       }
     ]
   },
@@ -1469,6 +1624,32 @@
         {"nome":"CARBONERO","pos":"ATA","clube":"INT","val":1.48,"status":"T"},
         {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":-1.71,"status":"T"},
         {"nome":"FERNANDO DINIZ","pos":"TEC","clube":"COR","val":-0.1,"status":"T"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 5.7,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"GIAY","pos":"LAT","clube":"PAL","val":0.08,"status":"T"},
+        {"nome":"TIAGO CÓSER","pos":"ZAG","clube":"CFC","val":0.26,"status":"T"},
+        {"nome":"LUCAS MONZÓN","pos":"ZAG","clube":"BOT","val":0.09,"status":"T"},
+        {"nome":"ANDREAS PEREIRA","pos":"MEI","clube":"PAL","val":0.39,"status":"T"},
+        {"nome":"LUCAS PAQUETÁ","pos":"MEI","clube":"FLA","val":0,"status":"T"},
+        {"nome":"JOSUÉ","pos":"MEI","clube":"CFC","val":0.17,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"ARTUR JORGE","pos":"TEC","clube":"CRU","val":0.32,"status":"T"},
+        {"nome":"SANTOS","pos":"GOL","clube":"CAP","val":0,"status":"R"},
+        {"nome":"JUNINHO CAPIXABA","pos":"LAT","clube":"RBB","val":0,"status":"R"},
+        {"nome":"MURILO","pos":"ZAG","clube":"PAL","val":0,"status":"R"},
+        {"nome":"ALLAN","pos":"MEI","clube":"COR","val":0,"status":"R"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"R"}
       ]
       }
     ]
@@ -1684,6 +1865,32 @@
         {"nome":"ACEVEDO","pos":"MEI","clube":"BAH","val":0.28,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 3.39,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"BERNABEI","pos":"LAT","clube":"INT","val":-0.65,"status":"T"},
+        {"nome":"DAVID DUARTE","pos":"ZAG","clube":"BAH","val":0.49,"status":"T"},
+        {"nome":"ARTHUR DIAS","pos":"ZAG","clube":"CAP","val":0.44,"status":"T"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"T"},
+        {"nome":"DANILO","pos":"MEI","clube":"BOT","val":-0.57,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"TITE","pos":"TEC","clube":"BOT","val":-0.77,"status":"T"},
+        {"nome":"MATHEUS CUNHA","pos":"GOL","clube":"INT","val":0,"status":"R"},
+        {"nome":"BRUNO MELO","pos":"LAT","clube":"CFC","val":-0.04,"status":"R"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"R"},
+        {"nome":"GANSO","pos":"MEI","clube":"FLU","val":0.89,"status":"R"},
+        {"nome":"LEOZINHO","pos":"ATA","clube":"CAP","val":-0.05,"status":"R"}
+      ]
       }
     ]
   },
@@ -1896,6 +2103,32 @@
         {"nome":"DANILO","pos":"ZAG","clube":"FLA","val":0.12,"status":"R"},
         {"nome":"ERICK PULGAR","pos":"MEI","clube":"FLA","val":0.34,"status":"R"},
         {"nome":"ISIDRO PITTA","pos":"ATA","clube":"RBB","val":0.2,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 7.77,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BIDU","pos":"LAT","clube":"COR","val":0.41,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"FABRÍCIO BRUNO","pos":"ZAG","clube":"CRU","val":0.23,"status":"T"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"VARGAS","pos":"ATA","clube":"CAP","val":2.05,"status":"T"},
+        {"nome":"ARTUR","pos":"ATA","clube":"SAO","val":0.05,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"MYCAEL","pos":"GOL","clube":"CAP","val":0.9,"status":"R"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"R"},
+        {"nome":"TIAGO CÓSER","pos":"ZAG","clube":"CFC","val":0.26,"status":"R"},
+        {"nome":"SANTIAGO SOSA","pos":"MEI","clube":"VAS","val":0.45,"status":"R"},
+        {"nome":"LEOZINHO","pos":"ATA","clube":"CAP","val":-0.05,"status":"R"}
       ]
       }
     ]
@@ -2111,6 +2344,32 @@
         {"nome":"ACEVEDO","pos":"MEI","clube":"BAH","val":0.28,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 3.17,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"REINALDO","pos":"LAT","clube":"MIR","val":0.97,"status":"T"},
+        {"nome":"RENAN LODI","pos":"LAT","clube":"CAM","val":-0.46,"status":"T"},
+        {"nome":"THIAGO SILVA","pos":"ZAG","clube":"FLU","val":-0.66,"status":"T"},
+        {"nome":"ARTHUR DIAS","pos":"ZAG","clube":"CAP","val":0.44,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"FRED","pos":"MEI","clube":"CAM","val":-0.5,"status":"T"},
+        {"nome":"ARIAS","pos":"MEI","clube":"PAL","val":-0.24,"status":"T"},
+        {"nome":"FLACO LÓPEZ","pos":"ATA","clube":"PAL","val":-0.03,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"WALTER","pos":"GOL","clube":"MIR","val":1.24,"status":"R"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"R"},
+        {"nome":"LYANCO","pos":"ZAG","clube":"CAM","val":0,"status":"R"},
+        {"nome":"LUIZ GUSTAVO","pos":"MEI","clube":"CAP","val":-0.72,"status":"R"},
+        {"nome":"SOTELDO","pos":"ATA","clube":"FLU","val":0,"status":"R"}
+      ]
       }
     ]
   }
@@ -2286,6 +2545,27 @@
         {"nome":"GABRIEL BONTEMPO","pos":"MEI","clube":"SAN","val":0.26,"status":"T"},
         {"nome":"ÊNIO","pos":"ATA","clube":"OUT","val":0,"status":"T"},
         {"nome":"CUCA","pos":"TEC","clube":"SAN","val":-0.05,"status":"T"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": -1.19,
+      "re": 0,
+      "pen": 0,
+      "formacao": 451,
+      "jogadores": [
+        {"nome":"GABRIEL BRAZÃO","pos":"GOL","clube":"SAN","val":0,"status":"T"},
+        {"nome":"BRUNO PACHECO","pos":"LAT","clube":"CHA","val":-0.42,"status":"T"},
+        {"nome":"IGOR VINÍCIUS","pos":"LAT","clube":"SAN","val":0,"status":"T"},
+        {"nome":"EDUARDO DOMA","pos":"ZAG","clube":"CHA","val":0.55,"status":"T"},
+        {"nome":"JOÃO ANANIAS","pos":"ZAG","clube":"SAN","val":0,"status":"T"},
+        {"nome":"ROLLHEISER","pos":"MEI","clube":"SAN","val":0,"status":"T"},
+        {"nome":"HIGOR MERITÃO","pos":"MEI","clube":"OUT","val":0,"status":"T"},
+        {"nome":"GABRIEL BONTEMPO","pos":"MEI","clube":"SAN","val":-0.64,"status":"T"},
+        {"nome":"CAMILO","pos":"MEI","clube":"CHA","val":-0.47,"status":"T"},
+        {"nome":"NEYMAR","pos":"MEI","clube":"SAN","val":0,"status":"T"},
+        {"nome":"ÊNIO","pos":"ATA","clube":"OUT","val":0,"status":"T"},
+        {"nome":"CUCA","pos":"TEC","clube":"SAN","val":-0.21,"status":"T"}
       ]
       }
     ]
@@ -2495,6 +2775,32 @@
         {"nome":"ERICK PULGAR","pos":"MEI","clube":"FLA","val":0.34,"status":"R"},
         {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":-0.69,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 7.16,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BIDU","pos":"LAT","clube":"COR","val":0.41,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"WILLIAN MACHADO","pos":"ZAG","clube":"MIR","val":1.23,"status":"T"},
+        {"nome":"VITOR HUGO","pos":"ZAG","clube":"CAM","val":-0.35,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"CALLERI","pos":"ATA","clube":"SAO","val":0.77,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"FERNANDO DINIZ","pos":"TEC","clube":"COR","val":0.03,"status":"T"},
+        {"nome":"RONALDO","pos":"GOL","clube":"BAH","val":0.5,"status":"R"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"R"},
+        {"nome":"KANU","pos":"ZAG","clube":"BAH","val":-0.08,"status":"R"},
+        {"nome":"MAYCON","pos":"MEI","clube":"CAM","val":-0.17,"status":"R"},
+        {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.45,"status":"R"}
+      ]
       }
     ]
   },
@@ -2668,6 +2974,27 @@
         {"nome":"CUELLO","pos":"ATA","clube":"CAM","val":2.25,"status":"T"},
         {"nome":"FLACO LÓPEZ","pos":"ATA","clube":"PAL","val":0,"status":"T"},
         {"nome":"ABEL FERREIRA","pos":"TEC","clube":"PAL","val":0.44,"status":"T"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": -1.18,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"CARLOS MIGUEL","pos":"GOL","clube":"PAL","val":0.38,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"GIAY","pos":"LAT","clube":"PAL","val":0.08,"status":"T"},
+        {"nome":"GUSTAVO GÓMEZ","pos":"ZAG","clube":"PAL","val":-0.45,"status":"T"},
+        {"nome":"MURILO","pos":"ZAG","clube":"PAL","val":0,"status":"T"},
+        {"nome":"ARIAS","pos":"MEI","clube":"PAL","val":-0.24,"status":"T"},
+        {"nome":"MARLON FREITAS","pos":"MEI","clube":"PAL","val":0.81,"status":"T"},
+        {"nome":"FELIPE ANDERSON","pos":"MEI","clube":"PAL","val":-0.08,"status":"T"},
+        {"nome":"CANOBBIO","pos":"ATA","clube":"FLU","val":-1.02,"status":"T"},
+        {"nome":"CUELLO","pos":"ATA","clube":"CAM","val":-1.13,"status":"T"},
+        {"nome":"FLACO LÓPEZ","pos":"ATA","clube":"PAL","val":-0.03,"status":"T"},
+        {"nome":"ABEL FERREIRA","pos":"TEC","clube":"PAL","val":-0.31,"status":"T"}
       ]
       }
     ]
@@ -2883,6 +3210,32 @@
         {"nome":"THIAGO MENDES","pos":"MEI","clube":"VAS","val":0.86,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 4.93,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"RENAN LODI","pos":"LAT","clube":"CAM","val":-0.46,"status":"T"},
+        {"nome":"ESQUIVEL","pos":"LAT","clube":"CAP","val":1.7,"status":"T"},
+        {"nome":"LÉO ORTIZ","pos":"ZAG","clube":"FLA","val":-0.5,"status":"T"},
+        {"nome":"LYANCO","pos":"ZAG","clube":"CAM","val":0,"status":"T"},
+        {"nome":"LUIZ GUSTAVO","pos":"MEI","clube":"CAP","val":-0.72,"status":"T"},
+        {"nome":"FRED","pos":"MEI","clube":"CAM","val":-0.5,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"VARGAS","pos":"ATA","clube":"CAP","val":2.05,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"ANDRÉS GÓMEZ","pos":"ATA","clube":"VAS","val":1.27,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"MYCAEL","pos":"GOL","clube":"CAP","val":0.9,"status":"R"},
+        {"nome":"FAGNER","pos":"LAT","clube":"CRU","val":-0.63,"status":"R"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"R"},
+        {"nome":"JADSON","pos":"MEI","clube":"CAP","val":-0.08,"status":"R"},
+        {"nome":"LEOZINHO","pos":"ATA","clube":"CAP","val":-0.05,"status":"R"}
+      ]
       }
     ]
   },
@@ -3092,6 +3445,32 @@
         {"nome":"CARRASCAL","pos":"MEI","clube":"FLA","val":-0.41,"status":"R"},
         {"nome":"LINGARD","pos":"ATA","clube":"COR","val":-0.03,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 5.93,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BIDU","pos":"LAT","clube":"COR","val":0.41,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"FABRÍCIO BRUNO","pos":"ZAG","clube":"CRU","val":0.23,"status":"T"},
+        {"nome":"ANDREAS PEREIRA","pos":"MEI","clube":"PAL","val":0.39,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"FERNANDO","pos":"ATA","clube":"RBB","val":0.13,"status":"T"},
+        {"nome":"MENDOZA","pos":"ATA","clube":"CAP","val":0.64,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"MATHEUS CUNHA","pos":"GOL","clube":"INT","val":0,"status":"R"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"R"},
+        {"nome":"EDUARDO DOMA","pos":"ZAG","clube":"CHA","val":0.55,"status":"R"},
+        {"nome":"DENILSON","pos":"MEI","clube":"MIR","val":0.37,"status":"R"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"R"}
+      ]
       }
     ]
   },
@@ -3285,6 +3664,27 @@
         {"nome":"GALEANO","pos":"ATA","clube":"REM","val":-0.09,"status":"T"},
         {"nome":"KAIQUE KENJI","pos":"ATA","clube":"CRU","val":0,"status":"T"},
         {"nome":"LUÍS CASTRO","pos":"TEC","clube":"OUT","val":0.24,"status":"T"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 2.82,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"FÁBIO","pos":"GOL","clube":"FLU","val":0.22,"status":"T"},
+        {"nome":"LUAN CÂNDIDO","pos":"LAT","clube":"VIT","val":0.57,"status":"T"},
+        {"nome":"REINALDO","pos":"LAT","clube":"MIR","val":0.97,"status":"T"},
+        {"nome":"MARLLON","pos":"ZAG","clube":"REM","val":0.69,"status":"T"},
+        {"nome":"CARLOS CUESTA","pos":"ZAG","clube":"VAS","val":0,"status":"T"},
+        {"nome":"LUIZ GUSTAVO","pos":"MEI","clube":"CAP","val":-0.72,"status":"T"},
+        {"nome":"MARLON FREITAS","pos":"MEI","clube":"PAL","val":0.81,"status":"T"},
+        {"nome":"PICCO","pos":"MEI","clube":"REM","val":-0.07,"status":"T"},
+        {"nome":"KAIQUE KENJI","pos":"ATA","clube":"CRU","val":0,"status":"T"},
+        {"nome":"GALEANO","pos":"ATA","clube":"REM","val":0.26,"status":"T"},
+        {"nome":"PAVÓN","pos":"ATA","clube":"GRE","val":0.09,"status":"T"},
+        {"nome":"LUÍS CASTRO","pos":"TEC","clube":"OUT","val":0,"status":"T"}
       ]
       }
     ]
@@ -3494,6 +3894,32 @@
         {"nome":"FREYTES","pos":"ZAG","clube":"FLU","val":0.12,"status":"R"},
         {"nome":"ACEVEDO","pos":"MEI","clube":"BAH","val":0.28,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 6.23,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"RENAN LODI","pos":"LAT","clube":"CAM","val":-0.46,"status":"T"},
+        {"nome":"DANTAS","pos":"ZAG","clube":"CAP","val":-0.26,"status":"T"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"CALLERI","pos":"ATA","clube":"SAO","val":0.77,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"RENATO GAÚCHO","pos":"TEC","clube":"GRE","val":0.3,"status":"T"},
+        {"nome":"RONALDO","pos":"GOL","clube":"BAH","val":0.5,"status":"R"},
+        {"nome":"GILBERTO","pos":"LAT","clube":"CAP","val":-0.67,"status":"R"},
+        {"nome":"LYANCO","pos":"ZAG","clube":"CAM","val":0,"status":"R"},
+        {"nome":"ALAN FRANCO","pos":"MEI","clube":"CAM","val":0,"status":"R"},
+        {"nome":"SOTELDO","pos":"ATA","clube":"FLU","val":0,"status":"R"}
       ]
       }
     ]
@@ -3708,6 +4134,32 @@
         {"nome":"REINIER","pos":"MEI","clube":"CAM","val":2.59,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
       ]
+      },
+      {
+      "rdd": 28,
+      "val": 7.16,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"MATHEUS BIDU","pos":"LAT","clube":"COR","val":0.41,"status":"T"},
+        {"nome":"WILLIAN MACHADO","pos":"ZAG","clube":"MIR","val":1.23,"status":"T"},
+        {"nome":"VITOR HUGO","pos":"ZAG","clube":"CAM","val":-0.35,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"KAIO JORGE","pos":"ATA","clube":"CRU","val":0.62,"status":"T"},
+        {"nome":"CALLERI","pos":"ATA","clube":"SAO","val":0.77,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"FERNANDO DINIZ","pos":"TEC","clube":"COR","val":0.03,"status":"T"},
+        {"nome":"RONALDO","pos":"GOL","clube":"BAH","val":0.5,"status":"R"},
+        {"nome":"PAULO HENRIQUE","pos":"LAT","clube":"VAS","val":0.74,"status":"R"},
+        {"nome":"TCHAMBA","pos":"ZAG","clube":"REM","val":-0.11,"status":"R"},
+        {"nome":"MAYCON","pos":"MEI","clube":"CAM","val":-0.17,"status":"R"},
+        {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.45,"status":"R"}
+      ]
       }
     ]
   },
@@ -3909,6 +4361,32 @@
         {"nome":"FREYTES","pos":"ZAG","clube":"FLU","val":0.12,"status":"R"},
         {"nome":"ERIC RAMIRES","pos":"MEI","clube":"RBB","val":0.1,"status":"R"},
         {"nome":"LINGARD","pos":"ATA","clube":"COR","val":-0.03,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 6.33,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"T"},
+        {"nome":"BRUNO MELO","pos":"LAT","clube":"CFC","val":-0.04,"status":"T"},
+        {"nome":"TIAGO CÓSER","pos":"ZAG","clube":"CFC","val":0.26,"status":"T"},
+        {"nome":"LUCAS MONZÓN","pos":"ZAG","clube":"BOT","val":0.09,"status":"T"},
+        {"nome":"GANSO","pos":"MEI","clube":"FLU","val":0.89,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"ARTHUR CABRAL","pos":"ATA","clube":"BOT","val":0.37,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"ISIDRO PITTA","pos":"ATA","clube":"RBB","val":-0.26,"status":"T"},
+        {"nome":"ODAIR HELLMANN","pos":"TEC","clube":"CAP","val":0.36,"status":"T"},
+        {"nome":"MATHEUS CUNHA","pos":"GOL","clube":"INT","val":0,"status":"R"},
+        {"nome":"PEDRO GABRIEL","pos":"LAT","clube":"GRE","val":1.69,"status":"R"},
+        {"nome":"AGUIRRE","pos":"ZAG","clube":"CAP","val":0.05,"status":"R"},
+        {"nome":"ALLAN","pos":"MEI","clube":"COR","val":0,"status":"R"},
+        {"nome":"HERRERA","pos":"ATA","clube":"RBB","val":0,"status":"R"}
       ]
       }
     ]
@@ -4122,6 +4600,32 @@
         {"nome":"GABRIEL KNESOWITSCH","pos":"ZAG","clube":"MIR","val":-0.05,"status":"R"},
         {"nome":"REINIER","pos":"MEI","clube":"CAM","val":2.59,"status":"R"},
         {"nome":"CARLOS VINÍCIUS","pos":"ATA","clube":"GRE","val":-0.21,"status":"R"}
+      ]
+      },
+      {
+      "rdd": 28,
+      "val": 8.89,
+      "re": 0,
+      "pen": 0,
+      "formacao": 433,
+      "jogadores": [
+        {"nome":"ROSSI","pos":"GOL","clube":"FLA","val":0.57,"status":"T"},
+        {"nome":"MATHEUS BIDU","pos":"LAT","clube":"COR","val":0.41,"status":"T"},
+        {"nome":"VARELA","pos":"LAT","clube":"FLA","val":0.81,"status":"T"},
+        {"nome":"ARTHUR DIAS","pos":"ZAG","clube":"CAP","val":0.44,"status":"T"},
+        {"nome":"WILLIAN MACHADO","pos":"ZAG","clube":"MIR","val":1.23,"status":"T"},
+        {"nome":"ARRASCAETA","pos":"MEI","clube":"FLA","val":0.33,"status":"T"},
+        {"nome":"GARRO","pos":"MEI","clube":"COR","val":1.08,"status":"T"},
+        {"nome":"JORGINHO","pos":"MEI","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"PEDRO","pos":"ATA","clube":"FLA","val":0.83,"status":"T"},
+        {"nome":"CASSIERRA","pos":"ATA","clube":"CAM","val":1.56,"status":"T"},
+        {"nome":"CALLERI","pos":"ATA","clube":"SAO","val":0.77,"status":"T"},
+        {"nome":"FERNANDO DINIZ","pos":"TEC","clube":"COR","val":0.03,"status":"T"},
+        {"nome":"GABRIEL DELFIM","pos":"GOL","clube":"CAM","val":-0.63,"status":"R"},
+        {"nome":"MATHEUS BAHIA","pos":"LAT","clube":"INT","val":0.62,"status":"R"},
+        {"nome":"EDUARDO DOMA","pos":"ZAG","clube":"CHA","val":0.55,"status":"R"},
+        {"nome":"BERNARD","pos":"MEI","clube":"CAM","val":0.9,"status":"R"},
+        {"nome":"SOTELDO","pos":"ATA","clube":"FLU","val":0,"status":"R"}
       ]
       }
     ]
