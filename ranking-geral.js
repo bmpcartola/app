@@ -221,9 +221,9 @@
                     <div class="flex h-12 min-w-12 items-center justify-center rounded-2xl ${isLeader ? "bg-amber-400 text-amber-950" : "bg-slate-100 text-slate-600"} px-2 text-lg font-black">
                         ${team.position}º
                     </div>
-                    <div class="flex h-[108px] w-[108px] shrink-0 items-center justify-center rounded-2xl bg-white p-2 sm:h-[116px] sm:w-[116px]">
+                    <div class="flex h-[140px] w-[140px] shrink-0 items-center justify-center rounded-2xl bg-white p-2 sm:h-[151px] sm:w-[151px]">
                         <img src="${imagePath}" alt="Escudo ${name}" loading="lazy"
-                             class="ranking-geral-shield max-h-full max-w-full object-contain"
+                             class="ranking-geral-shield max-h-full max-w-full scale-[1.3] object-contain"
                              onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
                         <span class="hidden text-3xl font-black text-slate-300">${name.slice(0, 1)}</span>
                     </div>
@@ -243,7 +243,7 @@
                         </div>
                         <div>
                             <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total</p>
-                            <p class="ranking-geral-number mt-1 text-base font-black ${isLeader ? "text-amber-700" : "text-slate-900"} sm:text-lg">${formatPoints(team.totalCents)}</p>
+                            <p class="ranking-geral-number mt-1 text-[21px] font-black ${isLeader ? "text-amber-700" : "text-slate-900"} sm:text-[24px]">${formatPoints(team.totalCents)}</p>
                         </div>
                     </div>
                 </div>
