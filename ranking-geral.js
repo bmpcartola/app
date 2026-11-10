@@ -180,14 +180,18 @@
             originalOrder: index
         })).sort((a, b) => b.totalCents - a.totalCents || a.originalOrder - b.originalOrder);
 
-        let lastScore = null;
-        let lastPosition = 0;
-        ordered.forEach((team, index) => {
-            if (team.totalCents !== lastScore) {
-                lastPosition = index + 1;
-                lastScore = team.totalCents;
+        for (let index = 1; index < ordered.length; index++) {
+            if (ordered[index - 1].totalCents === ordered[index].totalCents) {
+                throw new Error(
+                    "Empate na pontuação total entre " + ordered[index - 1].name +
+                    " e " + ordered[index].name +
+                    ". O regulamento não informa um critério de desempate para o Ranking Geral."
+                );
             }
-            team.position = lastPosition;
+        }
+
+        ordered.forEach((team, index) => {
+            team.position = index + 1;
         });
 
         const allRounds = [...serieA, ...serieB].flatMap(team => team.rounds);
@@ -202,50 +206,45 @@
         };
     }
 
-    function renderTeamCard(team, index, isLeader) {
+    function renderTeamCard(team, index) {
         const name = escapeHtml(team.name);
         const imagePath = ESCUDOS_PATH + encodeURIComponent(team.name) + ".png";
-        const rankLabel = team.position + "º";
-        const leaderClasses = isLeader
+        const isLeader = index === 0;
+        const cardClasses = isLeader
             ? "border-amber-300 bg-gradient-to-br from-amber-50 via-white to-orange-50 shadow-xl shadow-amber-100/70"
             : "border-slate-200 bg-white shadow-lg shadow-slate-200/50";
 
         return `
-            <article class="ranking-geral-card relative overflow-hidden rounded-[28px] border ${leaderClasses} p-5 sm:p-6"
-                     style="animation-delay:${index * 110}ms">
-                ${isLeader ? '<div class="absolute right-0 top-0 rounded-bl-2xl bg-amber-400 px-4 py-2 text-[9px] font-black tracking-[.18em] text-amber-950">LÍDER GERAL</div>' : ""}
-                <div class="flex items-center gap-4">
-                    <div class="flex h-10 min-w-10 items-center justify-center rounded-2xl ${isLeader ? "bg-amber-400 text-amber-950" : "bg-slate-100 text-slate-500"} px-2 text-sm font-black">
-                        ${rankLabel}
+            <article class="ranking-geral-card flex flex-col items-center gap-4 rounded-[28px] border ${cardClasses} p-5 sm:flex-row sm:gap-6 sm:p-6"
+                     style="animation-delay:${index * 100}ms">
+                <div class="flex w-full items-center gap-4 sm:w-auto sm:shrink-0">
+                    <div class="flex h-12 min-w-12 items-center justify-center rounded-2xl ${isLeader ? "bg-amber-400 text-amber-950" : "bg-slate-100 text-slate-600"} px-2 text-lg font-black">
+                        ${team.position}º
                     </div>
-                    <div class="flex min-w-0 flex-1 items-center gap-3">
-                        <div class="flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-2xl bg-white/80 p-2">
-                            <img src="${imagePath}" alt="Escudo ${name}" loading="lazy"
-                                 class="ranking-geral-shield max-h-full max-w-full object-contain"
-                                 onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
-                            <span class="hidden text-2xl font-black text-slate-300">${name.slice(0, 1)}</span>
-                        </div>
-                        <div class="min-w-0 pt-3">
-                            <div class="mb-1 flex flex-wrap items-center gap-2">
-                                <span class="rounded-full bg-slate-900 px-2.5 py-1 text-[9px] font-black tracking-widest text-white">SÉRIE ${team.serie}</span>
-                            </div>
-                            <h3 class="break-words text-base font-black uppercase leading-tight tracking-tight text-slate-800 sm:text-lg">${name}</h3>
-                            <p class="mt-1 text-[9px] font-bold uppercase leading-relaxed tracking-[.11em] text-slate-400">${escapeHtml(team.qualification)}</p>
-                        </div>
+                    <div class="flex h-[108px] w-[108px] shrink-0 items-center justify-center rounded-2xl bg-white p-2 sm:h-[116px] sm:w-[116px]">
+                        <img src="${imagePath}" alt="Escudo ${name}" loading="lazy"
+                             class="ranking-geral-shield max-h-full max-w-full object-contain"
+                             onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')">
+                        <span class="hidden text-3xl font-black text-slate-300">${name.slice(0, 1)}</span>
                     </div>
+                    <h3 class="min-w-0 flex-1 break-words text-lg font-black uppercase leading-tight tracking-tight text-slate-800 sm:hidden">${name}</h3>
                 </div>
-                <div class="mt-5 grid grid-cols-3 gap-2 border-t border-slate-200/70 pt-4">
-                    <div>
-                        <p class="text-[8px] font-black uppercase tracking-wider text-slate-400">1º turno</p>
-                        <p class="mt-1 text-sm font-extrabold text-slate-700">${formatPoints(team.firstTurnCents)}</p>
-                    </div>
-                    <div>
-                        <p class="text-[8px] font-black uppercase tracking-wider text-slate-400">2º turno</p>
-                        <p class="mt-1 text-sm font-extrabold text-slate-700">${formatPoints(team.secondTurnCents)}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[8px] font-black uppercase tracking-wider text-slate-400">Total</p>
-                        <p class="ranking-geral-number mt-1 text-base font-black ${isLeader ? "text-amber-700" : "text-slate-900"}">${formatPoints(team.totalCents)}</p>
+
+                <div class="w-full min-w-0 flex-1">
+                    <h3 class="mb-4 hidden break-words text-xl font-black uppercase leading-tight tracking-tight text-slate-800 sm:block">${name}</h3>
+                    <div class="grid w-full grid-cols-3 gap-2 border-t border-slate-200/70 pt-4 sm:border-t-0 sm:pt-0">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">1º turno</p>
+                            <p class="mt-1 text-sm font-extrabold text-slate-700 sm:text-base">${formatPoints(team.firstTurnCents)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">2º turno</p>
+                            <p class="mt-1 text-sm font-extrabold text-slate-700 sm:text-base">${formatPoints(team.secondTurnCents)}</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total</p>
+                            <p class="ranking-geral-number mt-1 text-base font-black ${isLeader ? "text-amber-700" : "text-slate-900"} sm:text-lg">${formatPoints(team.totalCents)}</p>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -277,78 +276,19 @@
             }
 
             const result = buildRanking(data);
-            const leader = result.ordered[0];
-            const otherTeams = result.ordered.slice(1);
 
             main.innerHTML = `
-                <section class="mx-auto max-w-6xl space-y-6 sm:space-y-8">
-                    <header class="ranking-geral-card relative overflow-hidden rounded-[30px] bg-slate-950 px-5 py-7 text-white shadow-2xl shadow-slate-300/60 sm:px-8 sm:py-9">
-                        <div class="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full bg-amber-400/15 blur-3xl"></div>
-                        <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1.5 text-[9px] font-black tracking-[.2em] text-amber-200">
-                                    <i data-lucide="trophy" class="h-3.5 w-3.5"></i>
-                                    DISPUTA GERAL • TAÇA BMP 2026
-                                </div>
-                                <h2 class="text-2xl font-black uppercase leading-none tracking-tight sm:text-4xl">Ranking Geral</h2>
-                                <p class="mt-3 max-w-xl text-xs leading-relaxed text-slate-300 sm:text-sm">
-                                    Os quatro classificados, somando a pontuação fixa do primeiro turno com o desempenho atualizado do segundo turno.
-                                </p>
-                            </div>
-                            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:min-w-[180px]">
-                                <p class="text-[9px] font-black uppercase tracking-[.18em] text-slate-400">Apuração automática</p>
-                                <p class="mt-1 text-lg font-black text-amber-300">RDD ${result.firstRound}–${result.lastRound}</p>
-                                <p class="mt-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">Segundo turno • ${result.roundsCount} rodadas</p>
-                            </div>
-                        </div>
+                <section class="mx-auto max-w-5xl space-y-5 sm:space-y-6">
+                    <header class="ranking-geral-card py-2 text-center sm:py-4">
+                        <h2 class="text-3xl font-black uppercase leading-none tracking-tight text-slate-900 sm:text-4xl">RANKING GERAL</h2>
                     </header>
 
-                    <section class="ranking-geral-card relative overflow-hidden rounded-[30px] border border-amber-300 bg-gradient-to-br from-amber-50 via-white to-orange-50 p-5 shadow-xl shadow-amber-100/70 sm:p-7"
-                             style="animation-delay:100ms">
-                        <div class="absolute -right-8 -top-10 h-44 w-44 rounded-full bg-amber-200/40 blur-3xl"></div>
-                        <div class="relative grid items-center gap-5 sm:grid-cols-[1fr_auto]">
-                            <div class="flex items-center gap-4 sm:gap-6">
-                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-amber-950 shadow-lg shadow-amber-200">
-                                    <i data-lucide="crown" class="h-7 w-7"></i>
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="text-[9px] font-black uppercase tracking-[.22em] text-amber-700">1º lugar • líder geral</p>
-                                    <h3 class="mt-1 break-words text-2xl font-black uppercase leading-tight tracking-tight text-slate-900 sm:text-3xl">${escapeHtml(leader.name)}</h3>
-                                    <p class="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">Série ${leader.serie} • ${escapeHtml(leader.qualification)}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4 sm:justify-end">
-                                <img src="${ESCUDOS_PATH + encodeURIComponent(leader.name) + ".png"}" alt="Escudo ${escapeHtml(leader.name)}"
-                                     class="ranking-geral-shield h-20 w-20 object-contain sm:h-24 sm:w-24">
-                                <div class="min-w-[120px]">
-                                    <p class="text-[9px] font-black uppercase tracking-[.18em] text-amber-700">Pontuação total</p>
-                                    <p class="ranking-geral-number mt-1 text-3xl font-black text-amber-700 sm:text-4xl">${formatPoints(leader.totalCents)}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="relative mt-6 grid grid-cols-2 gap-3 border-t border-amber-200/80 pt-4 sm:max-w-md">
-                            <div>
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">1º turno</p>
-                                <p class="mt-1 text-lg font-black text-slate-700">${formatPoints(leader.firstTurnCents)}</p>
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">2º turno</p>
-                                <p class="mt-1 text-lg font-black text-slate-700">${formatPoints(leader.secondTurnCents)}</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        ${otherTeams.map((team, index) => renderTeamCard(team, index + 2, false)).join("")}
+                    <div class="space-y-4">
+                        ${result.ordered.map((team, index) => renderTeamCard(team, index)).join("")}
                     </div>
-
-                    <footer class="rounded-2xl border border-slate-200 bg-white/80 px-4 py-4 text-center">
-                        <p class="text-[9px] font-bold uppercase leading-relaxed tracking-[.12em] text-slate-400">
-                            Pontuação do 1º turno fixa • 2º turno calculado por VAL + RE − PEN a partir da rodada 20
-                        </p>
-                    </footer>
                 </section>
             `;
+
         } catch (error) {
             console.error("Erro ao calcular o Ranking Geral:", error);
             renderError(main, error.message || "Ocorreu um erro inesperado ao calcular o ranking.");
