@@ -130,9 +130,11 @@
                 throw new Error("Não há pontuação fixa cadastrada para " + firstChampionName + " na Série " + serie + ".");
             }
 
-            const firstChampionTeam = series[serie].find(team => team.name === firstChampionName);
+            // As séries podem ter composições diferentes entre os turnos.
+            // Localiza o campeão do 1º turno em qualquer série do JSON atual.
+            const firstChampionTeam = [...serieA, ...serieB].find(team => team.name === firstChampionName);
             if (!firstChampionTeam) {
-                throw new Error("O campeão do primeiro turno " + firstChampionName + " não foi encontrado na Série " + serie + " do JSON.");
+                throw new Error("O campeão do primeiro turno " + firstChampionName + " não foi encontrado em bd/cartola.json.");
             }
 
             qualifiers.push({
@@ -149,9 +151,11 @@
                 ? getUniquePosition(series[serie], 2, serie, "vice-campeonato necessário para transferência da vaga")
                 : secondTurnChampion;
 
-            const secondTurnPoints = fixedScores[serie][secondTurnQualifier.name];
+            // O cadastro fixo identifica a série do 1º turno; o classificado
+            // pode estar na outra série no segundo turno após a reorganização.
+            const secondTurnPoints = fixedScores.A[secondTurnQualifier.name] ?? fixedScores.B[secondTurnQualifier.name];
             if (!Number.isFinite(Number(secondTurnPoints))) {
-                throw new Error("Não há pontuação fixa do primeiro turno para " + secondTurnQualifier.name + " na Série " + serie + ".");
+                throw new Error("Não há pontuação fixa do primeiro turno para " + secondTurnQualifier.name + ".");
             }
 
             qualifiers.push({
