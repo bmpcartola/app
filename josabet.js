@@ -167,7 +167,8 @@ function renderHeaderControls() {
     if (
         bmpState.viewMode === "provaveis" ||
         bmpState.viewMode === "jogos" ||
-        bmpState.viewMode === "analise"
+        bmpState.viewMode === "analise" ||
+        bmpState.viewMode === "ranking-geral"
     ) {
         headerControls.innerHTML = "";
         return;
@@ -216,6 +217,15 @@ function renderContent() {
     if (bmpState.viewMode === "jogos") {
         if (window.carregarJogos) {
             window.carregarJogos();
+        }
+        return;
+    }
+
+    if (bmpState.viewMode === "ranking-geral") {
+        if (window.renderRankingGeral) {
+            window.renderRankingGeral();
+        } else {
+            main.innerHTML = '<div class="p-8 text-center text-slate-500">Não foi possível carregar o Ranking Geral.</div>';
         }
         return;
     }
