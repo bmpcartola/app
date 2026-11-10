@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bmp-v3';
+const CACHE_NAME = 'bmp-v4';
 const ASSETS = [
   '/',
   '/index.html',
