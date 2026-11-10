@@ -215,7 +215,17 @@
         
         </button>
 
-                <!-- INSTALAR -->
+                <!-- RANKING GERAL -->
+        <button onclick="handleSidebarClick('ranking-geral')" class="flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95 sidebar-btn" data-view="ranking-geral">
+            <div class="sidebar-icon-container w-16 h-16 rounded-[28px] flex items-center justify-center transition-all shadow-lg border-2 border-transparent bg-slate-50 text-slate-300 border border-slate-100 hover:bg-slate-100 hover:text-slate-500 hover:border-slate-200">
+                <i data-lucide="trophy" class="w-9 h-9"></i>
+            </div>
+            <span class="sidebar-label text-[12px] font-black font-jogos uppercase text-center tracking-tight transition-all text-slate-400 opacity-60">
+                RANKING GERAL
+            </span>
+        </button>
+
+        <!-- INSTALAR -->
                 <button id="btn-install"
                         onclick="if(window.installApp) window.installApp(); toggleSidebar(false);"
                         class="hidden flex flex-col items-center gap-2.5 group w-full px-4 py-2 transition-all hover:scale-110 active:scale-95">
@@ -263,6 +273,8 @@
         <script src="jogos.js"></script>
         <script src="bd/analise.js"></script>
         <script src="dadoscartola.js"></script>
+        <script src="bd/pontos-primeiro-turno.js"></script>
+        <script src="ranking-geral.js"></script>
         <script src="josabet.js"></script>
 
     <!-- APP -->
